@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PlanPilot Trip Request",
+  "description": "Input schema for trip planning workflow",
+  "type": "object",
+  "properties": {
+    "destination": {
+      "type": "string",
+      "description": "The destination city, region, or country for the trip",
+      "examples": ["Paris, France", "Tokyo", "Bali, Indonesia", "Costa Rica"]
+    },
+    "duration": {
+      "type": "string",
+      "description": "How long the trip will last",
+      "examples": ["3 days", "1 week", "10 days", "2 weeks"]
+    },
+    "budget": {
+      "type": "string",
+      "description": "Budget level for the trip",
+      "enum": ["budget", "mid-range", "luxury", ""],
+      "examples": ["budget", "mid-range", "luxury"]
+    },
+    "interests": {
+      "type": "array",
+      "description": "User's interests and preferences",
+      "items": {
+        "type": "string"
+      },
+      "examples": [
+        ["art", "food", "history"],
+        ["beaches", "hiking", "nature"],
+        ["nightlife", "shopping", "museums"]
+      ]
+    },
+    "mustVisit": {
+      "type": "string",
+      "description": "Specific places or attractions the user wants to include",
+      "examples": [
+        "Eiffel Tower, Louvre Museum",
+        "Mount Fuji",
+        "Angkor Wat"
+      ]
+    }
+  },
+  "required": ["destination", "duration"]
+}
+

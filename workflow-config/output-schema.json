@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PlanPilot Trip Plan",
+  "description": "Output schema for generated trip plans",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Descriptive name for the trip",
+      "examples": ["5-Day Paris Adventure", "Sri Lanka Honeymoon 2025"]
+    },
+    "locations": {
+      "type": "array",
+      "description": "Array of all locations in the trip",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this location"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["key-location", "accommodation", "attraction"],
+            "description": "Type of location: key-location (purple), accommodation (green), or attraction (red)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the location"
+          },
+          "description": {
+            "type": "string",
+            "description": "Additional details or notes about the location"
+          },
+          "price": {
+            "type": "string",
+            "description": "Cost information (e.g., '$150/night', '€17 entry', 'Free') or empty string"
+          },
+          "link": {
+            "type": "string",
+            "description": "URL for booking or information, or empty string"
+          },
+          "lat": {
+            "type": "number",
+            "description": "Latitude coordinate (must be number, not string)",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "lng": {
+            "type": "number",
+            "description": "Longitude coordinate (must be number, not string)",
+            "minimum": -180,
+            "maximum": 180
+          }
+        },
+        "required": ["id", "type", "name", "lat", "lng"]
+      },
+      "minItems": 1
+    },
+    "connections": {
+      "type": "array",
+      "description": "Array of connections between key locations (travel routes)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier, typically 'fromId-toId'"
+          },
+          "from": {
+            "type": "string",
+            "description": "ID of the starting key-location"
+          },
+          "to": {
+            "type": "string",
+            "description": "ID of the destination key-location"
+          }
+        },
+        "required": ["id", "from", "to"]
+      }
+    }
+  },
+  "required": ["title", "locations"],
+  "examples": [
+    {
+      "title": "5-Day Paris Art & Food Tour",
+      "locations": [
+        {
+          "id": "1",
+          "type": "key-location",
+          "name": "Paris",
+          "description": "City of Light",
+          "price": "",
+          "link": "",
+          "lat": 48.8566,
+          "lng": 2.3522
+        },
+        {
+          "id": "2",
+          "type": "accommodation",
+          "name": "Hotel Atmospheres",
+          "description": "Boutique hotel in Le Marais",
+          "price": "$180/night",
+          "link": "https://www.booking.com/hotel/fr/atmospheres.html",
+          "lat": 48.8584,
+          "lng": 2.3615
+        },
+        {
+          "id": "3",
+          "type": "attraction",
+          "name": "Louvre Museum",
+          "description": "World's largest art museum",
+          "price": "€17 entry",
+          "link": "https://www.louvre.fr",
+          "lat": 48.8606,
+          "lng": 2.3376
+        }
+      ],
+      "connections": []
+    }
+  ]
+}
+
