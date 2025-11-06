@@ -1,0 +1,11 @@
+{
+  "name": "planpilot",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {},
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}
+

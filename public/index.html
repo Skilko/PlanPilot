@@ -1,0 +1,2711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanPilot</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .sidebar-fixed-header {
+            flex-shrink: 0;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .sidebar-header-logo {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 15px auto;
+            border-radius: 22px;
+            background: white;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sidebar-header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sidebar-header-logo .logo-fallback {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+        }
+
+        .sidebar-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .info-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .info-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        .sidebar-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Custom scrollbar for sidebar */
+        .sidebar-scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-thumb {
+            background: #0891D0;
+            border-radius: 4px;
+        }
+
+        .sidebar-scrollable::-webkit-scrollbar-thumb:hover {
+            background: #0670A0;
+        }
+
+        .controls {
+            padding: 20px;
+        }
+
+        .sidebar-action-buttons {
+            padding: 15px 20px 20px 20px;
+        }
+
+        .sidebar-action-buttons .btn {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .controls > .control-group:first-child {
+            margin-top: 0;
+        }
+
+        .controls > button:first-child {
+            margin-top: 0;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .control-group input,
+        .control-group select,
+        .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus,
+        .control-group textarea:focus {
+            outline: none;
+            border-color: #0891D0;
+        }
+
+        .control-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .control-group input[type="file"] {
+            padding: 8px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .control-group input[type="file"]::file-selector-button {
+            padding: 8px 16px;
+            border: 2px solid #0891D0;
+            border-radius: 4px;
+            background: #0891D0;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: all 0.3s;
+        }
+
+        .control-group input[type="file"]::file-selector-button:hover {
+            background: #0670A0;
+            border-color: #0670A0;
+        }
+
+        .control-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 167, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ee5a6f;
+        }
+
+        .btn-danger:disabled {
+            background: #ccc;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-danger:disabled:hover {
+            background: #ccc;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .items-list {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .items-list h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+            margin-top: 0;
+        }
+
+        .item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 4px solid #0891D0;
+        }
+
+        .item.accommodation {
+            border-left-color: #4CAF50;
+        }
+
+        .item.attraction {
+            border-left-color: #FFA726;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .item-type {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: white;
+            color: #0891D0;
+            font-weight: 600;
+        }
+
+        .item.accommodation .item-type {
+            color: #4CAF50;
+        }
+
+        .item.attraction .item-type {
+            color: #FFA726;
+        }
+
+        .item-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .item-description a {
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        .item-description a:hover {
+            color: #0670A0;
+            text-decoration: underline;
+        }
+
+        .item-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .item-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer !important;
+            background: white;
+            color: #0891D0;
+            font-weight: 600;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+
+        .item-btn:hover {
+            background: #0891D0;
+            color: white;
+        }
+
+        .item-btn.delete {
+            color: #ff4757;
+        }
+
+        .item-btn.delete:hover {
+            background: #ff4757;
+            color: white;
+        }
+
+        .item-btn:active {
+            transform: scale(0.95);
+        }
+
+        #map {
+            flex: 1;
+            position: relative;
+        }
+
+        .map-title {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            padding: 10px 45px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(8, 145, 208, 0.35);
+            z-index: 1000;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            max-width: 70%;
+            text-align: center;
+            display: none;
+            letter-spacing: 0.3px;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-title::before {
+            content: '✈️';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            animation: plane-fly 3s ease-in-out infinite;
+        }
+
+        .map-title::after {
+            content: '🌍';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            animation: globe-spin 4s linear infinite;
+        }
+
+        @keyframes plane-fly {
+            0%, 100% {
+                transform: translateY(-50%) translateX(0);
+            }
+            50% {
+                transform: translateY(-50%) translateX(5px);
+            }
+        }
+
+        @keyframes globe-spin {
+            0%, 100% {
+                transform: translateY(-50%) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-50%) rotate(20deg);
+            }
+        }
+
+        .map-title.visible {
+            display: block;
+            animation: titleBounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes titleBounceIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.3);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        .map-title:hover {
+            box-shadow: 0 8px 25px rgba(8, 145, 208, 0.5);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        /* Leaflet Layer Control Styling */
+        .leaflet-control-layers {
+            border-radius: 8px !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+            border: none !important;
+            margin-top: 10px !important;
+            margin-right: 10px !important;
+        }
+
+        .leaflet-top.leaflet-right {
+            z-index: 1001 !important;
+        }
+
+        .leaflet-control-layers-expanded {
+            padding: 12px 15px !important;
+            background: white !important;
+            min-width: 160px !important;
+        }
+
+        .leaflet-control-layers-expanded::before {
+            content: "Map Style";
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .leaflet-control-layers-list {
+            margin-bottom: 0 !important;
+        }
+
+        .leaflet-control-layers-base label {
+            padding: 8px 0 !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            color: #333 !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .leaflet-control-layers-base label:hover {
+            color: #0891D0 !important;
+        }
+
+        .leaflet-control-layers-base input[type="radio"] {
+            margin-right: 8px !important;
+            cursor: pointer !important;
+            accent-color: #0891D0 !important;
+        }
+
+        .leaflet-control-layers-base input[type="radio"]:checked + span {
+            color: #0891D0 !important;
+            font-weight: 600 !important;
+        }
+
+        .leaflet-control-layers-base label:has(input:checked) {
+            background: #E3F2FD !important;
+            margin: 0 -8px !important;
+            padding: 8px 8px !important;
+            border-radius: 4px !important;
+        }
+
+        .filter-control {
+            position: absolute;
+            bottom: 30px;
+            left: 380px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .filter-control h4 {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .filter-item:hover {
+            background: #f5f5f5;
+        }
+
+        .filter-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-item input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: #0891D0;
+        }
+
+        .filter-item .legend-color {
+            margin-right: 10px;
+        }
+
+        .filter-item label {
+            cursor: pointer;
+            flex: 1;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-item-count {
+            font-size: 11px;
+            color: #666;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 180px;
+        }
+
+        .legend h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .legend-color.key-location {
+            background: #0891D0;
+        }
+
+        .legend-color.accommodation {
+            background: #4CAF50;
+        }
+
+        .legend-color.attraction {
+            background: #FFA726;
+        }
+
+        .custom-marker {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        /* Leaflet Popup Styling */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 0 !important;
+            line-height: 1.6 !important;
+            min-width: 280px !important;
+            max-width: 320px !important;
+        }
+
+        .leaflet-popup-tip {
+            box-shadow: 0 3px 14px rgba(0,0,0,0.2) !important;
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            padding: 15px;
+            color: white;
+        }
+
+        .popup-header.accommodation {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+        }
+
+        .popup-header.attraction {
+            background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+        }
+
+        .popup-header-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            line-height: 1.3;
+            padding-right: 30px;
+        }
+
+        .popup-header-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            opacity: 0.9;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        .popup-body {
+            padding: 18px;
+            background: white;
+        }
+
+        .popup-section {
+            margin-bottom: 14px;
+        }
+
+        .popup-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .popup-section:first-child {
+            margin-bottom: 16px;
+        }
+
+        .popup-description {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .popup-info-row {
+            display: flex;
+            align-items: flex-start;
+            font-size: 14px;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .popup-info-label {
+            font-weight: 600;
+            color: #333;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .popup-info-value {
+            color: #555;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .popup-button-container {
+            padding-top: 0;
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .popup-body > .popup-section:only-child {
+            margin-bottom: 0;
+        }
+
+        /* Leaflet popup close button styling */
+        .leaflet-popup-close-button {
+            color: white !important;
+            font-size: 22px !important;
+            padding: 4px 8px !important;
+            opacity: 0.85 !important;
+            transition: all 0.2s !important;
+            right: 5px !important;
+            top: 5px !important;
+            width: 30px !important;
+            height: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+
+        .leaflet-popup-close-button:hover {
+            opacity: 1 !important;
+            background: rgba(255, 255, 255, 0.25) !important;
+            border-radius: 6px !important;
+            transform: scale(1.1) !important;
+        }
+
+        .leaflet-popup-close-button span {
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Popup animation */
+        .leaflet-popup {
+            animation: popupSlideUp 0.3s ease-out;
+        }
+
+        @keyframes popupSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #editTripContainer {
+            animation: slideDown 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 2000px;
+            }
+        }
+
+        .connection-mode {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .connection-mode p {
+            font-size: 13px;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-bottom: 10px;
+        }
+
+        .data-actions button {
+            flex: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 2px solid #e0e0e0;
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            border-radius: 8px 8px 0 0;
+            flex-shrink: 0;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: white;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Custom scrollbar styling for modal body */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #0891D0;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #0670A0;
+        }
+
+        .modal-body .control-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-body .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-body .control-group label {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            padding: 20px 25px;
+            border-top: 2px solid #e0e0e0;
+            background: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+            flex-shrink: 0;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        #infoModal .modal-content {
+            max-width: 700px;
+            max-height: 90vh;
+        }
+
+        #infoModal .modal-actions {
+            justify-content: center;
+        }
+
+        #infoModal .modal-actions .btn {
+            flex: 0 1 auto;
+            min-width: 150px;
+        }
+
+        #confirmModal .modal-content {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        #planningModal .modal-content {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        #planningModal ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #planningModal ul li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        #planningModal ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2ecc71;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+            background: white;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+        }
+
+        .loading-content h3 {
+            margin: 20px 0 10px 0;
+            color: #0891D0;
+            font-size: 20px;
+        }
+
+        .loading-content p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0891D0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-content > p:first-child {
+            margin-top: 0;
+        }
+
+        .info-content h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #0891D0;
+            font-size: 16px;
+        }
+
+        .info-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .info-content code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #e74c3c;
+        }
+
+        .info-content pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+            border: 1px solid #e0e0e0;
+        }
+
+        .info-content ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        .info-content li {
+            margin-bottom: 8px;
+        }
+
+        .info-content .note {
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-fixed-header">
+            <div class="sidebar-header">
+                <div class="sidebar-header-logo" id="logoContainer">
+                    <img id="logoImage" src="planpilot.png" alt="PlanPilot Logo" onerror="showLogoFallback()">
+                </div>
+                <h1>
+                    <span>PlanPilot</span>
+                    <button class="info-btn" onclick="openInfoModal()" title="Format Information">i</button>
+                </h1>
+                <p>Plan your perfect getaway</p>
+            </div>
+            
+            <div class="sidebar-action-buttons">
+                <button class="btn btn-primary" onclick="openPlanningModal()" style="margin-bottom: 15px;">
+                    🚀 Start Planning
+                </button>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="exportData()" style="flex: 1;">📤 Export</button>
+                    <button class="btn btn-secondary" onclick="importData()" style="flex: 1;">📥 Import</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-scrollable">
+            <div class="controls">
+                <button class="btn btn-secondary" onclick="toggleEditMode()" style="margin-bottom: 20px;">
+                    <span id="editModeIcon">✏️</span> <span id="editModeText">Edit Trip</span>
+                </button>
+
+                <div id="editTripContainer" style="display: none;">
+                    <div class="control-group">
+                        <label for="tripTitle">Trip Title</label>
+                        <input type="text" id="tripTitle" placeholder="e.g., Sri Lanka Honeymoon" oninput="updateTripTitle()">
+                        <small>This title will display on your map</small>
+                    </div>
+
+                    <div style="border-top: 2px solid #e0e0e0; margin: 20px 0;"></div>
+
+                    <div id="connectionMode" class="connection-mode" style="display: none;">
+                        <p><strong>Connection Mode Active</strong><br>Click on two Key Locations to connect them with a line.</p>
+                        <button class="btn btn-secondary" onclick="cancelConnectionMode()">Cancel</button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="locationType">Location Type</label>
+                        <select id="locationType">
+                            <option value="key-location">Key Location</option>
+                            <option value="accommodation">Accommodation</option>
+                            <option value="attraction">Attraction</option>
+                        </select>
+                    </div>
+
+            <div class="control-group">
+                <label for="locationName">Name</label>
+                <input type="text" id="locationName" placeholder="e.g., Eiffel Tower">
+            </div>
+
+            <div class="control-group">
+                <label for="locationDescription">Description (Optional)</label>
+                <textarea id="locationDescription" placeholder="Add notes about this location..."></textarea>
+            </div>
+
+            <div class="control-group">
+                <label for="locationPrice">Price (Optional)</label>
+                <input type="text" id="locationPrice" placeholder="e.g., $150/night or €25 entry">
+            </div>
+
+            <div class="control-group">
+                <label for="locationLink">Link (Optional)</label>
+                <input type="url" id="locationLink" placeholder="https://example.com/booking">
+                <small>Website, booking link, or reference URL</small>
+            </div>
+
+            <div class="control-group">
+                <label for="locationCoords">Coordinates</label>
+                <input type="text" id="locationCoords" placeholder="Click on map or enter lat, lng" readonly>
+                <small>Click anywhere on the map to set coordinates</small>
+            </div>
+
+                    <button class="btn btn-primary" onclick="addLocation()">Add to Map</button>
+                    <button class="btn btn-secondary" onclick="startConnectionMode()">Connect Key Locations</button>
+
+                    <div style="border-top: 2px solid #e0e0e0; margin: 20px 0;"></div>
+                </div>
+
+                <div class="items-list">
+                <h3>Your Locations</h3>
+                <div id="locationsList"></div>
+            </div>
+
+            <div class="data-actions">
+                <button class="btn btn-danger" id="clearAllBtn" onclick="clearAll()">🗑️ Clear All</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map">
+        <div id="mapTitle" class="map-title"></div>
+    </div>
+
+    <div class="filter-control">
+        <h4>🔍 Show/Hide</h4>
+        <div class="filter-item" onclick="toggleFilter('filterKeyLocation')">
+            <input type="checkbox" id="filterKeyLocation" checked onchange="applyFilters()" onclick="event.stopPropagation()">
+            <div class="legend-color key-location">📍</div>
+            <label for="filterKeyLocation">
+                <span>Key Locations</span>
+                <span class="filter-item-count" id="countKeyLocation">0</span>
+            </label>
+        </div>
+        <div class="filter-item" onclick="toggleFilter('filterAccommodation')">
+            <input type="checkbox" id="filterAccommodation" checked onchange="applyFilters()" onclick="event.stopPropagation()">
+            <div class="legend-color accommodation">🏨</div>
+            <label for="filterAccommodation">
+                <span>Accommodation</span>
+                <span class="filter-item-count" id="countAccommodation">0</span>
+            </label>
+        </div>
+        <div class="filter-item" onclick="toggleFilter('filterAttraction')">
+            <input type="checkbox" id="filterAttraction" checked onchange="applyFilters()" onclick="event.stopPropagation()">
+            <div class="legend-color attraction">⭐</div>
+            <label for="filterAttraction">
+                <span>Attractions</span>
+                <span class="filter-item-count" id="countAttraction">0</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="legend">
+        <h4>Legend</h4>
+        <div class="legend-item">
+            <div class="legend-color key-location">📍</div>
+            <span>Key Location</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color accommodation">🏨</div>
+            <span>Accommodation</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color attraction">⭐</div>
+            <span>Attraction</span>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📥 Import Data</h2>
+            </div>
+            <div class="modal-body">
+                <div class="control-group">
+                    <label>Option 1: Select JSON File</label>
+                    <input type="file" id="importFile" accept=".json" style="margin-bottom: 10px;" onchange="clearImportText()">
+                    <small>Choose a .json file from your computer</small>
+                </div>
+                <div style="text-align: center; margin: 15px 0; color: #999;">— OR —</div>
+                <div class="control-group">
+                    <label for="importText">Option 2: Paste JSON Data</label>
+                    <textarea id="importText" style="min-height: 150px;" oninput="clearImportFile()"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="processImport()">Import</button>
+                <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="confirmTitle">⚠️ Confirm Action</h2>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage" style="font-size: 14px; color: #333; line-height: 1.6;"></p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="confirmYes">Yes, Continue</button>
+                <button class="btn btn-secondary" id="confirmNo">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planning Modal -->
+    <div id="planningModal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2>🚀 Plan Your Trip</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 14px; color: #555; margin-bottom: 20px;">
+                    Tell us about your trip and our AI will research and generate a complete itinerary for you!
+                </p>
+                
+                <form id="tripPlanningForm" onsubmit="handlePlanningFormSubmit(event)">
+                    <div class="control-group">
+                        <label for="planDestination">Destination *</label>
+                        <input type="text" id="planDestination" required placeholder="e.g., Paris, France" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="planDuration">Trip Duration *</label>
+                        <input type="text" id="planDuration" required placeholder="e.g., 5 days, 1 week" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="planBudget">Budget Level</label>
+                        <select id="planBudget" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">Select budget (optional)</option>
+                            <option value="budget">Budget-friendly</option>
+                            <option value="mid-range">Mid-range</option>
+                            <option value="luxury">Luxury</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="planInterests">Interests (comma-separated)</label>
+                        <input type="text" id="planInterests" placeholder="e.g., art, food, history, beaches" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="planMustVisit">Must-Visit Locations</label>
+                        <textarea id="planMustVisit" rows="2" placeholder="Specific places you want to include (optional)" 
+                                  style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div class="note" style="margin-top: 15px; font-size: 12px;">
+                        <strong>✨ Note:</strong> The AI will research accommodations, attractions, prices, and coordinates to create your complete trip plan.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" form="tripPlanningForm" class="btn btn-primary">
+                    ✨ Generate Trip Plan
+                </button>
+                <button class="btn btn-secondary" onclick="closePlanningModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3 id="loadingTitle">Generating Your Trip Plan...</h3>
+            <p id="loadingMessage">Researching destinations and gathering information</p>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 JSON Format Guide</h2>
+            </div>
+            <div class="modal-body">
+                <div style="padding: 0 0 15px 0; margin: -10px -10px 20px -10px; border-bottom: 2px solid #e0e0e0;">
+                    <button class="btn btn-secondary" onclick="copyGuideToClipboard()" style="width: 100%; margin: 0;">📋 Copy Guide for AI</button>
+                    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666; text-align: center;">Copy this guide to your clipboard and paste it into an AI assistant to generate custom JSON files</p>
+                </div>
+                <div class="info-content">
+                <p>Use this guide to create or import location data for the PlanPilot. This format is designed for easy data entry and AI agent integration.</p>
+                
+                <h3>Required JSON Structure</h3>
+                <p>The JSON file must contain a <code>locations</code> array and optionally a <code>title</code> and <code>connections</code> fields:</p>
+                
+                <pre>{
+  "title": "Your Trip Name",
+  "locations": [ ... ],
+  "connections": [ ... ]
+}</pre>
+
+                <h3>Title Field (Optional)</h3>
+                <ul>
+                    <li><code>title</code> (string, optional): The name of your trip or holiday</li>
+                    <li>This will be displayed prominently at the top center of the map</li>
+                    <li>Example: "Sri Lanka Honeymoon", "European Adventure 2025"</li>
+                </ul>
+
+                <h3>Location Object Format</h3>
+                <p>Each location in the <code>locations</code> array must have the following properties:</p>
+                
+                <ul>
+                    <li><code>id</code> (string, required): Unique identifier for the location</li>
+                    <li><code>type</code> (string, required): Must be one of:
+                        <ul>
+                            <li><code>"key-location"</code> - Major destinations (purple markers)</li>
+                            <li><code>"accommodation"</code> - Hotels, rentals (green markers)</li>
+                            <li><code>"attraction"</code> - Places to visit (red markers)</li>
+                        </ul>
+                    </li>
+                    <li><code>name</code> (string, required): Display name of the location</li>
+                    <li><code>description</code> (string, optional): Additional notes or details</li>
+                    <li><code>price</code> (string, optional): Cost information (e.g., "$150/night", "€25 entry")</li>
+                    <li><code>link</code> (string, optional): URL for booking, website, or reference</li>
+                    <li><code>lat</code> (number, required): Latitude coordinate (-90 to 90)</li>
+                    <li><code>lng</code> (number, required): Longitude coordinate (-180 to 180)</li>
+                </ul>
+
+                <h3>Connection Object Format</h3>
+                <p>Each connection in the <code>connections</code> array connects two Key Locations:</p>
+                
+                <ul>
+                    <li><code>id</code> (string, required): Unique identifier (typically "fromId-toId")</li>
+                    <li><code>from</code> (string, required): ID of the first Key Location</li>
+                    <li><code>to</code> (string, required): ID of the second Key Location</li>
+                </ul>
+
+                <div class="note">
+                    <strong>⚠️ Note:</strong> Connections only work between locations with type <code>"key-location"</code>. Make sure both <code>from</code> and <code>to</code> reference valid Key Location IDs.
+                </div>
+
+                <h3>Complete Example</h3>
+                <pre>{
+  "title": "Paris & Rome Adventure",
+  "locations": [
+    {
+      "id": "1",
+      "type": "key-location",
+      "name": "Paris",
+      "description": "City of Light, arrival point",
+      "price": "",
+      "link": "",
+      "lat": 48.8566,
+      "lng": 2.3522
+    },
+    {
+      "id": "2",
+      "type": "accommodation",
+      "name": "Hotel de Paris",
+      "description": "5-star hotel near Eiffel Tower",
+      "price": "$250/night",
+      "link": "https://booking.com/hotel-de-paris",
+      "lat": 48.8584,
+      "lng": 2.2945
+    },
+    {
+      "id": "3",
+      "type": "attraction",
+      "name": "Louvre Museum",
+      "description": "World's largest art museum",
+      "price": "€17 entry",
+      "link": "https://louvre.fr",
+      "lat": 48.8606,
+      "lng": 2.3376
+    },
+    {
+      "id": "4",
+      "type": "key-location",
+      "name": "Rome",
+      "description": "Next destination",
+      "price": "",
+      "link": "",
+      "lat": 41.9028,
+      "lng": 12.4964
+    }
+  ],
+  "connections": [
+    {
+      "id": "1-4",
+      "from": "1",
+      "to": "4"
+    }
+  ]
+}</pre>
+
+                <h3>AI Agent Instructions</h3>
+                <p>When creating a JSON file for this PlanPilot:</p>
+                <ol>
+                    <li>Add a descriptive <code>title</code> field that summarizes the trip (e.g., "Sri Lanka Honeymoon", "Summer Europe Tour 2025")</li>
+                    <li>Ensure all required fields are present for each location</li>
+                    <li>Use consistent ID formats (strings, unique)</li>
+                    <li>Verify coordinates are valid (use geocoding if needed)</li>
+                    <li>Only create connections between <code>"key-location"</code> types</li>
+                    <li>Include helpful descriptions to provide context</li>
+                    <li>Add price and link information where relevant for accommodation and attractions</li>
+                    <li>Validate JSON syntax before importing</li>
+                </ol>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeInfoModal()">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Initialize map with zoom restrictions
+        const map = L.map('map', {
+            center: [20, 0],
+            zoom: 2,
+            minZoom: 2,
+            maxZoom: 18,
+            worldCopyJump: true
+        });
+        
+        // Define different map layers - allow horizontal wrapping
+        const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+            noWrap: false
+        });
+
+        const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri',
+            maxZoom: 19,
+            noWrap: false
+        });
+
+        const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenTopoMap contributors',
+            maxZoom: 17,
+            noWrap: false
+        });
+
+        const cartoLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap, © CARTO',
+            maxZoom: 19,
+            noWrap: false
+        });
+
+        const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap, © CARTO',
+            maxZoom: 19,
+            noWrap: false
+        });
+
+        // Add default layer (Light map)
+        cartoLight.addTo(map);
+
+        // Create layer control
+        const baseMaps = {
+            "☀️ Light": cartoLight,
+            "🗺️ Street": streetMap,
+            "🛰️ Satellite": satelliteMap,
+            "⛰️ Topographic": topoMap,
+            "🌙 Dark": cartoDark
+        };
+
+        L.control.layers(baseMaps, null, {
+            position: 'topright',
+            collapsed: false
+        }).addTo(map);
+
+        // Data structure
+        let tripTitle = '';
+        let locations = [];
+        let connections = [];
+        let markers = {};
+        let connectionLines = {};
+        let selectedCoords = null;
+
+        // Connection mode state
+        let connectionMode = false;
+        let firstConnectionPoint = null;
+
+        // Logo fallback if image doesn't load
+        function showLogoFallback() {
+            const logoContainer = document.getElementById('logoContainer');
+            const logoImage = document.getElementById('logoImage');
+            
+            // Hide the broken image
+            if (logoImage) {
+                logoImage.style.display = 'none';
+            }
+            
+            // Create fallback orange circle
+            const fallback = document.createElement('div');
+            fallback.className = 'logo-fallback';
+            logoContainer.appendChild(fallback);
+            
+            console.log('Logo image not found, using orange circle fallback');
+        }
+
+        // Update trip title display
+        function updateTripTitle() {
+            tripTitle = document.getElementById('tripTitle').value.trim();
+            const mapTitleEl = document.getElementById('mapTitle');
+            
+            if (tripTitle) {
+                mapTitleEl.textContent = tripTitle;
+                mapTitleEl.classList.add('visible');
+            } else {
+                mapTitleEl.classList.remove('visible');
+            }
+            
+            saveData();
+        }
+
+        // Toggle edit mode
+        let editModeActive = false;
+        function toggleEditMode() {
+            editModeActive = !editModeActive;
+            const container = document.getElementById('editTripContainer');
+            const icon = document.getElementById('editModeIcon');
+            const text = document.getElementById('editModeText');
+            const button = event.target.closest('button');
+            
+            if (editModeActive) {
+                container.style.display = 'block';
+                icon.textContent = '✖️';
+                text.textContent = 'Hide Editor';
+                button.style.background = '#E3F2FD';
+                button.style.border = '2px solid #0891D0';
+            } else {
+                container.style.display = 'none';
+                icon.textContent = '✏️';
+                text.textContent = 'Edit Trip';
+                button.style.background = '';
+                button.style.border = '';
+            }
+        }
+
+        // Color scheme - matching PlanPilot brand colors
+        const markerColors = {
+            'key-location': '#0891D0',
+            'accommodation': '#4CAF50',
+            'attraction': '#FFA726'
+        };
+
+        // Icon mapping
+        const markerIcons = {
+            'key-location': '📍',
+            'accommodation': '🏨',
+            'attraction': '⭐'
+        };
+
+        // Custom marker icon
+        function createCustomIcon(type) {
+            const color = markerColors[type];
+            const icon = markerIcons[type];
+            return L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="
+                    width: 36px;
+                    height: 36px;
+                    background-color: ${color};
+                    border: 3px solid white;
+                    border-radius: 50%;
+                    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 18px;
+                ">${icon}</div>`,
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -18]
+            });
+        }
+
+        // Map click handler
+        map.on('click', function(e) {
+            if (connectionMode) {
+                return; // Don't set coordinates in connection mode
+            }
+            selectedCoords = e.latlng;
+            document.getElementById('locationCoords').value = `${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
+        });
+
+        // Add location
+        function addLocation() {
+            const type = document.getElementById('locationType').value;
+            const name = document.getElementById('locationName').value.trim();
+            const description = document.getElementById('locationDescription').value.trim();
+            const price = document.getElementById('locationPrice').value.trim();
+            const link = document.getElementById('locationLink').value.trim();
+            
+            if (!name) {
+                alert('Please enter a location name');
+                return;
+            }
+            
+            if (!selectedCoords) {
+                alert('Please click on the map to set coordinates');
+                return;
+            }
+
+            const location = {
+                id: Date.now().toString(),
+                type: type,
+                name: name,
+                description: description,
+                price: price,
+                link: link,
+                lat: selectedCoords.lat,
+                lng: selectedCoords.lng
+            };
+
+            locations.push(location);
+            addMarker(location);
+            updateLocationsList();
+            updateFilterCounts();
+            saveData();
+            
+            // Clear form
+            document.getElementById('locationName').value = '';
+            document.getElementById('locationDescription').value = '';
+            document.getElementById('locationPrice').value = '';
+            document.getElementById('locationLink').value = '';
+            document.getElementById('locationCoords').value = '';
+            selectedCoords = null;
+        }
+
+        // Add marker to map
+        function addMarker(location) {
+            const marker = L.marker([location.lat, location.lng], {
+                icon: createCustomIcon(location.type)
+            });
+
+            // Only add to map if filter allows it
+            if (visibilityFilters[location.type]) {
+                marker.addTo(map);
+            }
+
+            // Get icon for location type
+            const typeIcon = markerIcons[location.type];
+            const typeName = location.type.replace('-', ' ').toUpperCase();
+            
+            let popupContent = `
+                <div>
+                    <div class="popup-header ${location.type}">
+                        <div class="popup-header-title">${typeIcon} ${location.name}</div>
+                        <div class="popup-header-type">${typeName}</div>
+                    </div>
+                    <div class="popup-body">
+                        ${location.description ? `
+                            <div class="popup-section">
+                                <p class="popup-description">${location.description}</p>
+                            </div>
+                        ` : ''}
+                        ${location.price ? `
+                            <div class="popup-section">
+                                <div class="popup-info-row">
+                                    <div class="popup-info-label">💰 Price:</div>
+                                    <div class="popup-info-value">${location.price}</div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${location.link ? `
+                            <div class="popup-section">
+                                <a href="${location.link}" target="_blank" rel="noopener noreferrer" 
+                                   style="display: block;
+                                          text-align: center;
+                                          background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+                                          color: white;
+                                          padding: 12px 20px;
+                                          border-radius: 8px;
+                                          text-decoration: none;
+                                          font-size: 14px;
+                                          font-weight: 600;
+                                          transition: all 0.3s;
+                                          box-shadow: 0 2px 8px rgba(255, 167, 38, 0.3);"
+                                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 167, 38, 0.5)';"
+                                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 167, 38, 0.3)';">
+                                    🔗 Visit Website
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent, {
+                maxWidth: 350,
+                className: 'custom-popup'
+            });
+            
+            // Handle connection mode clicks
+            marker.on('click', function() {
+                if (connectionMode && location.type === 'key-location') {
+                    handleConnectionClick(location);
+                }
+            });
+
+            markers[location.id] = marker;
+        }
+
+        // Connection mode
+        function startConnectionMode() {
+            const keyLocations = locations.filter(loc => loc.type === 'key-location');
+            if (keyLocations.length < 2) {
+                alert('You need at least 2 Key Locations to create connections');
+                return;
+            }
+            connectionMode = true;
+            firstConnectionPoint = null;
+            document.getElementById('connectionMode').style.display = 'block';
+            map.getContainer().style.cursor = 'crosshair';
+        }
+
+        function cancelConnectionMode() {
+            connectionMode = false;
+            firstConnectionPoint = null;
+            document.getElementById('connectionMode').style.display = 'none';
+            map.getContainer().style.cursor = '';
+        }
+
+        function handleConnectionClick(location) {
+            if (!firstConnectionPoint) {
+                firstConnectionPoint = location;
+                markers[location.id].setZIndexOffset(1000);
+                alert(`Selected: ${location.name}\nNow click on another Key Location to connect them.`);
+            } else {
+                if (firstConnectionPoint.id === location.id) {
+                    alert('Please select a different location');
+                    return;
+                }
+                
+                createConnection(firstConnectionPoint, location);
+                markers[firstConnectionPoint.id].setZIndexOffset(0);
+                cancelConnectionMode();
+            }
+        }
+
+        function createConnection(loc1, loc2) {
+            const connectionId = `${loc1.id}-${loc2.id}`;
+            const reverseConnectionId = `${loc2.id}-${loc1.id}`;
+            
+            // Check if connection already exists
+            if (connections.find(c => c.id === connectionId || c.id === reverseConnectionId)) {
+                alert('Connection already exists between these locations');
+                return;
+            }
+
+            const connection = {
+                id: connectionId,
+                from: loc1.id,
+                to: loc2.id
+            };
+
+            connections.push(connection);
+            drawConnection(connection);
+            saveData();
+        }
+
+        function drawConnection(connection) {
+            const fromLoc = locations.find(l => l.id === connection.from);
+            const toLoc = locations.find(l => l.id === connection.to);
+
+            if (!fromLoc || !toLoc) return;
+
+            const line = L.polyline(
+                [[fromLoc.lat, fromLoc.lng], [toLoc.lat, toLoc.lng]],
+                {
+                    color: '#0891D0',
+                    weight: 3,
+                    opacity: 0.7,
+                    dashArray: '10, 10'
+                }
+            ).addTo(map);
+
+            connectionLines[connection.id] = line;
+        }
+
+        // Filter visibility state
+        let visibilityFilters = {
+            'key-location': true,
+            'accommodation': true,
+            'attraction': true
+        };
+
+        // Toggle filter checkbox when clicking on row
+        function toggleFilter(checkboxId) {
+            const checkbox = document.getElementById(checkboxId);
+            checkbox.checked = !checkbox.checked;
+            applyFilters();
+        }
+
+        // Update filter counts
+        function updateFilterCounts() {
+            const counts = {
+                'key-location': 0,
+                'accommodation': 0,
+                'attraction': 0
+            };
+
+            locations.forEach(loc => {
+                counts[loc.type]++;
+            });
+
+            document.getElementById('countKeyLocation').textContent = counts['key-location'];
+            document.getElementById('countAccommodation').textContent = counts['accommodation'];
+            document.getElementById('countAttraction').textContent = counts['attraction'];
+        }
+
+        // Apply filters to markers and list
+        function applyFilters() {
+            // Update filter state
+            visibilityFilters['key-location'] = document.getElementById('filterKeyLocation').checked;
+            visibilityFilters['accommodation'] = document.getElementById('filterAccommodation').checked;
+            visibilityFilters['attraction'] = document.getElementById('filterAttraction').checked;
+
+            console.log('Applying filters:', visibilityFilters);
+
+            // Update map markers visibility
+            locations.forEach(loc => {
+                const marker = markers[loc.id];
+                if (marker) {
+                    if (visibilityFilters[loc.type]) {
+                        marker.addTo(map);
+                    } else {
+                        map.removeLayer(marker);
+                    }
+                }
+            });
+
+            // Update sidebar list
+            updateLocationsList();
+            
+            // Update counts
+            updateFilterCounts();
+        }
+
+        // Update clear all button state
+        function updateClearAllButton() {
+            const clearAllBtn = document.getElementById('clearAllBtn');
+            if (clearAllBtn) {
+                if (locations.length === 0) {
+                    clearAllBtn.disabled = true;
+                } else {
+                    clearAllBtn.disabled = false;
+                }
+            }
+        }
+
+        // Update locations list
+        function updateLocationsList() {
+            console.log('updateLocationsList called, locations count:', locations.length);
+            const list = document.getElementById('locationsList');
+            
+            if (!list) {
+                console.error('locationsList element not found!');
+                return;
+            }
+            
+            if (locations.length === 0) {
+                console.log('No locations, showing empty message');
+                list.innerHTML = '<p style="color: #999; font-size: 13px;">No locations added yet</p>';
+                console.log('List innerHTML updated to empty message');
+                updateClearAllButton();
+                return;
+            }
+
+            // Filter locations based on visibility filters
+            const filteredLocations = locations.filter(loc => visibilityFilters[loc.type]);
+            
+            if (filteredLocations.length === 0) {
+                list.innerHTML = '<p style="color: #999; font-size: 13px;">No locations match current filters</p>';
+                updateClearAllButton();
+                return;
+            }
+
+            console.log('Generating HTML for', filteredLocations.length, 'filtered locations');
+            const html = filteredLocations.map(loc => `
+                <div class="item ${loc.type}" data-location-id="${loc.id}">
+                    <div class="item-header">
+                        <span class="item-name">${loc.name}</span>
+                        <span class="item-type">${loc.type.replace('-', ' ')}</span>
+                    </div>
+                    ${loc.description ? `<div class="item-description">${loc.description}</div>` : ''}
+                    ${loc.price ? `<div class="item-description" style="margin-top: 6px;"><strong>💰</strong> ${loc.price}</div>` : ''}
+                    ${loc.link ? `<div class="item-description" style="margin-top: 6px;"><a href="${loc.link}" target="_blank" rel="noopener noreferrer" style="color: #0891D0; text-decoration: none; font-size: 12px;">🔗 View Link</a></div>` : ''}
+                    <div class="item-actions">
+                        <button class="item-btn view-btn" data-id="${loc.id}">View</button>
+                        <button class="item-btn delete delete-btn" data-id="${loc.id}">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            list.innerHTML = html;
+            console.log('List innerHTML updated with', filteredLocations.length, 'location items');
+            updateClearAllButton();
+        }
+
+        // Focus on location
+        function focusLocation(id) {
+            const location = locations.find(l => l.id === id);
+            if (location) {
+                map.setView([location.lat, location.lng], 12);
+                markers[id].openPopup();
+            }
+        }
+
+        // Custom confirm dialog
+        function showConfirm(message, title = 'Confirm Action') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const titleEl = document.getElementById('confirmTitle');
+                const messageEl = document.getElementById('confirmMessage');
+                const yesBtn = document.getElementById('confirmYes');
+                const noBtn = document.getElementById('confirmNo');
+                
+                // Add emoji if not present
+                if (!title.includes('⚠️')) {
+                    titleEl.textContent = '⚠️ ' + title;
+                } else {
+                    titleEl.textContent = title;
+                }
+                messageEl.textContent = message;
+                modal.classList.add('active');
+                
+                function cleanup() {
+                    modal.classList.remove('active');
+                    yesBtn.removeEventListener('click', onYes);
+                    noBtn.removeEventListener('click', onNo);
+                }
+                
+                function onYes() {
+                    cleanup();
+                    resolve(true);
+                }
+                
+                function onNo() {
+                    cleanup();
+                    resolve(false);
+                }
+                
+                yesBtn.addEventListener('click', onYes);
+                noBtn.addEventListener('click', onNo);
+            });
+        }
+
+        // Delete location
+        async function deleteLocation(id) {
+            console.log('deleteLocation called with ID:', id);
+            console.log('Current locations:', locations);
+            
+            const confirmed = await showConfirm('Are you sure you want to delete this location?', 'Delete Location');
+            
+            if (!confirmed) {
+                console.log('User cancelled deletion');
+                return;
+            }
+
+            console.log('User confirmed deletion');
+
+            // Remove connections
+            connections = connections.filter(conn => {
+                if (conn.from === id || conn.to === id) {
+                    if (connectionLines[conn.id]) {
+                        map.removeLayer(connectionLines[conn.id]);
+                        delete connectionLines[conn.id];
+                    }
+                    return false;
+                }
+                return true;
+            });
+
+            // Remove marker
+            if (markers[id]) {
+                console.log('Removing marker for ID:', id);
+                map.removeLayer(markers[id]);
+                delete markers[id];
+            }
+
+            // Remove location
+            const beforeCount = locations.length;
+            locations = locations.filter(l => l.id !== id);
+            console.log('Locations count before:', beforeCount, 'after:', locations.length);
+            
+            updateLocationsList();
+            updateFilterCounts();
+            saveData();
+            console.log('Delete completed');
+        }
+
+        // Data persistence
+        function saveData() {
+            const data = {
+                title: tripTitle,
+                locations: locations,
+                connections: connections
+            };
+            console.log('saveData called. Saving:', data);
+            try {
+                localStorage.setItem('planPilotData', JSON.stringify(data));
+                console.log('Data saved to localStorage successfully');
+                // Verify it was saved
+                const verify = localStorage.getItem('planPilotData');
+                console.log('Verification - data in localStorage:', verify ? JSON.parse(verify) : 'null');
+            } catch (e) {
+                console.error('Error saving data to localStorage:', e);
+            }
+        }
+
+        function loadData() {
+            console.log('loadData called');
+            const saved = localStorage.getItem('planPilotData');
+            console.log('Data from localStorage:', saved);
+            
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    console.log('Parsed data:', data);
+                    
+                    // Load title
+                    tripTitle = data.title || '';
+                    document.getElementById('tripTitle').value = tripTitle;
+                    if (tripTitle) {
+                        document.getElementById('mapTitle').textContent = tripTitle;
+                        document.getElementById('mapTitle').classList.add('visible');
+                    }
+                    console.log('Loaded title:', tripTitle);
+                    
+                    locations = data.locations || [];
+                    connections = data.connections || [];
+                    console.log('Loaded', locations.length, 'locations and', connections.length, 'connections');
+                    
+                    console.log('Adding markers to map...');
+                    locations.forEach((loc, index) => {
+                        addMarker(loc);
+                        console.log('Added marker', index + 1, 'of', locations.length);
+                    });
+                    
+                    console.log('Drawing connections...');
+                    connections.forEach((conn, index) => {
+                        drawConnection(conn);
+                        console.log('Drew connection', index + 1, 'of', connections.length);
+                    });
+                    
+                    console.log('Updating locations list...');
+                    updateLocationsList();
+                    updateFilterCounts();
+                    console.log('loadData completed');
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                }
+            } else {
+                console.log('No saved data found in localStorage');
+            }
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                title: tripTitle,
+                locations: locations,
+                connections: connections,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            const filename = tripTitle ? tripTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.json' : 'planpilot-trip.json';
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Import data
+        function importData() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('importText').value = '';
+            document.getElementById('importFile').value = '';
+        }
+
+        function clearImportText() {
+            document.getElementById('importText').value = '';
+        }
+
+        function clearImportFile() {
+            document.getElementById('importFile').value = '';
+        }
+
+        // Planning modal
+        function openPlanningModal() {
+            document.getElementById('planningModal').classList.add('active');
+        }
+
+        function closePlanningModal() {
+            document.getElementById('planningModal').classList.remove('active');
+            // Reset form
+            document.getElementById('tripPlanningForm').reset();
+        }
+
+        // Handle trip planning form submission
+        function handlePlanningFormSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                destination: document.getElementById('planDestination').value.trim(),
+                duration: document.getElementById('planDuration').value.trim(),
+                budget: document.getElementById('planBudget').value,
+                interests: document.getElementById('planInterests').value.trim().split(',').map(i => i.trim()).filter(i => i),
+                mustVisit: document.getElementById('planMustVisit').value.trim()
+            };
+            
+            generateTripWithWorkflow(formData);
+        }
+
+        // Generate trip using ChatGPT Workflow API
+        async function generateTripWithWorkflow(formData) {
+            showLoadingOverlay('Generating Your Trip Plan...', 'Researching destinations and gathering information');
+            closePlanningModal();
+            
+            try {
+                const response = await fetch('/api/chat-workflow', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
+                }
+                
+                const tripData = await response.json();
+                
+                // Validate that we got valid trip data
+                if (!tripData.locations || !Array.isArray(tripData.locations)) {
+                    throw new Error('Invalid response format from API');
+                }
+                
+                // Auto-import the generated data
+                importDataFromJSON(tripData);
+                
+                hideLoadingOverlay();
+                
+                alert(`🎉 Trip plan generated successfully!\n\n${tripData.locations.length} location(s) added to your map.`);
+            } catch (error) {
+                console.error('Error generating trip:', error);
+                hideLoadingOverlay();
+                alert('❌ Error generating trip: ' + error.message + '\n\nYou can still use the Import button to manually add a JSON file.');
+            }
+        }
+
+        // Loading overlay functions
+        function showLoadingOverlay(title = 'Processing...', message = 'Please wait') {
+            const overlay = document.getElementById('loadingOverlay');
+            document.getElementById('loadingTitle').textContent = title;
+            document.getElementById('loadingMessage').textContent = message;
+            overlay.classList.add('active');
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        // Info modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.add('active');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+
+        // Copy guide to clipboard
+        async function copyGuideToClipboard() {
+            const guideText = `# PlanPilot JSON Format Guide
+
+## Required JSON Structure
+The JSON file must contain a "locations" array and optionally a "title" and "connections" fields:
+
+{
+  "title": "Your Trip Name",
+  "locations": [ ... ],
+  "connections": [ ... ]
+}
+
+## Title Field (Optional)
+- "title" (string, optional): The name of your trip or holiday
+- This will be displayed prominently at the top center of the map
+- Example: "Sri Lanka Honeymoon", "European Adventure 2025"
+
+## Location Object Format
+Each location in the "locations" array must have the following properties:
+
+- "id" (string, required): Unique identifier for the location
+- "type" (string, required): Must be one of:
+  - "key-location" - Major destinations (purple markers with 📍)
+  - "accommodation" - Hotels, rentals (green markers with 🏨)
+  - "attraction" - Places to visit (red markers with ⭐)
+- "name" (string, required): Display name of the location
+- "description" (string, optional): Additional notes or details
+- "price" (string, optional): Cost information (e.g., "$150/night", "€25 entry")
+- "link" (string, optional): URL for booking, website, or reference
+- "lat" (number, required): Latitude coordinate (-90 to 90)
+- "lng" (number, required): Longitude coordinate (-180 to 180)
+
+## Connection Object Format
+Each connection in the "connections" array connects two Key Locations:
+
+- "id" (string, required): Unique identifier (typically "fromId-toId")
+- "from" (string, required): ID of the first Key Location
+- "to" (string, required): ID of the second Key Location
+
+⚠️ Note: Connections only work between locations with type "key-location". Make sure both "from" and "to" reference valid Key Location IDs.
+
+## Complete Example
+
+{
+  "title": "Paris & Rome Adventure",
+  "locations": [
+    {
+      "id": "1",
+      "type": "key-location",
+      "name": "Paris",
+      "description": "City of Light, arrival point",
+      "price": "",
+      "link": "",
+      "lat": 48.8566,
+      "lng": 2.3522
+    },
+    {
+      "id": "2",
+      "type": "accommodation",
+      "name": "Hotel de Paris",
+      "description": "5-star hotel near Eiffel Tower",
+      "price": "$250/night",
+      "link": "https://booking.com/hotel-de-paris",
+      "lat": 48.8584,
+      "lng": 2.2945
+    },
+    {
+      "id": "3",
+      "type": "attraction",
+      "name": "Louvre Museum",
+      "description": "World's largest art museum",
+      "price": "€17 entry",
+      "link": "https://louvre.fr",
+      "lat": 48.8606,
+      "lng": 2.3376
+    },
+    {
+      "id": "4",
+      "type": "key-location",
+      "name": "Rome",
+      "description": "Next destination",
+      "price": "",
+      "link": "",
+      "lat": 41.9028,
+      "lng": 12.4964
+    }
+  ],
+  "connections": [
+    {
+      "id": "1-4",
+      "from": "1",
+      "to": "4"
+    }
+  ]
+}
+
+## AI Agent Instructions
+When creating a JSON file for this PlanPilot:
+
+1. Add a descriptive "title" field that summarizes the trip (e.g., "Sri Lanka Honeymoon", "Summer Europe Tour 2025")
+2. Ensure all required fields are present for each location
+3. Use consistent ID formats (strings, unique)
+4. Verify coordinates are valid (use geocoding if needed)
+5. Only create connections between "key-location" types
+6. Include helpful descriptions to provide context
+7. Add price and link information where relevant for accommodation and attractions
+8. Validate JSON syntax before importing
+`;
+
+            try {
+                await navigator.clipboard.writeText(guideText);
+                
+                // Visual feedback
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.style.background = '#2ecc71';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+                
+                console.log('Guide copied to clipboard');
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            }
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                if (e.target.id === 'importModal') {
+                    closeImportModal();
+                } else if (e.target.id === 'infoModal') {
+                    closeInfoModal();
+                } else if (e.target.id === 'planningModal') {
+                    closePlanningModal();
+                } else if (e.target.id === 'confirmModal') {
+                    // Click outside confirm modal = cancel
+                    document.getElementById('confirmNo').click();
+                }
+            }
+        });
+
+        function processImport() {
+            const fileInput = document.getElementById('importFile');
+            const textInput = document.getElementById('importText').value.trim();
+            
+            // Check if a file was selected
+            if (fileInput.files && fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        importDataFromJSON(data);
+                    } catch (error) {
+                        alert('Error reading file: ' + error.message);
+                    }
+                };
+                
+                reader.onerror = function() {
+                    alert('Error reading file. Please try again.');
+                };
+                
+                reader.readAsText(file);
+            } 
+            // Otherwise, check if text was pasted
+            else if (textInput) {
+                try {
+                    const data = JSON.parse(textInput);
+                    importDataFromJSON(data);
+                } catch (e) {
+                    alert('Error parsing JSON: ' + e.message);
+                }
+            } 
+            // No input provided
+            else {
+                alert('Please select a JSON file or paste JSON data');
+            }
+        }
+
+        function importDataFromJSON(data) {
+            try {
+                if (!data.locations || !Array.isArray(data.locations)) {
+                    throw new Error('Invalid data format: missing or invalid "locations" array');
+                }
+
+                // Clear existing data
+                clearAllData(false);
+
+                // Import new data
+                tripTitle = data.title || '';
+                document.getElementById('tripTitle').value = tripTitle;
+                if (tripTitle) {
+                    document.getElementById('mapTitle').textContent = tripTitle;
+                    document.getElementById('mapTitle').classList.add('visible');
+                } else {
+                    document.getElementById('mapTitle').classList.remove('visible');
+                }
+                
+                locations = data.locations;
+                connections = data.connections || [];
+
+                locations.forEach(loc => addMarker(loc));
+                connections.forEach(conn => drawConnection(conn));
+                updateLocationsList();
+                updateFilterCounts();
+                saveData();
+
+                closeImportModal();
+                alert('Data imported successfully!');
+            } catch (e) {
+                alert('Error importing data: ' + e.message);
+            }
+        }
+
+        // Clear all
+        async function clearAll() {
+            console.log('clearAll called');
+            console.log('Current locations:', locations.length);
+            
+            const confirmed = await showConfirm(
+                'Are you sure you want to clear all locations and connections? This cannot be undone.',
+                'Clear All Data'
+            );
+            
+            if (!confirmed) {
+                console.log('User cancelled clear all');
+                return;
+            }
+            
+            console.log('User confirmed clear all');
+            clearAllData(true);
+        }
+
+        function clearAllData(showConfirmation) {
+            console.log('clearAllData called, showConfirmation:', showConfirmation);
+            console.log('Markers to remove:', Object.keys(markers).length);
+            console.log('Connections to remove:', Object.keys(connectionLines).length);
+            console.log('Locations before clear:', locations.length);
+            
+            try {
+                // Remove all markers
+                const markerKeys = Object.keys(markers);
+                console.log('Removing markers:', markerKeys);
+                Object.values(markers).forEach((marker, index) => {
+                    try {
+                        map.removeLayer(marker);
+                        console.log('Removed marker', index + 1, 'of', markerKeys.length);
+                    } catch (e) {
+                        console.error('Error removing marker:', e);
+                    }
+                });
+                markers = {};
+                console.log('All markers removed, markers object cleared');
+
+                // Remove all connection lines
+                const connectionKeys = Object.keys(connectionLines);
+                console.log('Removing connection lines:', connectionKeys);
+                Object.values(connectionLines).forEach((line, index) => {
+                    try {
+                        map.removeLayer(line);
+                        console.log('Removed line', index + 1, 'of', connectionKeys.length);
+                    } catch (e) {
+                        console.error('Error removing line:', e);
+                    }
+                });
+                connectionLines = {};
+                console.log('All connection lines removed');
+
+                // Clear data
+                tripTitle = '';
+                document.getElementById('tripTitle').value = '';
+                document.getElementById('mapTitle').classList.remove('visible');
+                locations = [];
+                connections = [];
+                console.log('Data arrays cleared. Locations:', locations.length, 'Connections:', connections.length);
+
+                console.log('Calling updateLocationsList...');
+                updateLocationsList();
+                updateFilterCounts();
+                console.log('List updated, calling saveData...');
+                saveData();
+                console.log('Data saved to localStorage');
+                
+                // Force a small delay to ensure UI updates
+                setTimeout(() => {
+                    console.log('Clear all completed successfully');
+                    console.log('Final state - Locations:', locations.length, 'Markers:', Object.keys(markers).length);
+                }, 100);
+
+                if (showConfirmation) {
+                    alert('All data cleared');
+                }
+            } catch (error) {
+                console.error('Error in clearAllData:', error);
+                alert('Error clearing data: ' + error.message);
+            }
+        }
+
+        // Debug helper - manually clear localStorage
+        window.forceReset = function() {
+            console.log('=== FORCE RESET CALLED ===');
+            console.log('Clearing localStorage...');
+            localStorage.removeItem('planPilotData');
+            console.log('Reloading page...');
+            location.reload();
+        };
+
+        // Make functions globally accessible
+        window.showLogoFallback = showLogoFallback;
+        window.applyFilters = applyFilters;
+        window.toggleFilter = toggleFilter;
+        window.updateFilterCounts = updateFilterCounts;
+        window.updateTripTitle = updateTripTitle;
+        window.toggleEditMode = toggleEditMode;
+        window.showConfirm = showConfirm;
+        window.focusLocation = focusLocation;
+        window.deleteLocation = deleteLocation;
+        window.clearAll = clearAll;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.closeImportModal = closeImportModal;
+        window.clearImportText = clearImportText;
+        window.clearImportFile = clearImportFile;
+        window.openPlanningModal = openPlanningModal;
+        window.closePlanningModal = closePlanningModal;
+        window.startResearching = startResearching;
+        window.openInfoModal = openInfoModal;
+        window.closeInfoModal = closeInfoModal;
+        window.copyGuideToClipboard = copyGuideToClipboard;
+        window.processImport = processImport;
+        window.addLocation = addLocation;
+        window.startConnectionMode = startConnectionMode;
+        window.cancelConnectionMode = cancelConnectionMode;
+
+        // Initialize
+        function init() {
+            console.log('=== APPLICATION INITIALIZING ===');
+            console.log('Current timestamp:', new Date().toISOString());
+            
+            loadData();
+            
+            console.log('After loadData - locations:', locations.length, 'markers:', Object.keys(markers).length);
+            
+            // Update clear all button state on init
+            updateClearAllButton();
+            
+            // Update filter counts on init
+            updateFilterCounts();
+            
+            // Event delegation for dynamically created buttons
+            const locationsList = document.getElementById('locationsList');
+            if (locationsList) {
+                console.log('Setting up event delegation for locationsList');
+                locationsList.addEventListener('click', function(e) {
+                    let target = e.target;
+                    console.log('Click detected on:', target, 'classList:', target.classList);
+                    
+                    // Find the closest button element (in case click is on child element)
+                    while (target && target !== locationsList) {
+                        // Handle View button clicks
+                        if (target.classList && target.classList.contains('view-btn')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const id = target.getAttribute('data-id');
+                            console.log('View button clicked for ID:', id);
+                            if (id) {
+                                window.focusLocation(id);
+                            }
+                            return;
+                        }
+                        
+                        // Handle Delete button clicks
+                        if (target.classList && target.classList.contains('delete-btn')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const id = target.getAttribute('data-id');
+                            console.log('Delete button clicked for ID:', id);
+                            if (id) {
+                                window.deleteLocation(id);
+                            }
+                            return;
+                        }
+                        
+                        target = target.parentElement;
+                    }
+                });
+            } else {
+                console.error('locationsList element not found during init!');
+            }
+            
+            console.log('=== INITIALIZATION COMPLETE ===');
+        }
+        
+        // Run initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
+
