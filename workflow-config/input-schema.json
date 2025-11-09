@@ -42,7 +42,7 @@
       ]
     }
   },
-  "required": ["destination", "duration"],
+  "required": ["destination", "duration", "budget", "interests", "mustVisit"],
   "additionalProperties": false
 }
 

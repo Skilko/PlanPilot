@@ -80,6 +80,7 @@ This defines what information users provide to the agent.
 **Important:** When Agent Builder asks for a "schema name", use: `planpilot_trip_request`
 - ✅ Use underscores or hyphens (no spaces, dots, or brackets)
 - The schema name must follow Agent Builder naming rules
+- ⚠️ **Strict Mode:** All properties are marked as required for strict mode compliance. The frontend sends empty strings for optional fields (budget, interests, mustVisit)
 
 ### Option A: If Agent Builder has Schema Editor
 
