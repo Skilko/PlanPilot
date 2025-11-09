@@ -42,6 +42,7 @@
       ]
     }
   },
-  "required": ["destination", "duration"]
+  "required": ["destination", "duration"],
+  "additionalProperties": false
 }
 
