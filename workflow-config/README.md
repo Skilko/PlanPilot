@@ -41,6 +41,8 @@ This directory contains all the configuration files needed to set up the ChatGPT
 ### 3. **input-schema.json** 📥
 **JSON Schema** defining what users input to generate a trip.
 
+**Schema Name:** `planpilot_trip_request` (use this in Agent Builder)
+
 **Fields:**
 - `destination` (required) - Where to travel
 - `duration` (required) - How long
@@ -50,12 +52,15 @@ This directory contains all the configuration files needed to set up the ChatGPT
 
 **How to use:**
 - Copy/paste into "Input Schema" configuration in Agent Builder
+- Set schema name to: `planpilot_trip_request` (no spaces!)
 - Or use it as reference when manually configuring input fields
 
 ---
 
 ### 4. **output-schema.json** 📤
 **JSON Schema** defining the structure of generated trip plans.
+
+**Schema Name:** `planpilot_trip_plan` (use this in Agent Builder)
 
 **Structure:**
 - `title` - Trip name
@@ -64,6 +69,7 @@ This directory contains all the configuration files needed to set up the ChatGPT
 
 **How to use:**
 - Copy/paste into "Output Schema" configuration in Agent Builder
+- Set schema name to: `planpilot_trip_plan` (no spaces!)
 - Ensures AI returns data in the correct format for PlanPilot
 
 ---

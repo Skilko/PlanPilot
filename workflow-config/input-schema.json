@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "PlanPilot Trip Request",
+  "title": "planpilot_trip_request",
   "description": "Input schema for trip planning workflow",
   "type": "object",
   "properties": {

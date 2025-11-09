@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "PlanPilot Trip Plan",
+  "title": "planpilot_trip_plan",
   "description": "Output schema for generated trip plans",
   "type": "object",
   "properties": {

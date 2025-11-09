@@ -77,10 +77,15 @@ Copy the **ENTIRE contents** of `system-prompt.md` file from the `workflow-confi
 
 This defines what information users provide to the agent.
 
+**Important:** When Agent Builder asks for a "schema name", use: `planpilot_trip_request`
+- ✅ Use underscores or hyphens (no spaces, dots, or brackets)
+- The schema name must follow Agent Builder naming rules
+
 ### Option A: If Agent Builder has Schema Editor
 
 1. Find **"Input Schema"** or **"Parameters"** section
-2. Add these fields:
+2. Set schema name to: `planpilot_trip_request`
+3. Add these fields:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -102,18 +107,24 @@ Copy and paste the entire JSON schema into the input configuration.
 
 This defines the format of the agent's response.
 
+**Important:** When Agent Builder asks for a "schema name", use: `planpilot_trip_plan`
+- ✅ Use underscores or hyphens (no spaces, dots, or brackets)
+- The schema name must follow Agent Builder naming rules
+
 ### Option A: Manual Configuration
 
-Specify that output should be:
-- **Format:** JSON
-- **Structure:** Object with `title`, `locations`, and `connections` fields
-- **Validation:** Must match PlanPilot format
+1. Set schema name to: `planpilot_trip_plan`
+2. Specify that output should be:
+   - **Format:** JSON
+   - **Structure:** Object with `title`, `locations`, and `connections` fields
+   - **Validation:** Must match PlanPilot format
 
 ### Option B: If Using JSON Schema
 
 Use the file: `workflow-config/output-schema.json`
 
-Copy and paste the entire JSON schema into the output configuration.
+1. Set schema name to: `planpilot_trip_plan`
+2. Copy and paste the entire JSON schema into the output configuration
 
 ---
 

@@ -179,9 +179,9 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
 ## Guidelines for Quality Output
 
 ### Quantity Recommendations
-- **3-5 days**: 1 key location, 1-2 accommodations, 5-10 attractions
-- **1 week**: 2-3 key locations, 2-3 accommodations, 10-15 attractions
-- **2+ weeks**: 3-5 key locations, 3-5 accommodations, 15-25 attractions
+- **3-5 days**: 1 key location, 2-4 accommodations, 5-10 attractions
+- **1 week**: 2-3 key locations, 4-6 accommodations, 10-15 attractions
+- **2+ weeks**: 3-5 key locations, 6-10 accommodations, 15-25 attractions
 
 ### Budget Considerations
 - **Budget**: Hostels ($30-60/night), free/cheap attractions, local eateries
