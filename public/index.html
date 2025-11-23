@@ -1129,10 +1129,638 @@
             margin: 15px 0;
             font-size: 13px;
         }
+
+        /* ========================================
+           RESPONSIVE DESIGN - MOBILE & TABLET
+           ======================================== */
+
+        /* Hamburger Menu Button */
+        .hamburger-menu {
+            display: none; /* Hidden on desktop */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 2001;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(8, 145, 208, 0.4);
+            transition: all 0.3s;
+        }
+
+        .hamburger-menu span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(8, 145, 208, 0.5);
+        }
+
+        .hamburger-menu:active {
+            transform: scale(0.95);
+        }
+
+        /* Hamburger animation when sidebar is open */
+        .hamburger-menu.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* Sidebar Backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* TABLET STYLES (768px - 1024px) */
+        @media (max-width: 1024px) and (min-width: 768px) {
+            /* Narrower sidebar */
+            .sidebar {
+                width: 280px;
+            }
+
+            /* Adjust filter control position */
+            .filter-control {
+                left: 310px;
+                min-width: 180px;
+                padding: 12px;
+            }
+
+            .filter-control h4 {
+                font-size: 13px;
+                margin-bottom: 10px;
+            }
+
+            .filter-item {
+                font-size: 12px;
+                padding: 5px;
+                margin-bottom: 8px;
+            }
+
+            /* Smaller legend */
+            .legend {
+                bottom: 25px;
+                right: 25px;
+                min-width: 150px;
+                padding: 12px;
+            }
+
+            .legend h4 {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+
+            .legend-item {
+                font-size: 12px;
+                margin-bottom: 6px;
+            }
+
+            .legend-color {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+
+            /* Adjust map title */
+            .map-title {
+                font-size: 14px;
+                padding: 8px 35px;
+            }
+
+            .map-title::before,
+            .map-title::after {
+                font-size: 14px;
+            }
+
+            /* Modal adjustments */
+            .modal-content {
+                max-width: 450px;
+            }
+
+            #infoModal .modal-content {
+                max-width: 600px;
+            }
+        }
+
+        /* MOBILE STYLES (< 768px) */
+        @media (max-width: 767px) {
+            /* Show hamburger menu */
+            .hamburger-menu {
+                display: flex;
+            }
+
+            /* Body adjustments */
+            body {
+                flex-direction: column;
+            }
+
+            /* Sidebar - hidden by default, overlay when open */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 85%;
+                max-width: 320px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease-in-out;
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                left: 0;
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Map takes full width */
+            #map {
+                width: 100%;
+                height: 100vh;
+            }
+
+            /* Sidebar header adjustments */
+            .sidebar-header {
+                padding: 15px;
+            }
+
+            .sidebar-header-logo {
+                width: 90px;
+                height: 90px;
+                margin-bottom: 12px;
+            }
+
+            .sidebar-header h1 {
+                font-size: 24px;
+                gap: 8px;
+            }
+
+            .sidebar-header p {
+                font-size: 13px;
+            }
+
+            /* Info button */
+            .info-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 14px;
+            }
+
+            /* Sidebar scrollable area */
+            .sidebar-scrollable {
+                padding-bottom: 20px;
+            }
+
+            /* Controls padding */
+            .controls {
+                padding: 15px;
+            }
+
+            .sidebar-action-buttons {
+                padding: 12px 15px 15px 15px;
+            }
+
+            /* Increase touch targets for buttons */
+            .btn {
+                padding: 14px;
+                font-size: 15px;
+                min-height: 48px;
+            }
+
+            .btn-primary {
+                font-size: 16px;
+            }
+
+            /* Form inputs - larger for mobile */
+            .control-group input,
+            .control-group select,
+            .control-group textarea {
+                padding: 12px;
+                font-size: 16px; /* Prevents iOS zoom on focus */
+                min-height: 44px;
+            }
+
+            .control-group textarea {
+                min-height: 70px;
+            }
+
+            .control-group label {
+                font-size: 15px;
+                margin-bottom: 10px;
+            }
+
+            /* Item cards */
+            .item {
+                padding: 14px;
+                margin-bottom: 10px;
+            }
+
+            .item-name {
+                font-size: 15px;
+            }
+
+            .item-description {
+                font-size: 13px;
+            }
+
+            /* Item action buttons - larger touch targets */
+            .item-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+                min-height: 36px;
+            }
+
+            /* Checkboxes and inputs larger */
+            .filter-item input[type="checkbox"] {
+                width: 22px;
+                height: 22px;
+                margin-right: 12px;
+            }
+
+            /* Map title - mobile optimized */
+            .map-title {
+                top: 70px; /* Below hamburger button */
+                font-size: 14px;
+                padding: 8px 30px;
+                max-width: 85%;
+            }
+
+            .map-title::before {
+                left: 8px;
+                font-size: 14px;
+            }
+
+            .map-title::after {
+                right: 8px;
+                font-size: 14px;
+            }
+
+            /* Filter and Legend - reposition to bottom center, stacked */
+            .filter-control,
+            .legend {
+                position: fixed;
+                left: 50%;
+                transform: translateX(-50%);
+                right: auto;
+                bottom: 15px;
+                min-width: auto;
+                width: calc(100% - 30px);
+                max-width: 400px;
+                padding: 12px 15px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            }
+
+            .filter-control {
+                bottom: 15px;
+            }
+
+            .legend {
+                bottom: auto;
+                top: 70px; /* Just below hamburger */
+                right: 15px;
+                left: auto;
+                transform: none;
+                width: auto;
+                max-width: 200px;
+            }
+
+            /* Make filter/legend collapsible for mobile */
+            .filter-control h4,
+            .legend h4 {
+                font-size: 14px;
+                margin-bottom: 10px;
+                font-weight: 700;
+            }
+
+            .filter-item {
+                padding: 8px;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .filter-item label {
+                font-size: 14px;
+            }
+
+            .filter-item-count {
+                font-size: 12px;
+                padding: 3px 9px;
+            }
+
+            .legend-item {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .legend-color {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+                margin-right: 12px;
+            }
+
+            /* Leaflet controls */
+            .leaflet-control-layers {
+                margin-top: 5px !important;
+                margin-right: 5px !important;
+            }
+
+            .leaflet-top.leaflet-right {
+                top: 130px; /* Below legend */
+            }
+
+            .leaflet-control-zoom {
+                margin-top: 10px !important;
+                margin-left: 10px !important;
+            }
+
+            .leaflet-control-zoom a {
+                width: 36px !important;
+                height: 36px !important;
+                line-height: 36px !important;
+                font-size: 20px !important;
+            }
+
+            /* Popup adjustments for mobile */
+            .leaflet-popup-content-wrapper {
+                border-radius: 10px !important;
+            }
+
+            .leaflet-popup-content {
+                min-width: 260px !important;
+                max-width: 280px !important;
+                margin: 0 !important;
+            }
+
+            .popup-header {
+                padding: 12px;
+            }
+
+            .popup-header-title {
+                font-size: 16px;
+                padding-right: 25px;
+            }
+
+            .popup-header-type {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+
+            .popup-body {
+                padding: 15px;
+            }
+
+            .popup-description {
+                font-size: 13px;
+            }
+
+            .popup-info-row {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+
+            /* Popup close button - larger */
+            .leaflet-popup-close-button {
+                font-size: 24px !important;
+                width: 36px !important;
+                height: 36px !important;
+                right: 2px !important;
+                top: 2px !important;
+            }
+
+            /* Modal - mobile optimized */
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+                max-height: 90vh;
+                border-radius: 12px;
+                margin: 10px;
+            }
+
+            .modal-header {
+                padding: 15px 20px;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .modal-body .control-group input,
+            .modal-body .control-group select,
+            .modal-body .control-group textarea {
+                font-size: 16px; /* Prevents iOS zoom */
+                padding: 12px;
+            }
+
+            .modal-actions {
+                padding: 15px 20px;
+                flex-direction: column;
+            }
+
+            .modal-actions .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+            .modal-actions .btn:last-child {
+                margin-bottom: 0;
+            }
+
+            #infoModal .modal-content {
+                max-width: 95%;
+            }
+
+            #infoModal .modal-actions {
+                flex-direction: row;
+            }
+
+            #infoModal .modal-actions .btn {
+                width: auto;
+                flex: 1;
+                margin-bottom: 0;
+            }
+
+            /* Info content adjustments */
+            .info-content {
+                font-size: 13px;
+            }
+
+            .info-content h3 {
+                font-size: 15px;
+                margin-top: 15px;
+            }
+
+            .info-content pre {
+                font-size: 11px;
+                padding: 12px;
+                overflow-x: auto;
+            }
+
+            .info-content code {
+                font-size: 12px;
+            }
+
+            /* Loading overlay */
+            .loading-content {
+                padding: 30px 35px;
+                max-width: 90%;
+                margin: 0 15px;
+            }
+
+            .loading-content h3 {
+                font-size: 18px;
+            }
+
+            .loading-content p {
+                font-size: 13px;
+            }
+
+            /* Data actions */
+            .data-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .data-actions button {
+                width: 100%;
+            }
+        }
+
+        /* Extra small mobile devices (< 375px) */
+        @media (max-width: 374px) {
+            .sidebar {
+                width: 90%;
+            }
+
+            .sidebar-header h1 {
+                font-size: 22px;
+            }
+
+            .sidebar-header-logo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .map-title {
+                font-size: 12px;
+                padding: 6px 25px;
+                max-width: 90%;
+            }
+
+            .filter-control,
+            .legend {
+                width: calc(100% - 20px);
+                max-width: none;
+            }
+
+            .legend {
+                max-width: 180px;
+            }
+
+            .modal-content {
+                width: 98%;
+                margin: 5px;
+            }
+        }
+
+        /* Landscape mobile optimization */
+        @media (max-width: 767px) and (orientation: landscape) {
+            .sidebar {
+                width: 60%;
+                max-width: 350px;
+            }
+
+            .map-title {
+                top: 15px;
+                font-size: 12px;
+                padding: 6px 25px;
+            }
+
+            .legend {
+                top: 15px;
+                right: 10px;
+                padding: 8px 10px;
+                max-width: 160px;
+            }
+
+            .legend h4 {
+                font-size: 12px;
+                margin-bottom: 6px;
+            }
+
+            .legend-item {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+
+            .legend-color {
+                width: 24px;
+                height: 24px;
+                font-size: 13px;
+                margin-right: 8px;
+            }
+
+            .filter-control {
+                bottom: 10px;
+                padding: 10px 12px;
+            }
+
+            .leaflet-top.leaflet-right {
+                top: 80px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger-menu" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <!-- Sidebar Backdrop for Mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-fixed-header">
             <div class="sidebar-header">
                 <div class="sidebar-header-logo" id="logoContainer">
@@ -2024,6 +2652,11 @@
             if (location) {
                 map.setView([location.lat, location.lng], 12);
                 markers[id].openPopup();
+                
+                // Close sidebar on mobile after viewing location
+                if (window.innerWidth < 768) {
+                    setTimeout(closeSidebar, 300);
+                }
             }
         }
 
@@ -2613,6 +3246,34 @@ When creating a JSON file for this PlanPilot:
             location.reload();
         };
 
+        // Hamburger menu functions for mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const hamburger = document.getElementById('hamburgerBtn');
+            
+            sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const hamburger = document.getElementById('hamburgerBtn');
+            
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+            hamburger.classList.remove('active');
+        }
+
+        // Close sidebar when clicking on a location in list (mobile only)
+        function closeSidebarOnMobile() {
+            if (window.innerWidth < 768) {
+                closeSidebar();
+            }
+        }
+
         // Make functions globally accessible
         window.showLogoFallback = showLogoFallback;
         window.applyFilters = applyFilters;
@@ -2639,6 +3300,8 @@ When creating a JSON file for this PlanPilot:
         window.addLocation = addLocation;
         window.startConnectionMode = startConnectionMode;
         window.cancelConnectionMode = cancelConnectionMode;
+        window.toggleSidebar = toggleSidebar;
+        window.closeSidebar = closeSidebar;
 
         // Initialize
         function init() {
