@@ -101,48 +101,34 @@ REQUIREMENTS:
 
     const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || defaultSystemPrompt;
 
-    // Call Google Gemini API with retry logic for 503 errors
-    // Using Gemini 1.5 Pro - more stable than 2.5 Pro experimental
-    const makeGeminiRequest = async (retryCount = 0) => {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: userPrompt }]
-            }],
-            systemInstruction: {
-              parts: [{
-                text: systemPrompt
-              }]
-            },
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 8192
-            },
-            tools: [{
-              google_search: {}
+    // Call Google Gemini API with grounding (requires billing)
+    // Using Gemini 2.5 Flash - faster and more cost-effective
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: userPrompt }]
+          }],
+          systemInstruction: {
+            parts: [{
+              text: systemPrompt
             }]
-          })
-        }
-      );
-
-      // Handle 503 with retry (model overloaded)
-      if (response.status === 503 && retryCount < 3) {
-        const waitTime = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-        console.log(`Model overloaded, retrying in ${waitTime}ms (attempt ${retryCount + 1}/3)...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-        return makeGeminiRequest(retryCount + 1);
+          },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192
+          },
+          tools: [{
+            google_search: {}
+          }]
+        })
       }
-
-      return response;
-    };
-
-    const response = await makeGeminiRequest();
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
