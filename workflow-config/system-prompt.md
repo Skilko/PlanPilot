@@ -30,6 +30,29 @@ When a user provides trip parameters (destination, duration, budget, interests, 
 - Prioritize user's **interests** when choosing attractions
 - Always include any **must-visit locations** the user specified
 
+### CRITICAL - Accommodation Link Requirements
+
+**ALL accommodation links MUST be direct property/hotel-specific URLs:**
+
+- ✅ **Booking.com**: Use format like `https://www.booking.com/hotel/[country]/[hotel-name].html`
+  - Example: `https://www.booking.com/hotel/fr/atmospheres.html`
+- ✅ **Hotels.com**: Use format like `https://www.hotels.com/ho[property-id]/`
+  - Example: `https://www.hotels.com/ho123456/`
+- ✅ **Airbnb**: Use format like `https://www.airbnb.com/rooms/[listing-id]`
+  - Example: `https://www.airbnb.com/rooms/12345678`
+- ❌ **NEVER** use generic search URLs like:
+  - `https://www.booking.com/searchresults.html?ss=Paris`
+  - `https://www.booking.com/city/fr/paris.html`
+  - `https://www.hotels.com/search.do?destination-id=123`
+  - `https://www.airbnb.com/s/Paris`
+
+**How to find specific property URLs:**
+1. Search for the exact hotel name on the booking platform
+2. Navigate to the specific property page
+3. Copy the direct URL to that property
+4. Verify the URL contains the property identifier (hotel name slug, property ID, or listing ID)
+5. If you cannot find a specific URL, leave the link field empty rather than using a search URL
+
 ## JSON Format Specification
 
 ### Root Structure
@@ -237,10 +260,13 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
 - For multi-city trips, use connections to show the route
 
 ### Link Quality
-- Use real, clickable URLs
-- Prefer official websites or major booking platforms
-- Include booking.com, airbnb.com, official museum sites, etc.
-- If no link available, use empty string ""
+- Use real, clickable URLs that point to SPECIFIC properties/pages
+- **For accommodations**: MUST be direct property URLs (see Critical Requirements above)
+- **For attractions**: Prefer official websites or ticketing pages
+- Include booking.com property pages, airbnb.com room listings, official museum sites, etc.
+- **NEVER** use generic search result pages or city overview pages
+- If you cannot find a specific property URL, use empty string "" rather than a search URL
+- Test that your URLs would take a user directly to the intended destination
 
 ### Coordinate Accuracy
 - Use precise GPS coordinates (not just city center)
@@ -255,7 +281,8 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
 - Put quotes around numbers (lat/lng and order must be numbers)
 - Create connections between attractions or accommodations
 - Use outdated prices or closed venues
-- Include invalid URLs
+- Include invalid URLs or generic search URLs for accommodations
+- Use booking.com search results instead of specific hotel pages
 - Forget to add order and duration fields
 - Use illogical ordering (attractions before their city)
 - Give unrealistic durations (30 days at a museum)
@@ -282,6 +309,8 @@ Before returning your JSON, verify:
 - [ ] All lat/lng are numbers (not strings)
 - [ ] All prices are strings (with currency symbols)
 - [ ] All links are full URLs starting with https:// or empty strings
+- [ ] **CRITICAL: All accommodation links point to SPECIFIC properties, NOT search pages**
+- [ ] No accommodation links contain "searchresults", "/s/", or generic city pages
 - [ ] All locations have an order field (number)
 - [ ] Order numbers create a logical sequence (1, 2, 3, etc.)
 - [ ] All locations have a duration field (string like "3 days", "2 hours", etc.)

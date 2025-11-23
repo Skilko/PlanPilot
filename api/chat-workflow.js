@@ -66,6 +66,15 @@ SEARCH REQUIREMENT: Use Google Search to find CURRENT, REAL information about:
 - Accurate GPS coordinates for all locations
 - Current travel information and tips
 
+CRITICAL - ACCOMMODATION LINK REQUIREMENTS:
+- ALL accommodation links MUST be direct property/hotel-specific URLs
+- For Booking.com: Use format like "https://www.booking.com/hotel/[country]/[hotel-name].html" NOT search results
+- For Hotels.com: Use format like "https://www.hotels.com/ho[property-id]/" NOT search results
+- For Airbnb: Use format like "https://www.airbnb.com/rooms/[listing-id]" NOT search results
+- NEVER use generic search URLs like "searchresults.html" or "s/[city]"
+- If you cannot find a specific property URL, search for the exact hotel name on the booking platform
+- Verify each accommodation link points to a SPECIFIC property, not a city search page
+
 JSON FORMAT (REQUIRED):
 {
   "title": "Trip Name",
@@ -238,6 +247,41 @@ REQUIREMENTS:
         error: 'Invalid trip data format',
         details: 'Response missing required fields (title, locations)',
         data: tripData
+      });
+    }
+
+    // Validate accommodation links to ensure they're property-specific
+    const invalidAccommodations = [];
+    tripData.locations.forEach(location => {
+      if (location.type === 'accommodation' && location.link) {
+        const link = location.link.toLowerCase();
+        
+        // Check for generic search URLs that don't point to specific properties
+        const isGenericSearch = 
+          link.includes('searchresults') ||
+          link.includes('/s/') ||
+          link.match(/booking\.com\/[^/]*$/) || // Just domain without path
+          link.match(/hotels\.com\/[^/]*$/) ||
+          link.match(/airbnb\.com\/[^/]*$/) ||
+          link.includes('destination_id=') ||
+          link.includes('ss=') && !link.includes('/hotel/');
+        
+        if (isGenericSearch) {
+          invalidAccommodations.push({
+            name: location.name,
+            link: location.link,
+            issue: 'Link appears to be a generic search page, not a specific property'
+          });
+        }
+      }
+    });
+
+    // Log warnings for invalid accommodation links
+    if (invalidAccommodations.length > 0) {
+      console.warn('⚠️ WARNING: Found potentially invalid accommodation links:');
+      invalidAccommodations.forEach(item => {
+        console.warn(`  - ${item.name}: ${item.issue}`);
+        console.warn(`    URL: ${item.link}`);
       });
     }
 

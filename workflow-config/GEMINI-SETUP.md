@@ -132,9 +132,13 @@ Search grounding used: {
 Check that generated trips include:
 - ✅ **Real hotels** with actual names (not "Hotel 1", "Generic Hotel")
 - ✅ **Current prices** (e.g., "$180/night", "€17 entry")  
-- ✅ **Booking links** to Booking.com, Hotels.com, Airbnb
+- ✅ **Specific booking links** that go directly to property pages (NOT search results)
+  - ✅ Should be like: `https://www.booking.com/hotel/fr/specific-hotel.html`
+  - ❌ Should NOT be: `https://www.booking.com/searchresults.html?ss=Paris`
 - ✅ **Accurate coordinates** (verify a few on Google Maps)
 - ✅ **Popular attractions** with entry fees
+
+**Important:** The system now validates accommodation links to ensure they point to specific properties. Check Vercel logs for warnings about invalid accommodation links if you notice generic search URLs being returned.
 
 ---
 
@@ -284,6 +288,18 @@ curl -X POST http://localhost:3000/api/chat-workflow \
    dynamicThreshold: 0.2  // Search more aggressively
    ```
 4. Google Search may have rate limits - check API usage
+
+### Issue: Accommodation links go to search pages instead of specific hotels
+
+**Cause:** Gemini returning generic search URLs instead of property-specific links
+
+**Fix:**
+1. Check Vercel logs for validation warnings about invalid accommodation links
+2. The system now validates and logs warnings when accommodation links are generic
+3. Look for messages like "⚠️ WARNING: Found potentially invalid accommodation links"
+4. The system prompt has been updated to explicitly require property-specific URLs
+5. If this persists, try regenerating the trip plan (Gemini learns from its outputs)
+6. Consider adjusting the system prompt to be more specific for your use case
 
 ### Issue: Responses too slow (>60 seconds)
 
