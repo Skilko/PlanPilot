@@ -121,8 +121,7 @@ REQUIREMENTS:
           },
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 8192,
-            responseMimeType: "application/json"
+            maxOutputTokens: 8192
           },
           tools: [{
             google_search: {}
