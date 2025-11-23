@@ -478,6 +478,51 @@
             transform: translateX(-50%) translateY(-2px);
         }
 
+        /* Timeline Toggle Button */
+        .timeline-toggle-btn {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(8, 145, 208, 0.3);
+            z-index: 998;
+            transition: all 0.3s;
+            display: none;
+        }
+
+        .timeline-toggle-btn.visible {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .timeline-toggle-btn:hover {
+            box-shadow: 0 5px 15px rgba(8, 145, 208, 0.5);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .timeline-toggle-btn:active {
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* Timeline Styles */
         .timeline-container {
             position: absolute;
@@ -1687,6 +1732,13 @@
                 max-width: 200px;
             }
 
+            /* Timeline toggle button mobile */
+            .timeline-toggle-btn {
+                top: 80px;
+                font-size: 11px;
+                padding: 6px 16px;
+            }
+
             /* Timeline mobile styles */
             .timeline-container {
                 top: 110px;
@@ -2151,6 +2203,9 @@
 
     <div id="map">
         <div id="mapTitle" class="map-title"></div>
+        <button id="timeline-toggle-btn" class="timeline-toggle-btn" onclick="toggleTimeline()">
+            📅 Show Timeline
+        </button>
         <div id="timeline-container" class="timeline-container">
             <div class="timeline-controls">
                 <button class="timeline-btn" id="timeline-zoom-out" title="Zoom Out">−</button>
@@ -3026,6 +3081,7 @@
         // Timeline functionality
         let timelineZoom = 1;
         let selectedTimelineItemId = null;
+        let timelineVisible = false;
 
         // Parse duration string to hours
         function parseDurationToHours(durationStr) {
@@ -3085,8 +3141,13 @@
             // Only show timeline if we have locations with durations
             const locationsWithDuration = locations.filter(loc => loc.duration && loc.duration.trim() !== '');
             
+            const toggleBtn = document.getElementById('timeline-toggle-btn');
+            
             if (locationsWithDuration.length === 0) {
                 container.classList.remove('visible');
+                if (toggleBtn) {
+                    toggleBtn.classList.remove('visible');
+                }
                 return;
             }
             
@@ -3192,7 +3253,36 @@
             renderItemsToTrack(accommodationItems, accommodationTrack, 'accommodation');
             renderItemsToTrack(attractionItems, attractionTrack, 'attraction');
             
-            container.classList.add('visible');
+            // Show toggle button if we have timeline data
+            if (toggleBtn) {
+                toggleBtn.classList.add('visible');
+            }
+            
+            // Only show timeline if timelineVisible is true
+            if (timelineVisible) {
+                container.classList.add('visible');
+            } else {
+                container.classList.remove('visible');
+            }
+        }
+
+        // Toggle timeline visibility
+        function toggleTimeline() {
+            timelineVisible = !timelineVisible;
+            const container = document.getElementById('timeline-container');
+            const toggleBtn = document.getElementById('timeline-toggle-btn');
+            
+            if (timelineVisible) {
+                container.classList.add('visible');
+                if (toggleBtn) {
+                    toggleBtn.textContent = '📅 Hide Timeline';
+                }
+            } else {
+                container.classList.remove('visible');
+                if (toggleBtn) {
+                    toggleBtn.textContent = '📅 Show Timeline';
+                }
+            }
         }
 
         // Select timeline item and focus on map
