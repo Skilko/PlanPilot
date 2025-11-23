@@ -102,8 +102,9 @@ REQUIREMENTS:
     const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || defaultSystemPrompt;
 
     // Call Google Gemini API with search grounding
+    // Using Gemini 2.0 Flash experimental (latest with search support)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -124,12 +125,7 @@ REQUIREMENTS:
             responseMimeType: "application/json"
           },
           tools: [{
-            googleSearchRetrieval: {
-              dynamicRetrievalConfig: {
-                mode: "MODE_DYNAMIC",
-                dynamicThreshold: 0.3
-              }
-            }
+            googleSearch: {}
           }]
         })
       }
