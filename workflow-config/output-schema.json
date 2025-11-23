@@ -51,9 +51,17 @@
             "description": "Longitude coordinate (must be number, not string)",
             "minimum": -180,
             "maximum": 180
+          },
+          "order": {
+            "type": "number",
+            "description": "Sequence order for visiting this location (1, 2, 3, etc.). Lower numbers are visited first."
+          },
+          "duration": {
+            "type": "string",
+            "description": "Recommended stay duration (e.g., '3 days', '2 nights', '4 hours', '1 day'). Use empty string if not applicable."
           }
         },
-        "required": ["id", "type", "name", "description", "price", "link", "lat", "lng"],
+        "required": ["id", "type", "name", "description", "price", "link", "lat", "lng", "order", "duration"],
         "additionalProperties": false
       },
       "minItems": 1
@@ -96,7 +104,9 @@
           "price": "",
           "link": "",
           "lat": 48.8566,
-          "lng": 2.3522
+          "lng": 2.3522,
+          "order": 1,
+          "duration": "5 days"
         },
         {
           "id": "2",
@@ -106,7 +116,9 @@
           "price": "$180/night",
           "link": "https://www.booking.com/hotel/fr/atmospheres.html",
           "lat": 48.8584,
-          "lng": 2.3615
+          "lng": 2.3615,
+          "order": 2,
+          "duration": "5 nights"
         },
         {
           "id": "3",
@@ -116,7 +128,9 @@
           "price": "€17 entry",
           "link": "https://www.louvre.fr",
           "lat": 48.8606,
-          "lng": 2.3376
+          "lng": 2.3376,
+          "order": 3,
+          "duration": "3 hours"
         }
       ],
       "connections": []

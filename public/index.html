@@ -2118,7 +2118,9 @@
       "price": "",
       "link": "",
       "lat": 48.8566,
-      "lng": 2.3522
+      "lng": 2.3522,
+      "order": 1,
+      "duration": "3 days"
     },
     {
       "id": "2",
@@ -2128,7 +2130,9 @@
       "price": "$250/night",
       "link": "https://booking.com/hotel-de-paris",
       "lat": 48.8584,
-      "lng": 2.2945
+      "lng": 2.2945,
+      "order": 2,
+      "duration": "3 nights"
     },
     {
       "id": "3",
@@ -2138,7 +2142,9 @@
       "price": "€17 entry",
       "link": "https://louvre.fr",
       "lat": 48.8606,
-      "lng": 2.3376
+      "lng": 2.3376,
+      "order": 3,
+      "duration": "3 hours"
     },
     {
       "id": "4",
@@ -2148,7 +2154,9 @@
       "price": "",
       "link": "",
       "lat": 41.9028,
-      "lng": 12.4964
+      "lng": 12.4964,
+      "order": 4,
+      "duration": "4 days"
     }
   ],
   "connections": [
@@ -2165,6 +2173,8 @@
                 <ol>
                     <li>Add a descriptive <code>title</code> field that summarizes the trip (e.g., "Sri Lanka Honeymoon", "Summer Europe Tour 2025")</li>
                     <li>Ensure all required fields are present for each location</li>
+                    <li>Add <code>order</code> field (number) to sequence locations chronologically (1, 2, 3, etc.)</li>
+                    <li>Add <code>duration</code> field (string) for stay length: "3 days" for cities, "2 nights" for hotels, "2 hours" for attractions</li>
                     <li>Use consistent ID formats (strings, unique)</li>
                     <li>Verify coordinates are valid (use geocoding if needed)</li>
                     <li>Only create connections between <code>"key-location"</code> types</li>
@@ -2642,7 +2652,7 @@
             }
 
             // Filter locations based on visibility filters
-            const filteredLocations = locations.filter(loc => visibilityFilters[loc.type]);
+            let filteredLocations = locations.filter(loc => visibilityFilters[loc.type]);
             
             if (filteredLocations.length === 0) {
                 list.innerHTML = '<p style="color: #999; font-size: 13px;">No locations match current filters</p>';
@@ -2650,14 +2660,22 @@
                 return;
             }
 
+            // Sort by order if available, otherwise maintain original order
+            filteredLocations = filteredLocations.sort((a, b) => {
+                const orderA = typeof a.order === 'number' ? a.order : 999999;
+                const orderB = typeof b.order === 'number' ? b.order : 999999;
+                return orderA - orderB;
+            });
+
             console.log('Generating HTML for', filteredLocations.length, 'filtered locations');
             const html = filteredLocations.map(loc => `
                 <div class="item ${loc.type}" data-location-id="${loc.id}">
                     <div class="item-header">
-                        <span class="item-name">${loc.name}</span>
+                        <span class="item-name">${typeof loc.order === 'number' ? `${loc.order}. ` : ''}${loc.name}</span>
                         <span class="item-type">${loc.type.replace('-', ' ')}</span>
                     </div>
                     ${loc.description ? `<div class="item-description">${loc.description}</div>` : ''}
+                    ${loc.duration ? `<div class="item-description" style="margin-top: 6px;"><strong>⏱️</strong> ${loc.duration}</div>` : ''}
                     ${loc.price ? `<div class="item-description" style="margin-top: 6px;"><strong>💰</strong> ${loc.price}</div>` : ''}
                     ${loc.link ? `<div class="item-description" style="margin-top: 6px;"><a href="${loc.link}" target="_blank" rel="noopener noreferrer" style="color: #0891D0; text-decoration: none; font-size: 12px;">🔗 View Link</a></div>` : ''}
                     <div class="item-actions">
@@ -3043,6 +3061,8 @@ Each location in the "locations" array must have the following properties:
 - "link" (string, optional): URL for booking, website, or reference
 - "lat" (number, required): Latitude coordinate (-90 to 90)
 - "lng" (number, required): Longitude coordinate (-180 to 180)
+- "order" (number, required): Visit sequence number (1, 2, 3, etc.)
+- "duration" (string, required): Stay length (e.g., "3 days", "2 nights", "2 hours")
 
 ## Connection Object Format
 Each connection in the "connections" array connects two Key Locations:
@@ -3066,7 +3086,9 @@ Each connection in the "connections" array connects two Key Locations:
       "price": "",
       "link": "",
       "lat": 48.8566,
-      "lng": 2.3522
+      "lng": 2.3522,
+      "order": 1,
+      "duration": "3 days"
     },
     {
       "id": "2",
@@ -3076,7 +3098,9 @@ Each connection in the "connections" array connects two Key Locations:
       "price": "$250/night",
       "link": "https://booking.com/hotel-de-paris",
       "lat": 48.8584,
-      "lng": 2.2945
+      "lng": 2.2945,
+      "order": 2,
+      "duration": "3 nights"
     },
     {
       "id": "3",
@@ -3086,7 +3110,9 @@ Each connection in the "connections" array connects two Key Locations:
       "price": "€17 entry",
       "link": "https://louvre.fr",
       "lat": 48.8606,
-      "lng": 2.3376
+      "lng": 2.3376,
+      "order": 3,
+      "duration": "3 hours"
     },
     {
       "id": "4",
@@ -3096,7 +3122,9 @@ Each connection in the "connections" array connects two Key Locations:
       "price": "",
       "link": "",
       "lat": 41.9028,
-      "lng": 12.4964
+      "lng": 12.4964,
+      "order": 4,
+      "duration": "4 days"
     }
   ],
   "connections": [
@@ -3113,12 +3141,14 @@ When creating a JSON file for this PlanPilot:
 
 1. Add a descriptive "title" field that summarizes the trip (e.g., "Sri Lanka Honeymoon", "Summer Europe Tour 2025")
 2. Ensure all required fields are present for each location
-3. Use consistent ID formats (strings, unique)
-4. Verify coordinates are valid (use geocoding if needed)
-5. Only create connections between "key-location" types
-6. Include helpful descriptions to provide context
-7. Add price and link information where relevant for accommodation and attractions
-8. Validate JSON syntax before importing
+3. Add "order" field (number) to sequence locations chronologically (1, 2, 3, etc.)
+4. Add "duration" field (string) for stay length: "3 days" for cities, "2 nights" for hotels, "2 hours" for attractions
+5. Use consistent ID formats (strings, unique)
+6. Verify coordinates are valid (use geocoding if needed)
+7. Only create connections between "key-location" types
+8. Include helpful descriptions to provide context
+9. Add price and link information where relevant for accommodation and attractions
+10. Validate JSON syntax before importing
 `;
 
             try {

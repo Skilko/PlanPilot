@@ -15,7 +15,9 @@ When a user provides trip parameters (destination, duration, budget, interests, 
 3. **Identify attractions** with entry fees, descriptions, and coordinates
 4. **Determine key locations** for the trip itinerary (cities, regions, major stops)
 5. **Create logical connections** between key locations to show travel routes
-6. **Generate valid JSON** that matches the PlanPilot format exactly
+6. **Order locations chronologically** - assign an order number to each location based on when it should be visited
+7. **Specify duration** - indicate how long to stay at each location (days for key locations, nights for accommodations, hours for attractions)
+8. **Generate valid JSON** that matches the PlanPilot format exactly
 
 ## Research Requirements
 
@@ -81,7 +83,9 @@ Each location must have:
   "price": "Cost information or empty string",
   "link": "Booking/info URL or empty string",
   "lat": 48.8566,
-  "lng": 2.3522
+  "lng": 2.3522,
+  "order": 1,
+  "duration": "3 days"
 }
 ```
 
@@ -94,6 +98,33 @@ Each location must have:
 - `link`: Full URL (https://...) or "" if not available
 - `lat`: Latitude as number (not string) between -90 and 90
 - `lng`: Longitude as number (not string) between -180 and 180
+- `order`: Number indicating visit sequence (1, 2, 3, etc.) - order locations chronologically
+- `duration`: Recommended stay duration as string (e.g., "3 days", "2 nights", "4 hours", "1 day") or "" if not applicable
+
+### Ordering and Duration
+
+**Order Field (Required):**
+- Assign a sequential number to each location indicating when it should be visited
+- Start at 1 and increment for each subsequent location
+- Order should reflect the logical flow of the trip
+- Key locations should be ordered first, followed by accommodations and attractions in that area
+- For multi-city trips, group locations by city in chronological order
+
+**Duration Field (Required):**
+- Specify how long to spend at each location
+- Format examples:
+  - Key locations: "3 days", "1 week", "5 days"
+  - Accommodations: "3 nights", "1 night", "7 nights"
+  - Attractions: "2 hours", "30 minutes", "half day", "full day"
+- Be realistic based on the location type and what there is to see/do
+- Use empty string "" only if duration truly doesn't apply
+
+**Ordering Strategy:**
+1. First key location and its accommodation (order 1, 2)
+2. Attractions in that area (order 3, 4, 5, etc.)
+3. Second key location and its accommodation
+4. Attractions in that area
+5. Continue pattern for additional destinations
 
 ### Connection Object Format
 
@@ -112,6 +143,7 @@ Connections create travel routes between key locations:
 - The `from` and `to` must reference valid location IDs
 - Use pattern "fromId-toId" for connection IDs
 - Create logical travel routes (order of travel)
+- Connections should align with the order field (lower order to higher order)
 
 ## Example Output
 
@@ -129,7 +161,9 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
       "price": "",
       "link": "",
       "lat": 48.8566,
-      "lng": 2.3522
+      "lng": 2.3522,
+      "order": 1,
+      "duration": "5 days"
     },
     {
       "id": "2",
@@ -139,7 +173,9 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
       "price": "$180/night",
       "link": "https://www.booking.com/hotel/fr/atmospheres.html",
       "lat": 48.8584,
-      "lng": 2.3615
+      "lng": 2.3615,
+      "order": 2,
+      "duration": "5 nights"
     },
     {
       "id": "3",
@@ -149,7 +185,9 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
       "price": "€17 entry",
       "link": "https://www.louvre.fr",
       "lat": 48.8606,
-      "lng": 2.3376
+      "lng": 2.3376,
+      "order": 3,
+      "duration": "3 hours"
     },
     {
       "id": "4",
@@ -159,7 +197,9 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
       "price": "€€ (~€50/person)",
       "link": "https://www.hotel-paris-relais-saint-germain.com/restaurant/",
       "lat": 48.8523,
-      "lng": 2.3387
+      "lng": 2.3387,
+      "order": 4,
+      "duration": "2 hours"
     },
     {
       "id": "5",
@@ -169,7 +209,9 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
       "price": "€16 entry",
       "link": "https://www.musee-orsay.fr",
       "lat": 48.8600,
-      "lng": 2.3266
+      "lng": 2.3266,
+      "order": 5,
+      "duration": "2 hours"
     }
   ],
   "connections": []
@@ -210,10 +252,13 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
 ❌ **Don't:**
 - Use placeholder data (make real recommendations)
 - Forget to include all three location types
-- Put quotes around numbers (lat/lng must be numbers)
+- Put quotes around numbers (lat/lng and order must be numbers)
 - Create connections between attractions or accommodations
 - Use outdated prices or closed venues
 - Include invalid URLs
+- Forget to add order and duration fields
+- Use illogical ordering (attractions before their city)
+- Give unrealistic durations (30 days at a museum)
 
 ✅ **Do:**
 - Research current information using web search
@@ -221,6 +266,8 @@ For a user requesting "5 days in Paris, mid-range budget, interested in art and 
 - Use accurate GPS coordinates
 - Include helpful descriptions
 - Match recommendations to user preferences
+- Order locations in a logical travel sequence
+- Provide realistic durations for each location
 - Return valid, parseable JSON
 
 ## Validation Checklist
@@ -235,6 +282,10 @@ Before returning your JSON, verify:
 - [ ] All lat/lng are numbers (not strings)
 - [ ] All prices are strings (with currency symbols)
 - [ ] All links are full URLs starting with https:// or empty strings
+- [ ] All locations have an order field (number)
+- [ ] Order numbers create a logical sequence (1, 2, 3, etc.)
+- [ ] All locations have a duration field (string like "3 days", "2 hours", etc.)
+- [ ] Durations are realistic for each location type
 - [ ] Connections only reference key-location IDs
 - [ ] JSON is valid and parseable
 

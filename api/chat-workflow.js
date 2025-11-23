@@ -78,7 +78,9 @@ JSON FORMAT (REQUIRED):
       "price": "string",
       "link": "string",
       "lat": number,
-      "lng": number
+      "lng": number,
+      "order": number,
+      "duration": "string"
     }
   ],
   "connections": [
@@ -102,6 +104,10 @@ QUANTITY GUIDELINES (STANDARD):
 
 REQUIREMENTS:
 - lat/lng MUST be numbers (not strings)
+- order MUST be a number indicating visit sequence (1, 2, 3, etc.)
+- duration MUST be a string (e.g., "3 days", "2 nights", "2 hours")
+- Order locations chronologically - start with first destination, its accommodation, then attractions
+- Provide realistic durations: key-locations (days), accommodations (nights), attractions (hours)
 - Use real hotels with real prices from search results
 - Include booking links from major platforms
 - Validate all coordinates are accurate
