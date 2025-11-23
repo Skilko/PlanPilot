@@ -25,78 +25,184 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get Workflow ID from environment
-    const workflowId = process.env.OPENAI_WORKFLOW_ID;
+    // Get Assistant ID from environment (Agent Builder creates Assistants, not Workflows)
+    const assistantId = process.env.OPENAI_WORKFLOW_ID;
+    const apiKey = process.env.OPENAI_API_KEY;
     
-    if (!workflowId) {
+    if (!assistantId) {
       throw new Error('OPENAI_WORKFLOW_ID environment variable not set');
     }
 
-    // Call OpenAI Workflows API
-    const response = await fetch(`https://api.openai.com/v1/workflows/${workflowId}/runs`, {
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable not set');
+    }
+
+    const baseHeaders = {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v2'
+    };
+
+    // Step 1: Create a thread
+    const threadResponse = await fetch('https://api.openai.com/v1/threads', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        input: {
-          destination,
-          duration,
-          budget,
-          interests,
-          mustVisit
-        }
-      })
+      headers: baseHeaders,
+      body: JSON.stringify({})
     });
 
-    // Check if the workflow API responded successfully
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('OpenAI Workflow API error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorData
-      });
-      
-      // Handle specific error codes
-      if (response.status === 404) {
-        return res.status(500).json({ 
-          error: 'Workflow not found. Check OPENAI_WORKFLOW_ID is correct.' 
-        });
-      }
-      
-      return res.status(response.status).json({ 
-        error: `Workflow API error: ${errorData.error?.message || response.statusText}`,
+    if (!threadResponse.ok) {
+      const errorData = await threadResponse.json().catch(() => ({}));
+      console.error('Failed to create thread:', errorData);
+      return res.status(500).json({ 
+        error: 'Failed to create conversation thread',
         details: errorData
       });
     }
 
-    // Parse and extract the workflow response
-    const result = await response.json();
-    
-    // Handle different response formats
-    // Scenario A: Direct output
-    if (result.title && result.locations) {
-      return res.status(200).json(result);
-    }
-    
-    // Scenario B: Wrapped in output property
-    if (result.output) {
-      return res.status(200).json(result.output);
-    }
-    
-    // Scenario C: Async run (workflow still processing)
-    if (result.run_id && result.status === 'in_progress') {
-      return res.status(202).json({ 
-        error: 'Workflow is still processing. This workflow may require polling.',
-        run_id: result.run_id,
-        status: result.status
+    const thread = await threadResponse.json();
+    const threadId = thread.id;
+
+    // Step 2: Add user message to thread
+    const userMessage = JSON.stringify({
+      destination,
+      duration,
+      budget: budget || '',
+      interests: interests || [],
+      mustVisit: mustVisit || ''
+    });
+
+    const messageResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
+      method: 'POST',
+      headers: baseHeaders,
+      body: JSON.stringify({
+        role: 'user',
+        content: userMessage
+      })
+    });
+
+    if (!messageResponse.ok) {
+      const errorData = await messageResponse.json().catch(() => ({}));
+      console.error('Failed to add message:', errorData);
+      return res.status(500).json({ 
+        error: 'Failed to send request to assistant',
+        details: errorData
       });
     }
+
+    // Step 3: Create a run
+    const runResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs`, {
+      method: 'POST',
+      headers: baseHeaders,
+      body: JSON.stringify({
+        assistant_id: assistantId
+      })
+    });
+
+    if (!runResponse.ok) {
+      const errorData = await runResponse.json().catch(() => ({}));
+      console.error('Failed to create run:', errorData);
+      
+      if (runResponse.status === 404) {
+        return res.status(500).json({ 
+          error: 'Assistant not found. Check OPENAI_WORKFLOW_ID is correct (should be the Assistant ID from Agent Builder).' 
+        });
+      }
+      
+      return res.status(500).json({ 
+        error: `Assistant API error: ${errorData.error?.message || runResponse.statusText}`,
+        details: errorData
+      });
+    }
+
+    const run = await runResponse.json();
+    const runId = run.id;
+
+    // Step 4: Poll for completion (with timeout)
+    let runStatus = run.status;
+    let attempts = 0;
+    const maxAttempts = 60; // 60 seconds max
+
+    while (runStatus !== 'completed' && runStatus !== 'failed' && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      
+      const statusResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs/${runId}`, {
+        method: 'GET',
+        headers: baseHeaders
+      });
+
+      if (statusResponse.ok) {
+        const statusData = await statusResponse.json();
+        runStatus = statusData.status;
+      }
+      
+      attempts++;
+    }
+
+    if (runStatus === 'failed') {
+      return res.status(500).json({ 
+        error: 'Assistant run failed',
+        details: 'The assistant encountered an error while processing your request'
+      });
+    }
+
+    if (runStatus !== 'completed') {
+      return res.status(500).json({ 
+        error: 'Assistant run timed out',
+        details: 'The request took too long to process. Please try again.'
+      });
+    }
+
+    // Step 5: Retrieve messages
+    const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
+      method: 'GET',
+      headers: baseHeaders
+    });
+
+    if (!messagesResponse.ok) {
+      const errorData = await messagesResponse.json().catch(() => ({}));
+      console.error('Failed to retrieve messages:', errorData);
+      return res.status(500).json({ 
+        error: 'Failed to retrieve assistant response',
+        details: errorData
+      });
+    }
+
+    const messages = await messagesResponse.json();
     
-    // Default: return as-is
-    return res.status(200).json(result);
+    // Get the latest assistant message
+    const assistantMessage = messages.data.find(msg => msg.role === 'assistant');
+    
+    if (!assistantMessage || !assistantMessage.content || !assistantMessage.content[0]) {
+      return res.status(500).json({ 
+        error: 'No response from assistant',
+        details: 'The assistant did not provide a response'
+      });
+    }
+
+    // Extract the text content
+    const responseText = assistantMessage.content[0].text.value;
+    
+    // Try to parse as JSON
+    let tripData;
+    try {
+      // Remove markdown code blocks if present
+      const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || 
+                       responseText.match(/```\n?([\s\S]*?)\n?```/);
+      const jsonString = jsonMatch ? jsonMatch[1] : responseText;
+      
+      tripData = JSON.parse(jsonString.trim());
+    } catch (parseError) {
+      console.error('Failed to parse assistant response as JSON:', parseError);
+      console.error('Response text:', responseText);
+      return res.status(500).json({ 
+        error: 'Invalid response format from assistant',
+        details: 'The assistant did not return valid JSON. Please check the assistant configuration.',
+        rawResponse: responseText.substring(0, 500)
+      });
+    }
+
+    // Return the parsed trip data
+    return res.status(200).json(tripData);
     
   } catch (error) {
     console.error('Workflow error:', error);
