@@ -1983,6 +1983,17 @@
                     </div>
                     
                     <div class="control-group">
+                        <label for="planResponseMode">AI Response Mode</label>
+                        <select id="planResponseMode" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="flash">⚡ Quick & Light (5-15 seconds, fewer options)</option>
+                            <option value="pro">🎯 Slow & Detailed (15-30 seconds, more options)</option>
+                        </select>
+                        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0; font-style: italic;">
+                            Quick mode is faster and cheaper. Detailed mode searches more thoroughly and provides more accommodation and attraction options.
+                        </p>
+                    </div>
+                    
+                    <div class="control-group">
                         <label for="planInterests">Interests (comma-separated)</label>
                         <input type="text" id="planInterests" placeholder="e.g., art, food, history, beaches" 
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
@@ -2863,12 +2874,15 @@
         function handlePlanningFormSubmit(event) {
             event.preventDefault();
             
+            const responseMode = document.getElementById('planResponseMode').value;
+            
             const formData = {
                 destination: document.getElementById('planDestination').value.trim(),
                 duration: document.getElementById('planDuration').value.trim(),
                 budget: document.getElementById('planBudget').value,
                 interests: document.getElementById('planInterests').value.trim().split(',').map(i => i.trim()).filter(i => i),
-                mustVisit: document.getElementById('planMustVisit').value.trim()
+                mustVisit: document.getElementById('planMustVisit').value.trim(),
+                responseMode: responseMode
             };
             
             generateTripWithWorkflow(formData);
@@ -2876,7 +2890,15 @@
 
         // Generate trip using ChatGPT Workflow API
         async function generateTripWithWorkflow(formData) {
-            showLoadingOverlay('Generating Your Trip Plan...', 'Researching destinations and gathering information');
+            const isProMode = formData.responseMode === 'pro';
+            const loadingTitle = isProMode 
+                ? 'Generating Detailed Trip Plan...' 
+                : 'Generating Quick Trip Plan...';
+            const loadingMessage = isProMode 
+                ? 'Conducting thorough research for more options (15-30 seconds)' 
+                : 'Researching destinations and gathering information (5-15 seconds)';
+            
+            showLoadingOverlay(loadingTitle, loadingMessage);
             closePlanningModal();
             
             try {

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   // Extract trip parameters from request body
-  const { destination, duration, budget, interests, mustVisit } = req.body;
+  const { destination, duration, budget, interests, mustVisit, responseMode } = req.body;
 
   // Validate required fields
   if (!destination || !duration) {
@@ -23,6 +23,10 @@ export default async function handler(req, res) {
       error: 'Missing required fields: destination and duration are required' 
     });
   }
+
+  // Determine which mode to use (default to flash for speed)
+  const isProMode = responseMode === 'pro';
+  const modelName = isProMode ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
 
   try {
     const apiKey = process.env.GOOGLE_AI_API_KEY;
@@ -32,13 +36,17 @@ export default async function handler(req, res) {
     }
 
     // Build the prompt with trip parameters
+    const modeInstruction = isProMode 
+      ? '\n\nMODE: DETAILED - Provide MORE accommodation and attraction options than usual. Be thorough and comprehensive.' 
+      : '\n\nMODE: QUICK - Provide a good selection of accommodations and attractions, but prioritize speed.';
+    
     const userPrompt = `Generate a comprehensive trip plan in JSON format for the following trip:
 
 Destination: ${destination}
 Duration: ${duration}
 Budget Level: ${budget || 'not specified'}
 Interests: ${interests && interests.length > 0 ? interests.join(', ') : 'not specified'}
-Must-Visit Locations: ${mustVisit || 'none specified'}
+Must-Visit Locations: ${mustVisit || 'none specified'}${modeInstruction}
 
 IMPORTANT: 
 1. Search for CURRENT information about hotels, accommodations, attractions, and prices
@@ -87,7 +95,7 @@ LOCATION TYPES:
 - accommodation: Hotels, hostels, Airbnb (MUST have price and link)
 - attraction: Places to visit (entry fees if applicable)
 
-QUANTITY GUIDELINES:
+QUANTITY GUIDELINES (STANDARD):
 - 3-5 days: 1 key location, 2-4 accommodations, 5-10 attractions
 - 1 week: 2-3 key locations, 4-6 accommodations, 10-15 attractions
 - 2+ weeks: 3-5 key locations, 6-10 accommodations, 15-25 attractions
@@ -99,12 +107,29 @@ REQUIREMENTS:
 - Validate all coordinates are accurate
 - Return ONLY valid JSON (no markdown, no explanation)`;
 
-    const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || defaultSystemPrompt;
+    // Pro mode system prompt with increased quantity requirements
+    const proSystemPrompt = defaultSystemPrompt.replace(
+      'QUANTITY GUIDELINES (STANDARD):',
+      'QUANTITY GUIDELINES (DETAILED MODE - PROVIDE MORE OPTIONS):'
+    ).replace(
+      '- 3-5 days: 1 key location, 2-4 accommodations, 5-10 attractions',
+      '- 3-5 days: 1-2 key locations, 4-6 accommodations, 10-15 attractions'
+    ).replace(
+      '- 1 week: 2-3 key locations, 4-6 accommodations, 10-15 attractions',
+      '- 1 week: 2-4 key locations, 8-12 accommodations, 20-30 attractions'
+    ).replace(
+      '- 2+ weeks: 3-5 key locations, 6-10 accommodations, 15-25 attractions',
+      '- 2+ weeks: 4-8 key locations, 12-20 accommodations, 30-50 attractions'
+    );
+
+    const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || (isProMode ? proSystemPrompt : defaultSystemPrompt);
 
     // Call Google Gemini API with grounding (requires billing)
-    // Using Gemini 2.5 Flash - faster and more cost-effective
+    // Model selection based on user preference
+    console.log(`Using ${modelName} model for ${isProMode ? 'detailed' : 'quick'} mode`);
+    
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
