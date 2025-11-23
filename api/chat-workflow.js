@@ -125,7 +125,7 @@ REQUIREMENTS:
             responseMimeType: "application/json"
           },
           tools: [{
-            googleSearchRetrieval: {}
+            google_search: {}
           }]
         })
       }
