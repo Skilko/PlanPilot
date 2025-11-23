@@ -102,9 +102,9 @@ REQUIREMENTS:
     const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || defaultSystemPrompt;
 
     // Call Google Gemini API with grounding (requires billing)
-    // Using Gemini 1.5 Pro - best balance of quality, speed, and search capability
+    // Using gemini-1.5-pro-latest - correct stable alias for v1beta API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
