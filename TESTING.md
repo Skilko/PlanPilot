@@ -54,11 +54,13 @@ This guide will help you verify that Phases 1-3 of the PlanPilot deployment are 
 
 | Variable Name | Value | Environment |
 |--------------|-------|-------------|
-| `CHATGPT_WORKFLOW_URL` | Your ChatGPT Agent Workflow endpoint | Production, Preview, Development |
-| `CHATGPT_API_KEY` | Your OpenAI API key | Production, Preview, Development |
+| `OPENAI_WORKFLOW_ID` | Your OpenAI Workflow ID (e.g., wf_69077644...) | Production, Preview, Development |
+| `OPENAI_API_KEY` | Your OpenAI API key | Production, Preview, Development |
 
 5. Click **Save**
 6. **Redeploy** your app (Settings → Deployments → click ⋯ on latest → Redeploy)
+
+**Note:** Find your Workflow ID in the OpenAI dashboard under Workflows → select your workflow → the ID starts with `wf_`
 
 ### Test 2.1: API Endpoint Exists
 **What it tests:** Serverless function deployment
@@ -275,7 +277,11 @@ Copy this checklist and check off as you test:
 
 ### Issue: API returns "fetch failed"
 **Cause:** Environment variables not set or incorrect
-**Fix:** Add `CHATGPT_WORKFLOW_URL` and `CHATGPT_API_KEY` in Vercel Dashboard → Settings → Environment Variables → Redeploy
+**Fix:** Add `OPENAI_WORKFLOW_ID` and `OPENAI_API_KEY` in Vercel Dashboard → Settings → Environment Variables → Redeploy
+
+### Issue: "Workflow not found" error
+**Cause:** Incorrect Workflow ID or workflow doesn't exist
+**Fix:** Verify `OPENAI_WORKFLOW_ID` is correct in Vercel environment variables. Check the ID in your OpenAI dashboard (should start with `wf_`)
 
 ### Issue: Loading overlay doesn't appear
 **Cause:** CSS not loading or Phase 3 not deployed

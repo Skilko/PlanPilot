@@ -221,13 +221,14 @@ Now connect your workflow to the Vercel deployment:
 3. Go to **Settings** → **Environment Variables**
 4. Add/Update these variables:
 
-### Variable 1: CHATGPT_WORKFLOW_URL
-- **Key:** `CHATGPT_WORKFLOW_URL`
-- **Value:** (Paste the endpoint URL from Step 8.1)
+### Variable 1: OPENAI_WORKFLOW_ID
+- **Key:** `OPENAI_WORKFLOW_ID`
+- **Value:** Your workflow ID (e.g., `wf_69077644556c8190ae880fe26c11591202b869b697351d99`)
 - **Environment:** Select all (Production, Preview, Development)
+- **Where to find:** In your OpenAI dashboard, go to Workflows → select your workflow → the ID is in the URL or workflow details
 
-### Variable 2: CHATGPT_API_KEY
-- **Key:** `CHATGPT_API_KEY`
+### Variable 2: OPENAI_API_KEY
+- **Key:** `OPENAI_API_KEY`
 - **Value:** (Paste your API key from Step 8.2)
 - **Environment:** Select all (Production, Preview, Development)
 
@@ -237,6 +238,8 @@ Now connect your workflow to the Vercel deployment:
    - Click ⋯ on the latest deployment
    - Select **Redeploy**
    - Wait for deployment to complete
+
+**Note:** The workflow ID format is `wf_` followed by alphanumeric characters. Make sure to use the full ID, not a shortened URL.
 
 ---
 
