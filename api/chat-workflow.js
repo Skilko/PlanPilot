@@ -101,10 +101,10 @@ REQUIREMENTS:
 
     const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || defaultSystemPrompt;
 
-    // Call Google Gemini API
-    // Using Gemini 1.5 Flash (stable model with free tier)
+    // Call Google Gemini API with grounding (requires billing)
+    // Using Gemini 1.5 Pro - best balance of quality, speed, and search capability
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -123,7 +123,10 @@ REQUIREMENTS:
             temperature: 0.7,
             maxOutputTokens: 8192,
             responseMimeType: "application/json"
-          }
+          },
+          tools: [{
+            googleSearchRetrieval: {}
+          }]
         })
       }
     );
