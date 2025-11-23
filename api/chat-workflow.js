@@ -178,8 +178,19 @@ REQUIREMENTS:
     // Parse JSON response
     let tripData;
     try {
-      // Gemini with responseMimeType="application/json" should return valid JSON
-      tripData = JSON.parse(responseText);
+      // Strip markdown code blocks if present (Gemini often wraps JSON in ```json ... ```)
+      let jsonString = responseText.trim();
+      
+      // Check for markdown code blocks
+      const jsonMatch = jsonString.match(/```json\s*\n?([\s\S]*?)\n?```/) || 
+                        jsonString.match(/```\s*\n?([\s\S]*?)\n?```/);
+      
+      if (jsonMatch) {
+        jsonString = jsonMatch[1].trim();
+      }
+      
+      // Parse the cleaned JSON
+      tripData = JSON.parse(jsonString);
     } catch (parseError) {
       console.error('Failed to parse JSON response:', parseError);
       console.error('Response text:', responseText);
