@@ -50,17 +50,16 @@ This guide will help you verify that Phases 1-3 of the PlanPilot deployment are 
 1. Go to your Vercel Dashboard: https://vercel.com/dashboard
 2. Select your PlanPilot project
 3. Go to **Settings** → **Environment Variables**
-4. Add these two variables:
+4. Add this required variable:
 
 | Variable Name | Value | Environment |
 |--------------|-------|-------------|
-| `OPENAI_WORKFLOW_ID` | Your OpenAI Workflow ID (e.g., wf_69077644...) | Production, Preview, Development |
-| `OPENAI_API_KEY` | Your OpenAI API key | Production, Preview, Development |
+| `GOOGLE_AI_API_KEY` | Your Google AI API key (starts with AIza...) | Production, Preview, Development |
 
 5. Click **Save**
 6. **Redeploy** your app (Settings → Deployments → click ⋯ on latest → Redeploy)
 
-**Note:** Find your Workflow ID in the OpenAI dashboard under Workflows → select your workflow → the ID starts with `wf_`
+**Note:** Get your API key from https://aistudio.google.com/app/apikey (free tier available with 1,500 requests/day)
 
 ### Test 2.1: API Endpoint Exists
 **What it tests:** Serverless function deployment
@@ -277,11 +276,15 @@ Copy this checklist and check off as you test:
 
 ### Issue: API returns "fetch failed"
 **Cause:** Environment variables not set or incorrect
-**Fix:** Add `OPENAI_WORKFLOW_ID` and `OPENAI_API_KEY` in Vercel Dashboard → Settings → Environment Variables → Redeploy
+**Fix:** Add `GOOGLE_AI_API_KEY` in Vercel Dashboard → Settings → Environment Variables → Redeploy
 
-### Issue: "Workflow not found" error
-**Cause:** Incorrect Workflow ID or workflow doesn't exist
-**Fix:** Verify `OPENAI_WORKFLOW_ID` is correct in Vercel environment variables. Check the ID in your OpenAI dashboard (should start with `wf_`)
+### Issue: "GOOGLE_AI_API_KEY environment variable not set"
+**Cause:** Missing API key in Vercel
+**Fix:** Get API key from https://aistudio.google.com/app/apikey and add to Vercel environment variables
+
+### Issue: "No response generated" or "Content was filtered"
+**Cause:** Gemini safety filters triggered or API quota exceeded
+**Fix:** Check if API key is valid, verify you haven't exceeded free tier limits (1,500 requests/day), or try different search terms
 
 ### Issue: Loading overlay doesn't appear
 **Cause:** CSS not loading or Phase 3 not deployed

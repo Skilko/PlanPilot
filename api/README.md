@@ -6,7 +6,7 @@ This directory contains serverless functions that run on Vercel.
 
 ### POST /api/chat-workflow
 
-Proxies requests to the OpenAI Workflows API to generate trip plans using a configured workflow.
+Calls Google Gemini 1.5 Pro API with search grounding to generate trip plans with real-time travel information.
 
 **Request Body:**
 ```json
@@ -69,33 +69,42 @@ curl -X POST http://localhost:3000/api/chat-workflow \
 
 Required environment variables:
 
-### OPENAI_WORKFLOW_ID
-- **Format:** `wf_` followed by alphanumeric characters
-- **Example:** `wf_69077644556c8190ae880fe26c11591202b869b697351d99`
-- **Description:** Unique identifier for your OpenAI Workflow
-- **Where to find:** OpenAI dashboard → Workflows → select your workflow → ID is in URL or details
+### GOOGLE_AI_API_KEY
+- **Format:** Starts with `AIza`
+- **Example:** `AIzaSyABC123def456GHI789jkl...`
+- **Description:** Google AI API key for Gemini access
+- **Where to get:** https://aistudio.google.com/app/apikey
+- **Free tier:** Yes - 1,500 requests/day
 
-### OPENAI_API_KEY
-- **Format:** `sk-` followed by alphanumeric characters
-- **Example:** `sk-proj-xxxxxxxxxxxxx`
-- **Description:** Your OpenAI API key for authentication
-- **Where to get:** https://platform.openai.com/api-keys
+### GEMINI_SYSTEM_PROMPT (Optional)
+- **Description:** Custom system instructions for Gemini model
+- **Default:** Uses embedded prompt if not set
+- **Format:** Plain text, multi-line
+- **When to use:** For custom prompt modifications
+- **Location:** Can be copied from `workflow-config/gemini-system-prompt.txt`
 
 ## Production Deployment
 
 Environment variables must be configured in the Vercel Dashboard:
 1. Go to Project Settings → Environment Variables
-2. Add `OPENAI_WORKFLOW_ID` with your workflow ID
-3. Add `OPENAI_API_KEY` with your OpenAI API key
+2. Add `GOOGLE_AI_API_KEY` with your Google AI API key
+3. (Optional) Add `GEMINI_SYSTEM_PROMPT` for custom instructions
 4. Select all environments (Production, Preview, Development)
 5. Save and redeploy if already deployed
 
 ## API Details
 
-The serverless function calls the OpenAI Workflows API endpoint:
+The serverless function calls Google Gemini 1.5 Pro API:
 ```
-POST https://api.openai.com/v1/workflows/{WORKFLOW_ID}/runs
+POST https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent
 ```
 
-Request body is wrapped in an `input` object as required by the Workflows API.
+With search grounding enabled via `googleSearchRetrieval` tool for real-time web search capabilities.
+
+**Features:**
+- Native JSON response format (`responseMimeType: "application/json"`)
+- Google Search grounding for current travel information
+- Dynamic retrieval threshold (0.3) for balanced search usage
+- Temperature 0.7 for creative but accurate outputs
+- Max 8192 output tokens for detailed trip plans
 

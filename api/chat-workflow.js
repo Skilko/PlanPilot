@@ -25,191 +25,201 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get Assistant ID from environment (Agent Builder creates Assistants, not Workflows)
-    const assistantId = process.env.OPENAI_WORKFLOW_ID;
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GOOGLE_AI_API_KEY;
     
-    if (!assistantId) {
-      throw new Error('OPENAI_WORKFLOW_ID environment variable not set');
-    }
-
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable not set');
+      throw new Error('GOOGLE_AI_API_KEY environment variable not set');
     }
 
-    const baseHeaders = {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2'
-    };
+    // Build the prompt with trip parameters
+    const userPrompt = `Generate a comprehensive trip plan in JSON format for the following trip:
 
-    // Step 1: Create a thread
-    const threadResponse = await fetch('https://api.openai.com/v1/threads', {
-      method: 'POST',
-      headers: baseHeaders,
-      body: JSON.stringify({})
-    });
+Destination: ${destination}
+Duration: ${duration}
+Budget Level: ${budget || 'not specified'}
+Interests: ${interests && interests.length > 0 ? interests.join(', ') : 'not specified'}
+Must-Visit Locations: ${mustVisit || 'none specified'}
 
-    if (!threadResponse.ok) {
-      const errorData = await threadResponse.json().catch(() => ({}));
-      console.error('Failed to create thread:', errorData);
-      return res.status(500).json({ 
-        error: 'Failed to create conversation thread',
-        details: errorData
-      });
+IMPORTANT: 
+1. Search for CURRENT information about hotels, accommodations, attractions, and prices
+2. Find REAL hotels with actual prices and booking links
+3. Include popular attractions with current entry fees
+4. Use accurate GPS coordinates
+5. Return ONLY valid JSON, no other text
+6. Follow the exact format specified in your instructions`;
+
+    // Default system prompt (can be overridden by environment variable)
+    const defaultSystemPrompt = `You are a professional travel research agent that creates comprehensive trip plans in JSON format.
+
+SEARCH REQUIREMENT: Use Google Search to find CURRENT, REAL information about:
+- Hotel names, prices, and booking links (Booking.com, Hotels.com, Airbnb)
+- Attraction names, entry fees, and official websites
+- Restaurant recommendations with price ranges
+- Accurate GPS coordinates for all locations
+- Current travel information and tips
+
+JSON FORMAT (REQUIRED):
+{
+  "title": "Trip Name",
+  "locations": [
+    {
+      "id": "string",
+      "type": "key-location|accommodation|attraction",
+      "name": "string",
+      "description": "string",
+      "price": "string",
+      "link": "string",
+      "lat": number,
+      "lng": number
     }
-
-    const thread = await threadResponse.json();
-    const threadId = thread.id;
-
-    // Step 2: Add user message to thread
-    const userMessage = JSON.stringify({
-      destination,
-      duration,
-      budget: budget || '',
-      interests: interests || [],
-      mustVisit: mustVisit || ''
-    });
-
-    const messageResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
-      method: 'POST',
-      headers: baseHeaders,
-      body: JSON.stringify({
-        role: 'user',
-        content: userMessage
-      })
-    });
-
-    if (!messageResponse.ok) {
-      const errorData = await messageResponse.json().catch(() => ({}));
-      console.error('Failed to add message:', errorData);
-      return res.status(500).json({ 
-        error: 'Failed to send request to assistant',
-        details: errorData
-      });
+  ],
+  "connections": [
+    {
+      "id": "string",
+      "from": "string",
+      "to": "string"
     }
+  ]
+}
 
-    // Step 3: Create a run
-    const runResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs`, {
-      method: 'POST',
-      headers: baseHeaders,
-      body: JSON.stringify({
-        assistant_id: assistantId
-      })
-    });
+LOCATION TYPES:
+- key-location: Major destinations (cities, regions)
+- accommodation: Hotels, hostels, Airbnb (MUST have price and link)
+- attraction: Places to visit (entry fees if applicable)
 
-    if (!runResponse.ok) {
-      const errorData = await runResponse.json().catch(() => ({}));
-      console.error('Failed to create run:', errorData);
-      
-      if (runResponse.status === 404) {
-        return res.status(500).json({ 
-          error: 'Assistant not found. Check OPENAI_WORKFLOW_ID is correct (should be the Assistant ID from Agent Builder).' 
-        });
+QUANTITY GUIDELINES:
+- 3-5 days: 1 key location, 2-4 accommodations, 5-10 attractions
+- 1 week: 2-3 key locations, 4-6 accommodations, 10-15 attractions
+- 2+ weeks: 3-5 key locations, 6-10 accommodations, 15-25 attractions
+
+REQUIREMENTS:
+- lat/lng MUST be numbers (not strings)
+- Use real hotels with real prices from search results
+- Include booking links from major platforms
+- Validate all coordinates are accurate
+- Return ONLY valid JSON (no markdown, no explanation)`;
+
+    const systemPrompt = process.env.GEMINI_SYSTEM_PROMPT || defaultSystemPrompt;
+
+    // Call Google Gemini API with search grounding
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: userPrompt }]
+          }],
+          systemInstruction: {
+            parts: [{
+              text: systemPrompt
+            }]
+          },
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 8192,
+            responseMimeType: "application/json"
+          },
+          tools: [{
+            googleSearchRetrieval: {
+              dynamicRetrievalConfig: {
+                mode: "MODE_DYNAMIC",
+                dynamicThreshold: 0.3
+              }
+            }
+          }]
+        })
       }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Google Gemini API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
       
-      return res.status(500).json({ 
-        error: `Assistant API error: ${errorData.error?.message || runResponse.statusText}`,
+      return res.status(response.status).json({ 
+        error: `Gemini API error: ${errorData.error?.message || response.statusText}`,
         details: errorData
       });
     }
 
-    const run = await runResponse.json();
-    const runId = run.id;
-
-    // Step 4: Poll for completion (with timeout)
-    let runStatus = run.status;
-    let attempts = 0;
-    const maxAttempts = 60; // 60 seconds max
-
-    while (runStatus !== 'completed' && runStatus !== 'failed' && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-      
-      const statusResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/runs/${runId}`, {
-        method: 'GET',
-        headers: baseHeaders
-      });
-
-      if (statusResponse.ok) {
-        const statusData = await statusResponse.json();
-        runStatus = statusData.status;
-      }
-      
-      attempts++;
-    }
-
-    if (runStatus === 'failed') {
-      return res.status(500).json({ 
-        error: 'Assistant run failed',
-        details: 'The assistant encountered an error while processing your request'
-      });
-    }
-
-    if (runStatus !== 'completed') {
-      return res.status(500).json({ 
-        error: 'Assistant run timed out',
-        details: 'The request took too long to process. Please try again.'
-      });
-    }
-
-    // Step 5: Retrieve messages
-    const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${threadId}/messages`, {
-      method: 'GET',
-      headers: baseHeaders
-    });
-
-    if (!messagesResponse.ok) {
-      const errorData = await messagesResponse.json().catch(() => ({}));
-      console.error('Failed to retrieve messages:', errorData);
-      return res.status(500).json({ 
-        error: 'Failed to retrieve assistant response',
-        details: errorData
-      });
-    }
-
-    const messages = await messagesResponse.json();
+    const result = await response.json();
     
-    // Get the latest assistant message
-    const assistantMessage = messages.data.find(msg => msg.role === 'assistant');
-    
-    if (!assistantMessage || !assistantMessage.content || !assistantMessage.content[0]) {
+    // Extract the generated content
+    if (!result.candidates || result.candidates.length === 0) {
+      console.error('No candidates in response:', result);
       return res.status(500).json({ 
-        error: 'No response from assistant',
-        details: 'The assistant did not provide a response'
+        error: 'No response generated',
+        details: 'The model did not generate a response'
       });
     }
 
-    // Extract the text content
-    const responseText = assistantMessage.content[0].text.value;
+    const candidate = result.candidates[0];
     
-    // Try to parse as JSON
+    // Check for content filtering
+    if (candidate.finishReason === 'SAFETY') {
+      return res.status(500).json({ 
+        error: 'Content was filtered for safety reasons',
+        details: 'Please try different search terms'
+      });
+    }
+
+    if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+      console.error('No content parts in response:', candidate);
+      return res.status(500).json({ 
+        error: 'Invalid response format',
+        details: 'No content returned from model'
+      });
+    }
+
+    const responseText = candidate.content.parts[0].text;
+    
+    // Parse JSON response
     let tripData;
     try {
-      // Remove markdown code blocks if present
-      const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || 
-                       responseText.match(/```\n?([\s\S]*?)\n?```/);
-      const jsonString = jsonMatch ? jsonMatch[1] : responseText;
-      
-      tripData = JSON.parse(jsonString.trim());
+      // Gemini with responseMimeType="application/json" should return valid JSON
+      tripData = JSON.parse(responseText);
     } catch (parseError) {
-      console.error('Failed to parse assistant response as JSON:', parseError);
+      console.error('Failed to parse JSON response:', parseError);
       console.error('Response text:', responseText);
       return res.status(500).json({ 
-        error: 'Invalid response format from assistant',
-        details: 'The assistant did not return valid JSON. Please check the assistant configuration.',
+        error: 'Invalid JSON response from model',
+        details: 'The model did not return valid JSON',
         rawResponse: responseText.substring(0, 500)
       });
     }
 
-    // Return the parsed trip data
+    // Validate required fields
+    if (!tripData.title || !tripData.locations || !Array.isArray(tripData.locations)) {
+      return res.status(500).json({ 
+        error: 'Invalid trip data format',
+        details: 'Response missing required fields (title, locations)',
+        data: tripData
+      });
+    }
+
+    // Log search metadata if available
+    if (candidate.groundingMetadata) {
+      console.log('Search grounding used:', {
+        searchQueries: candidate.groundingMetadata.searchEntryPoint?.renderedContent,
+        retrievalQueries: candidate.groundingMetadata.retrievalQueries
+      });
+    }
+
+    // Return the trip data
     return res.status(200).json(tripData);
     
   } catch (error) {
-    console.error('Workflow error:', error);
+    console.error('Error generating trip:', error);
     return res.status(500).json({ 
       error: 'Failed to generate trip plan',
       message: error.message 
     });
   }
 }
-

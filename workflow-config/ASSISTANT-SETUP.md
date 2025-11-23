@@ -1,4 +1,18 @@
-# Setting Up OpenAI Assistant for PlanPilot
+# DEPRECATED: Setting Up OpenAI Assistant for PlanPilot
+
+**⚠️ NOTICE:** PlanPilot now uses Google Gemini 1.5 Pro with search grounding instead of OpenAI Assistants.
+
+**Reasons for migration:**
+- ✅ Built-in Google Search for real-time travel information
+- ✅ 95% cost reduction ($0.001-0.005 vs $0.01-0.03 per trip)
+- ✅ Simpler implementation (single API call vs multi-step threading)
+- ✅ Faster responses (10-30 seconds vs 15-60 seconds)
+
+**See the current setup guide:** `GEMINI-SETUP.md`
+
+---
+
+## Legacy Documentation (For Reference Only)
 
 This guide walks you through creating an OpenAI Assistant that integrates with PlanPilot for AI-powered trip generation.
 
