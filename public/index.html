@@ -481,15 +481,16 @@
         /* Timeline Styles */
         .timeline-container {
             position: absolute;
-            top: 60px;
+            top: 70px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
+            width: 92%;
             max-width: 1200px;
             background: rgba(255, 255, 255, 0.98);
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 12px;
+            padding: 16px;
+            padding-bottom: 12px;
             z-index: 999;
             display: none;
             backdrop-filter: blur(10px);
@@ -574,24 +575,65 @@
         }
 
         .timeline-content {
-            min-height: 120px;
+            min-height: 240px;
             position: relative;
-            padding: 10px 0;
+            padding: 30px 0 10px 0;
+        }
+
+        .timeline-period-label {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .timeline-tracks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .timeline-track-wrapper {
+            position: relative;
+        }
+
+        .timeline-track-label {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 5;
+            white-space: nowrap;
         }
 
         .timeline-track {
             position: relative;
             min-width: 100%;
-            height: 100px;
-            display: flex;
-            gap: 2px;
+            height: 70px;
+            padding-left: 100px;
+            background: rgba(240, 240, 240, 0.3);
+            border-radius: 6px;
         }
 
         .timeline-item {
             position: relative;
-            height: 80px;
+            height: 60px;
             border-radius: 8px;
-            padding: 8px;
+            padding: 6px 8px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -1647,9 +1689,9 @@
 
             /* Timeline mobile styles */
             .timeline-container {
-                top: 100px;
+                top: 110px;
                 width: 95%;
-                padding: 8px;
+                padding: 10px;
             }
 
             .timeline-controls {
@@ -1663,35 +1705,47 @@
             }
 
             .timeline-content {
-                min-height: 100px;
+                min-height: 200px;
+                padding: 25px 0 8px 0;
+            }
+
+            .timeline-period-label {
+                font-size: 10px;
+                padding: 3px 10px;
             }
 
             .timeline-track {
-                height: 80px;
+                height: 60px;
+                padding-left: 90px;
+            }
+
+            .timeline-track-label {
+                font-size: 9px;
+                padding: 2px 4px;
             }
 
             .timeline-item {
-                height: 60px;
-                padding: 6px;
+                height: 50px;
+                padding: 5px 6px;
             }
 
             .timeline-item-icon {
-                font-size: 16px;
+                font-size: 14px;
                 margin-bottom: 2px;
             }
 
             .timeline-item-name {
-                font-size: 10px;
-            }
-
-            .timeline-item-duration {
                 font-size: 9px;
             }
 
-            .timeline-item-order {
-                width: 16px;
-                height: 16px;
+            .timeline-item-duration {
                 font-size: 8px;
+            }
+
+            .timeline-item-order {
+                width: 14px;
+                height: 14px;
+                font-size: 7px;
             }
 
             /* Make filter/legend collapsible for mobile */
@@ -2106,7 +2160,21 @@
             <div class="timeline-wrapper">
                 <div class="timeline-viewport">
                     <div class="timeline-content" id="timeline-content">
-                        <div class="timeline-track" id="timeline-track"></div>
+                        <div class="timeline-period-label" id="timeline-period-label"></div>
+                        <div class="timeline-tracks-container" id="timeline-tracks-container">
+                            <div class="timeline-track-wrapper">
+                                <div class="timeline-track-label">📍 Key Locations</div>
+                                <div class="timeline-track" id="timeline-track-key-location"></div>
+                            </div>
+                            <div class="timeline-track-wrapper">
+                                <div class="timeline-track-label">🏨 Accommodation</div>
+                                <div class="timeline-track" id="timeline-track-accommodation"></div>
+                            </div>
+                            <div class="timeline-track-wrapper">
+                                <div class="timeline-track-label">⭐ Attractions</div>
+                                <div class="timeline-track" id="timeline-track-attraction"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3007,9 +3075,12 @@
         // Update timeline display
         function updateTimeline() {
             const container = document.getElementById('timeline-container');
-            const track = document.getElementById('timeline-track');
+            const periodLabel = document.getElementById('timeline-period-label');
+            const keyLocationTrack = document.getElementById('timeline-track-key-location');
+            const accommodationTrack = document.getElementById('timeline-track-accommodation');
+            const attractionTrack = document.getElementById('timeline-track-attraction');
             
-            if (!container || !track) return;
+            if (!container || !keyLocationTrack || !accommodationTrack || !attractionTrack) return;
             
             // Only show timeline if we have locations with durations
             const locationsWithDuration = locations.filter(loc => loc.duration && loc.duration.trim() !== '');
@@ -3039,46 +3110,87 @@
                 return item;
             });
             
+            // Calculate time period label
+            const totalDays = Math.ceil(totalHours / 24);
+            if (periodLabel) {
+                if (totalDays <= 1) {
+                    periodLabel.textContent = '1 Day';
+                } else if (totalDays <= 7) {
+                    periodLabel.textContent = `${totalDays} Days Trip`;
+                } else {
+                    const weeks = Math.floor(totalDays / 7);
+                    const days = totalDays % 7;
+                    periodLabel.textContent = weeks === 1 
+                        ? `1 Week${days > 0 ? ' + ' + days + ' Days' : ''}` 
+                        : `${weeks} Weeks${days > 0 ? ' + ' + days + ' Days' : ''}`;
+                }
+            }
+            
             // Minimum width for timeline
             const minTotalWidth = 800;
             const baseWidth = Math.max(minTotalWidth, totalHours * 10 * timelineZoom);
             
-            // Render timeline items
-            track.innerHTML = '';
-            track.style.width = baseWidth + 'px';
+            // Clear all tracks
+            keyLocationTrack.innerHTML = '';
+            accommodationTrack.innerHTML = '';
+            attractionTrack.innerHTML = '';
             
-            timelineItems.forEach(item => {
-                const widthPercent = (item.hours / totalHours) * 100;
-                const minWidth = 60; // Minimum pixel width for readability
-                const itemWidth = Math.max(minWidth, (item.hours / totalHours) * baseWidth);
-                
-                const itemEl = document.createElement('div');
-                itemEl.className = `timeline-item ${item.location.type}`;
-                itemEl.dataset.locationId = item.location.id;
-                itemEl.style.width = itemWidth + 'px';
-                itemEl.style.minWidth = minWidth + 'px';
-                itemEl.style.flexShrink = '0';
-                
-                if (selectedTimelineItemId === item.location.id) {
-                    itemEl.classList.add('selected');
+            // Set widths for all tracks
+            [keyLocationTrack, accommodationTrack, attractionTrack].forEach(track => {
+                track.style.width = baseWidth + 'px';
+            });
+            
+            // Separate items by type
+            const keyLocationItems = timelineItems.filter(item => item.location.type === 'key-location');
+            const accommodationItems = timelineItems.filter(item => item.location.type === 'accommodation');
+            const attractionItems = timelineItems.filter(item => item.location.type === 'attraction');
+            
+            // Function to render items to a track
+            function renderItemsToTrack(items, track, type) {
+                if (items.length === 0) {
+                    track.innerHTML = '<div style="padding: 20px; text-align: center; color: #999; font-size: 12px;">No items</div>';
+                    return;
                 }
                 
-                const icon = item.location.type === 'key-location' ? '📍' : 
-                            item.location.type === 'accommodation' ? '🏨' : '⭐';
-                
-                itemEl.innerHTML = `
-                    <div class="timeline-item-order">${item.location.order || ''}</div>
-                    <div class="timeline-item-icon">${icon}</div>
-                    <div class="timeline-item-name" title="${item.location.name}">${item.location.name}</div>
-                    <div class="timeline-item-duration">${item.location.duration}</div>
-                `;
-                
-                itemEl.addEventListener('click', () => {
-                    selectTimelineItem(item.location.id);
+                items.forEach(item => {
+                    const minWidth = 60; // Minimum pixel width for readability
+                    const itemWidth = Math.max(minWidth, (item.hours / totalHours) * baseWidth);
+                    const leftPosition = (item.startHour / totalHours) * baseWidth;
+                    
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `timeline-item ${type}`;
+                    itemEl.dataset.locationId = item.location.id;
+                    itemEl.style.width = itemWidth + 'px';
+                    itemEl.style.minWidth = minWidth + 'px';
+                    itemEl.style.position = 'absolute';
+                    itemEl.style.left = leftPosition + 'px';
+                    
+                    if (selectedTimelineItemId === item.location.id) {
+                        itemEl.classList.add('selected');
+                    }
+                    
+                    const icon = type === 'key-location' ? '📍' : 
+                                type === 'accommodation' ? '🏨' : '⭐';
+                    
+                    itemEl.innerHTML = `
+                        <div class="timeline-item-order">${item.location.order || ''}</div>
+                        <div class="timeline-item-icon">${icon}</div>
+                        <div class="timeline-item-name" title="${item.location.name}">${item.location.name}</div>
+                        <div class="timeline-item-duration">${item.location.duration}</div>
+                    `;
+                    
+                    itemEl.addEventListener('click', () => {
+                        selectTimelineItem(item.location.id);
+                    });
+                    
+                    track.appendChild(itemEl);
                 });
-                
-                track.appendChild(itemEl);
-            });
+            }
+            
+            // Render items to each track
+            renderItemsToTrack(keyLocationItems, keyLocationTrack, 'key-location');
+            renderItemsToTrack(accommodationItems, accommodationTrack, 'accommodation');
+            renderItemsToTrack(attractionItems, attractionTrack, 'attraction');
             
             container.classList.add('visible');
         }
