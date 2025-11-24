@@ -48,3 +48,5 @@ REQUIREMENTS:
 - Validate all coordinates are accurate
 - Return ONLY valid JSON (no markdown, no explanation)
 
+
+
