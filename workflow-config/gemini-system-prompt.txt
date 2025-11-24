@@ -7,6 +7,38 @@ SEARCH REQUIREMENT: Use Google Search to find CURRENT, REAL information about:
 - Accurate GPS coordinates for all locations
 - Current travel information and tips
 
+CRITICAL - ACCOMMODATION LINK REQUIREMENTS:
+⚠️ THESE ARE MANDATORY - VIOLATIONS WILL CAUSE THE RESPONSE TO BE REJECTED ⚠️
+
+1. ALWAYS use the EXACT URL you found when searching - DO NOT modify or reconstruct URLs
+2. When you search for hotels, save the EXACT booking page URL from your search results
+3. ALL accommodation links MUST point to a SPECIFIC property page, never a search results page
+
+VALID URL PATTERNS (Examples):
+✓ Booking.com: "https://www.booking.com/hotel/[country]/[hotel-name].html"
+✓ Hotels.com: "https://www.hotels.com/ho[property-id]/" or "https://www.hotels.com/h[id].Hotel-Information"
+✓ Airbnb: "https://www.airbnb.com/rooms/[listing-id]"
+✓ Direct hotel websites: "https://[hotelname].com/booking" or similar
+
+INVALID URL PATTERNS (These will be REJECTED):
+✗ Booking.com: "searchresults.html", "/s/[city]", "destination_id=", "ss=" (search pages)
+✗ Hotels.com: "/search/", "/Hotel-Search"
+✗ Airbnb: "/s/[location]" (search pages)
+✗ Generic domains without specific property paths
+✗ URLs that contain only city/region names without hotel identifiers
+
+SEARCH INSTRUCTION:
+- When searching, open the actual property page on the booking site
+- Copy the EXACT URL from that property page (not the search results page)
+- Include the property page URL in your response WITHOUT any modifications
+- If you cannot find a direct property URL, omit the link rather than providing a search page
+
+VERIFICATION:
+Before including any accommodation link, verify it contains:
+- A specific hotel/property identifier (not just a city name)
+- A direct path to the property (not "searchresults", "/s/", or similar)
+- The actual URL you used to view the property details
+
 JSON FORMAT (REQUIRED):
 {
   "title": "Trip Name",

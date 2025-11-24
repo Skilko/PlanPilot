@@ -194,6 +194,29 @@ Run through the testing checklist:
 
 ---
 
+## 📝 Changelog
+
+### November 24, 2025 - Accommodation Link Validation Fix
+**Problem:** Booking.com and accommodation links were returning 404 or "pack not found" errors.
+
+**Solution:**
+- Enhanced system prompt with explicit URL format requirements
+- Added comprehensive platform-specific link validation
+- Improved logging of Gemini's search metadata
+- Invalid links now removed and marked with warnings
+
+**Files Changed:**
+- `api/chat-workflow.js` - Enhanced validation and instructions
+- `workflow-config/gemini-system-prompt.txt` - Updated link requirements
+
+**Documentation:**
+- `Articles/accommodation-links-fix.md` - Detailed technical explanation
+- `Articles/link-validation-summary.md` - Quick visual summary
+
+**Impact:** Accommodation links now point to specific property pages or are clearly marked as unavailable.
+
+---
+
 ## 🤝 Contributing
 
 Contributions welcome! Areas for improvement:

@@ -48,13 +48,21 @@ Budget Level: ${budget || 'not specified'}
 Interests: ${interests && interests.length > 0 ? interests.join(', ') : 'not specified'}
 Must-Visit Locations: ${mustVisit || 'none specified'}${modeInstruction}
 
-IMPORTANT: 
+CRITICAL REQUIREMENTS: 
 1. Search for CURRENT information about hotels, accommodations, attractions, and prices
 2. Find REAL hotels with actual prices and booking links
-3. Include popular attractions with current entry fees
-4. Use accurate GPS coordinates
-5. Return ONLY valid JSON, no other text
-6. Follow the exact format specified in your instructions`;
+3. When you find a hotel on Booking.com/Hotels.com/Airbnb, use the EXACT URL from the property page
+4. NEVER provide search result URLs - only direct property/hotel page URLs
+5. If you cannot find a direct property URL, leave the link field empty
+6. Include popular attractions with current entry fees
+7. Use accurate GPS coordinates
+8. Return ONLY valid JSON, no other text
+9. Follow the exact format specified in your instructions
+
+⚠️ ACCOMMODATION LINKS MUST BE PROPERTY-SPECIFIC:
+- Use the EXACT URL you found when viewing the specific hotel page
+- Do NOT modify or reconstruct URLs
+- Invalid links (search pages) will be rejected`;
 
     // Default system prompt (can be overridden by environment variable)
     const defaultSystemPrompt = `You are a professional travel research agent that creates comprehensive trip plans in JSON format.
@@ -67,13 +75,36 @@ SEARCH REQUIREMENT: Use Google Search to find CURRENT, REAL information about:
 - Current travel information and tips
 
 CRITICAL - ACCOMMODATION LINK REQUIREMENTS:
-- ALL accommodation links MUST be direct property/hotel-specific URLs
-- For Booking.com: Use format like "https://www.booking.com/hotel/[country]/[hotel-name].html" NOT search results
-- For Hotels.com: Use format like "https://www.hotels.com/ho[property-id]/" NOT search results
-- For Airbnb: Use format like "https://www.airbnb.com/rooms/[listing-id]" NOT search results
-- NEVER use generic search URLs like "searchresults.html" or "s/[city]"
-- If you cannot find a specific property URL, search for the exact hotel name on the booking platform
-- Verify each accommodation link points to a SPECIFIC property, not a city search page
+⚠️ THESE ARE MANDATORY - VIOLATIONS WILL CAUSE THE RESPONSE TO BE REJECTED ⚠️
+
+1. ALWAYS use the EXACT URL you found when searching - DO NOT modify or reconstruct URLs
+2. When you search for hotels, save the EXACT booking page URL from your search results
+3. ALL accommodation links MUST point to a SPECIFIC property page, never a search results page
+
+VALID URL PATTERNS (Examples):
+✓ Booking.com: "https://www.booking.com/hotel/[country]/[hotel-name].html"
+✓ Hotels.com: "https://www.hotels.com/ho[property-id]/" or "https://www.hotels.com/h[id].Hotel-Information"
+✓ Airbnb: "https://www.airbnb.com/rooms/[listing-id]"
+✓ Direct hotel websites: "https://[hotelname].com/booking" or similar
+
+INVALID URL PATTERNS (These will be REJECTED):
+✗ Booking.com: "searchresults.html", "/s/[city]", "destination_id=", "ss=" (search pages)
+✗ Hotels.com: "/search/", "/Hotel-Search"
+✗ Airbnb: "/s/[location]" (search pages)
+✗ Generic domains without specific property paths
+✗ URLs that contain only city/region names without hotel identifiers
+
+SEARCH INSTRUCTION:
+- When searching, open the actual property page on the booking site
+- Copy the EXACT URL from that property page (not the search results page)
+- Include the property page URL in your response WITHOUT any modifications
+- If you cannot find a direct property URL, omit the link rather than providing a search page
+
+VERIFICATION:
+Before including any accommodation link, verify it contains:
+- A specific hotel/property identifier (not just a city name)
+- A direct path to the property (not "searchresults", "/s/", or similar)
+- The actual URL you used to view the property details
 
 JSON FORMAT (REQUIRED):
 {
@@ -252,45 +283,145 @@ REQUIREMENTS:
 
     // Validate accommodation links to ensure they're property-specific
     const invalidAccommodations = [];
-    tripData.locations.forEach(location => {
+    const validatedLocations = tripData.locations.map(location => {
       if (location.type === 'accommodation' && location.link) {
         const link = location.link.toLowerCase();
+        const originalLink = location.link;
         
         // Check for generic search URLs that don't point to specific properties
-        const isGenericSearch = 
-          link.includes('searchresults') ||
-          link.includes('/s/') ||
-          link.match(/booking\.com\/[^/]*$/) || // Just domain without path
-          link.match(/hotels\.com\/[^/]*$/) ||
-          link.match(/airbnb\.com\/[^/]*$/) ||
-          link.includes('destination_id=') ||
-          link.includes('ss=') && !link.includes('/hotel/');
+        const invalidPatterns = [
+          { pattern: 'searchresults', reason: 'Search results page' },
+          { pattern: '/s/', reason: 'Generic search page' },
+          { pattern: 'destination_id=', reason: 'Search query with destination ID' },
+          { pattern: '/search/', reason: 'Search page' },
+          { pattern: 'hotel-search', reason: 'Hotel search page' },
+        ];
         
-        if (isGenericSearch) {
-          invalidAccommodations.push({
-            name: location.name,
-            link: location.link,
-            issue: 'Link appears to be a generic search page, not a specific property'
-          });
+        // Booking.com specific validation
+        if (link.includes('booking.com')) {
+          const hasHotelPath = link.includes('/hotel/');
+          const hasPropertyId = link.match(/\/hotel\/[a-z]{2}\/[a-z0-9-]+\.html/i);
+          const isSearchPage = link.includes('ss=') && !hasHotelPath;
+          
+          if (isSearchPage || (!hasHotelPath && !link.includes('.html'))) {
+            invalidAccommodations.push({
+              id: location.id,
+              name: location.name,
+              link: originalLink,
+              issue: 'Booking.com link must be in format: /hotel/[country]/[hotel-name].html'
+            });
+            // Clear the invalid link
+            location.link = '';
+            location.description += ' ⚠️ [Booking link unavailable - was generic search page]';
+          }
+        }
+        
+        // Hotels.com specific validation
+        if (link.includes('hotels.com')) {
+          const hasPropertyId = link.match(/\/ho\d+/i) || link.match(/\/h\d+/i);
+          
+          if (!hasPropertyId || link.includes('/search/')) {
+            invalidAccommodations.push({
+              id: location.id,
+              name: location.name,
+              link: originalLink,
+              issue: 'Hotels.com link must include property ID (e.g., /ho123456/)'
+            });
+            location.link = '';
+            location.description += ' ⚠️ [Booking link unavailable - was generic search page]';
+          }
+        }
+        
+        // Airbnb specific validation
+        if (link.includes('airbnb.com')) {
+          const hasRoomId = link.match(/\/rooms\/\d+/i);
+          
+          if (!hasRoomId || link.includes('/s/')) {
+            invalidAccommodations.push({
+              id: location.id,
+              name: location.name,
+              link: originalLink,
+              issue: 'Airbnb link must include specific listing ID (e.g., /rooms/12345)'
+            });
+            location.link = '';
+            location.description += ' ⚠️ [Booking link unavailable - was generic search page]';
+          }
+        }
+        
+        // General pattern validation
+        for (const { pattern, reason } of invalidPatterns) {
+          if (link.includes(pattern)) {
+            // Only add if not already added by platform-specific validation
+            const alreadyMarked = invalidAccommodations.some(inv => inv.id === location.id);
+            if (!alreadyMarked) {
+              invalidAccommodations.push({
+                id: location.id,
+                name: location.name,
+                link: originalLink,
+                issue: reason
+              });
+              location.link = '';
+              location.description += ` ⚠️ [Booking link unavailable - ${reason.toLowerCase()}]`;
+            }
+            break;
+          }
         }
       }
+      return location;
     });
 
-    // Log warnings for invalid accommodation links
+    // Update locations with validated data
+    tripData.locations = validatedLocations;
+
+    // Log warnings and details for invalid accommodation links
     if (invalidAccommodations.length > 0) {
-      console.warn('⚠️ WARNING: Found potentially invalid accommodation links:');
-      invalidAccommodations.forEach(item => {
-        console.warn(`  - ${item.name}: ${item.issue}`);
-        console.warn(`    URL: ${item.link}`);
+      console.error('❌ INVALID ACCOMMODATION LINKS DETECTED AND REMOVED:');
+      console.error(`   Found ${invalidAccommodations.length} invalid link(s)\n`);
+      invalidAccommodations.forEach((item, index) => {
+        console.error(`${index + 1}. ${item.name} (ID: ${item.id})`);
+        console.error(`   Issue: ${item.issue}`);
+        console.error(`   Invalid URL: ${item.link}`);
+        console.error('');
       });
+      console.error('⚠️ These links have been removed and marked in the description.');
+      console.error('⚠️ Consider regenerating the trip for better results.\n');
     }
 
-    // Log search metadata if available
+    // Log search metadata if available - this shows what Gemini actually searched for
     if (candidate.groundingMetadata) {
-      console.log('Search grounding used:', {
-        searchQueries: candidate.groundingMetadata.searchEntryPoint?.renderedContent,
-        retrievalQueries: candidate.groundingMetadata.retrievalQueries
-      });
+      console.log('\n📊 GEMINI SEARCH METADATA:');
+      console.log('==========================');
+      
+      if (candidate.groundingMetadata.groundingChunks) {
+        console.log(`✓ Used ${candidate.groundingMetadata.groundingChunks.length} search result(s)`);
+        
+        // Log some of the sources used
+        const chunks = candidate.groundingMetadata.groundingChunks.slice(0, 5);
+        chunks.forEach((chunk, idx) => {
+          if (chunk.web) {
+            console.log(`  ${idx + 1}. ${chunk.web.title || 'Unknown'}`);
+            console.log(`     URL: ${chunk.web.uri || 'N/A'}`);
+          }
+        });
+        if (candidate.groundingMetadata.groundingChunks.length > 5) {
+          console.log(`  ... and ${candidate.groundingMetadata.groundingChunks.length - 5} more`);
+        }
+      }
+      
+      if (candidate.groundingMetadata.searchEntryPoint) {
+        console.log(`\n🔍 Search Entry: ${candidate.groundingMetadata.searchEntryPoint.renderedContent || 'N/A'}`);
+      }
+      
+      if (candidate.groundingMetadata.retrievalQueries) {
+        console.log('\n📝 Retrieval Queries:');
+        candidate.groundingMetadata.retrievalQueries.forEach((query, idx) => {
+          console.log(`  ${idx + 1}. ${query}`);
+        });
+      }
+      
+      console.log('==========================\n');
+    } else {
+      console.log('⚠️ No grounding metadata available - Gemini may not have used search');
     }
 
     // Return the trip data
