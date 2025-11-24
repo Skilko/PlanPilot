@@ -620,9 +620,9 @@
         }
 
         .timeline-content {
-            min-height: 240px;
+            min-height: 100px;
             position: relative;
-            padding: 30px 0 10px 0;
+            padding: 30px 20px 20px 20px;
         }
 
         .timeline-period-label {
@@ -640,58 +640,36 @@
             z-index: 10;
         }
 
-        .timeline-tracks-container {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .timeline-track-wrapper {
-            position: relative;
-        }
-
-        .timeline-track-label {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 10px;
-            font-weight: 600;
-            color: #666;
-            background: rgba(255,255,255,0.9);
-            padding: 2px 6px;
-            border-radius: 4px;
-            z-index: 5;
-            white-space: nowrap;
-        }
-
-        .timeline-track {
+        .timeline-locations {
             position: relative;
             min-width: 100%;
-            height: 70px;
-            padding-left: 100px;
-            background: rgba(240, 240, 240, 0.3);
-            border-radius: 6px;
+            display: flex;
+            gap: 0;
+            align-items: stretch;
         }
 
         .timeline-item {
             position: relative;
-            height: 60px;
+            min-height: 80px;
             border-radius: 8px;
-            padding: 6px 8px;
+            padding: 12px 16px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.3);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            text-align: center;
         }
 
         .timeline-item:hover {
             transform: translateY(-4px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
             z-index: 10;
         }
 
@@ -701,54 +679,40 @@
             transform: translateY(-4px);
         }
 
-        .timeline-item.key-location {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-            color: white;
-        }
-
-        .timeline-item.accommodation {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-            color: white;
-        }
-
-        .timeline-item.attraction {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-        }
-
         .timeline-item-icon {
-            font-size: 20px;
-            margin-bottom: 4px;
+            font-size: 24px;
+            margin-bottom: 6px;
         }
 
         .timeline-item-name {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .timeline-item-duration {
-            font-size: 10px;
+            font-size: 11px;
             opacity: 0.9;
             font-weight: 500;
         }
 
         .timeline-item-order {
             position: absolute;
-            top: 4px;
-            left: 4px;
+            top: 6px;
+            left: 6px;
             background: rgba(0,0,0,0.3);
             color: white;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
         }
 
@@ -1397,6 +1361,92 @@
 
         #planningModal ul li:before {
             content: "✓";
+        }
+
+        /* Location Details Modal Styles */
+        #locationDetailsModal .modal-content {
+            max-width: 900px;
+        }
+
+        .location-details-section {
+            margin-bottom: 30px;
+        }
+
+        .location-details-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .location-details-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #0891D0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .location-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .location-details-table thead {
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            color: white;
+        }
+
+        .location-details-table th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .location-details-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .location-details-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .location-details-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .location-details-table .table-name {
+            font-weight: 600;
+            color: #0891D0;
+        }
+
+        .location-details-table .table-link a {
+            color: #0891D0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .location-details-table .table-link a:hover {
+            color: #0670A0;
+            text-decoration: underline;
+        }
+
+        .location-details-empty {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-style: italic;
+            font-size: 14px;
+        }
             position: absolute;
             left: 0;
             color: #2ecc71;
@@ -1889,8 +1939,8 @@
             }
 
             .timeline-content {
-                min-height: 200px;
-                padding: 25px 0 8px 0;
+                min-height: 90px;
+                padding: 25px 10px 15px 10px;
             }
 
             .timeline-period-label {
@@ -1898,38 +1948,28 @@
                 padding: 3px 10px;
             }
 
-            .timeline-track {
-                height: 60px;
-                padding-left: 90px;
-            }
-
-            .timeline-track-label {
-                font-size: 9px;
-                padding: 2px 4px;
-            }
-
             .timeline-item {
-                height: 50px;
-                padding: 5px 6px;
+                min-height: 70px;
+                padding: 10px 12px;
             }
 
             .timeline-item-icon {
-                font-size: 14px;
-                margin-bottom: 2px;
+                font-size: 18px;
+                margin-bottom: 3px;
             }
 
             .timeline-item-name {
-                font-size: 9px;
+                font-size: 11px;
             }
 
             .timeline-item-duration {
-                font-size: 8px;
+                font-size: 9px;
             }
 
             .timeline-item-order {
-                width: 14px;
-                height: 14px;
-                font-size: 7px;
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
             }
 
             /* Make filter/legend collapsible for mobile */
@@ -2326,20 +2366,7 @@
                 <div class="timeline-viewport">
                     <div class="timeline-content" id="timeline-content">
                         <div class="timeline-period-label" id="timeline-period-label"></div>
-                        <div class="timeline-tracks-container" id="timeline-tracks-container">
-                            <div class="timeline-track-wrapper">
-                                <div class="timeline-track-label">📍 Key Locations</div>
-                                <div class="timeline-track" id="timeline-track-key-location"></div>
-                            </div>
-                            <div class="timeline-track-wrapper">
-                                <div class="timeline-track-label">🏨 Accommodation</div>
-                                <div class="timeline-track" id="timeline-track-accommodation"></div>
-                            </div>
-                            <div class="timeline-track-wrapper">
-                                <div class="timeline-track-label">⭐ Attractions</div>
-                                <div class="timeline-track" id="timeline-track-attraction"></div>
-                            </div>
-                        </div>
+                        <div class="timeline-locations" id="timeline-locations"></div>
                     </div>
                 </div>
             </div>
@@ -2693,6 +2720,23 @@
             </div>
             <div class="modal-actions">
                 <button class="btn btn-primary" onclick="closeInfoModal()">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Details Modal -->
+    <div id="locationDetailsModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="locationDetailsTitle">📍 Location Details</h2>
+            </div>
+            <div class="modal-body">
+                <div id="locationDetailsContent">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeLocationDetailsModal()">Close</button>
             </div>
         </div>
     </div>
@@ -3324,18 +3368,20 @@
         function updateTimeline() {
             const container = document.getElementById('timeline-container');
             const periodLabel = document.getElementById('timeline-period-label');
-            const keyLocationTrack = document.getElementById('timeline-track-key-location');
-            const accommodationTrack = document.getElementById('timeline-track-accommodation');
-            const attractionTrack = document.getElementById('timeline-track-attraction');
+            const locationsContainer = document.getElementById('timeline-locations');
             
-            if (!container || !keyLocationTrack || !accommodationTrack || !attractionTrack) return;
+            if (!container || !locationsContainer) return;
             
-            // Only show timeline if we have locations with durations
-            const locationsWithDuration = locations.filter(loc => loc.duration && loc.duration.trim() !== '');
+            // Only show timeline if we have key locations with durations
+            const keyLocations = locations.filter(loc => 
+                loc.type === 'key-location' && 
+                loc.duration && 
+                loc.duration.trim() !== ''
+            );
             
             const toggleBtn = document.getElementById('timeline-toggle-btn');
             
-            if (locationsWithDuration.length === 0) {
+            if (keyLocations.length === 0) {
                 container.classList.remove('visible');
                 if (toggleBtn) {
                     toggleBtn.classList.remove('visible');
@@ -3344,7 +3390,7 @@
             }
             
             // Sort by order
-            const sortedLocations = [...locationsWithDuration].sort((a, b) => {
+            const sortedLocations = [...keyLocations].sort((a, b) => {
                 const orderA = typeof a.order === 'number' ? a.order : 999999;
                 const orderB = typeof b.order === 'number' ? b.order : 999999;
                 return orderA - orderB;
@@ -3383,67 +3429,39 @@
             const minTotalWidth = 800;
             const baseWidth = Math.max(minTotalWidth, totalHours * 10 * timelineZoom);
             
-            // Clear all tracks
-            keyLocationTrack.innerHTML = '';
-            accommodationTrack.innerHTML = '';
-            attractionTrack.innerHTML = '';
+            // Clear locations container
+            locationsContainer.innerHTML = '';
+            locationsContainer.style.width = baseWidth + 'px';
             
-            // Set widths for all tracks
-            [keyLocationTrack, accommodationTrack, attractionTrack].forEach(track => {
-                track.style.width = baseWidth + 'px';
-            });
-            
-            // Separate items by type
-            const keyLocationItems = timelineItems.filter(item => item.location.type === 'key-location');
-            const accommodationItems = timelineItems.filter(item => item.location.type === 'accommodation');
-            const attractionItems = timelineItems.filter(item => item.location.type === 'attraction');
-            
-            // Function to render items to a track
-            function renderItemsToTrack(items, track, type) {
-                if (items.length === 0) {
-                    track.innerHTML = '<div style="padding: 20px; text-align: center; color: #999; font-size: 12px;">No items</div>';
-                    return;
+            // Render timeline items
+            timelineItems.forEach(item => {
+                const minWidth = 100; // Minimum pixel width for readability
+                const itemWidth = Math.max(minWidth, (item.hours / totalHours) * baseWidth);
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = 'timeline-item';
+                itemEl.dataset.locationId = item.location.id;
+                itemEl.style.width = itemWidth + 'px';
+                itemEl.style.minWidth = minWidth + 'px';
+                itemEl.style.flex = `0 0 ${itemWidth}px`;
+                
+                if (selectedTimelineItemId === item.location.id) {
+                    itemEl.classList.add('selected');
                 }
                 
-                items.forEach(item => {
-                    const minWidth = 60; // Minimum pixel width for readability
-                    const itemWidth = Math.max(minWidth, (item.hours / totalHours) * baseWidth);
-                    const leftPosition = (item.startHour / totalHours) * baseWidth;
-                    
-                    const itemEl = document.createElement('div');
-                    itemEl.className = `timeline-item ${type}`;
-                    itemEl.dataset.locationId = item.location.id;
-                    itemEl.style.width = itemWidth + 'px';
-                    itemEl.style.minWidth = minWidth + 'px';
-                    itemEl.style.position = 'absolute';
-                    itemEl.style.left = leftPosition + 'px';
-                    
-                    if (selectedTimelineItemId === item.location.id) {
-                        itemEl.classList.add('selected');
-                    }
-                    
-                    const icon = type === 'key-location' ? '📍' : 
-                                type === 'accommodation' ? '🏨' : '⭐';
-                    
-                    itemEl.innerHTML = `
-                        <div class="timeline-item-order">${item.location.order || ''}</div>
-                        <div class="timeline-item-icon">${icon}</div>
-                        <div class="timeline-item-name" title="${item.location.name}">${item.location.name}</div>
-                        <div class="timeline-item-duration">${item.location.duration}</div>
-                    `;
-                    
-                    itemEl.addEventListener('click', () => {
-                        selectTimelineItem(item.location.id);
-                    });
-                    
-                    track.appendChild(itemEl);
+                itemEl.innerHTML = `
+                    <div class="timeline-item-order">${item.location.order || ''}</div>
+                    <div class="timeline-item-icon">📍</div>
+                    <div class="timeline-item-name" title="${item.location.name}">${item.location.name}</div>
+                    <div class="timeline-item-duration">${item.location.duration}</div>
+                `;
+                
+                itemEl.addEventListener('click', () => {
+                    showLocationDetails(item.location.id);
                 });
-            }
-            
-            // Render items to each track
-            renderItemsToTrack(keyLocationItems, keyLocationTrack, 'key-location');
-            renderItemsToTrack(accommodationItems, accommodationTrack, 'accommodation');
-            renderItemsToTrack(attractionItems, attractionTrack, 'attraction');
+                
+                locationsContainer.appendChild(itemEl);
+            });
             
             // Show toggle button if we have timeline data
             if (toggleBtn) {
@@ -3477,8 +3495,8 @@
             }
         }
 
-        // Select timeline item and focus on map
-        function selectTimelineItem(locationId) {
+        // Show location details modal
+        function showLocationDetails(locationId) {
             selectedTimelineItemId = locationId;
             
             // Update timeline item visuals
@@ -3490,19 +3508,119 @@
                 }
             });
             
-            // Focus on the location on the map
+            // Find the location
             const location = locations.find(l => l.id === locationId);
-            if (location && markers[locationId]) {
-                map.setView([location.lat, location.lng], 14, {
+            if (!location) return;
+            
+            // Find all accommodations and attractions associated with this location
+            // We'll consider items "associated" if they are nearby geographically
+            // or have a similar order number
+            const associatedItems = locations.filter(loc => {
+                if (loc.id === locationId || loc.type === 'key-location') return false;
+                
+                // Check if order is close (within 10 positions)
+                if (typeof location.order === 'number' && typeof loc.order === 'number') {
+                    const orderDiff = Math.abs(loc.order - location.order);
+                    if (orderDiff <= 10) return true;
+                }
+                
+                // Check if geographically close (within ~50km)
+                const distance = getDistance(location.lat, location.lng, loc.lat, loc.lng);
+                if (distance < 50) return true;
+                
+                return false;
+            });
+            
+            const accommodations = associatedItems.filter(item => item.type === 'accommodation');
+            const attractions = associatedItems.filter(item => item.type === 'attraction');
+            
+            // Build modal content
+            const modal = document.getElementById('locationDetailsModal');
+            const title = document.getElementById('locationDetailsTitle');
+            const content = document.getElementById('locationDetailsContent');
+            
+            title.textContent = `📍 ${location.name}`;
+            
+            let html = '';
+            
+            // Accommodations section
+            html += '<div class="location-details-section">';
+            html += '<h3>🏨 Accommodations</h3>';
+            if (accommodations.length > 0) {
+                html += '<table class="location-details-table">';
+                html += '<thead><tr><th>Name</th><th>Description</th><th>Duration</th><th>Price</th><th>Link</th></tr></thead>';
+                html += '<tbody>';
+                accommodations.forEach(acc => {
+                    html += '<tr>';
+                    html += `<td class="table-name">${acc.name}</td>`;
+                    html += `<td>${acc.description || '-'}</td>`;
+                    html += `<td>${acc.duration || '-'}</td>`;
+                    html += `<td>${acc.price || '-'}</td>`;
+                    html += `<td class="table-link">${acc.link ? `<a href="${acc.link}" target="_blank">View</a>` : '-'}</td>`;
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+            } else {
+                html += '<div class="location-details-empty">No accommodations found for this location</div>';
+            }
+            html += '</div>';
+            
+            // Attractions section
+            html += '<div class="location-details-section">';
+            html += '<h3>⭐ Attractions</h3>';
+            if (attractions.length > 0) {
+                html += '<table class="location-details-table">';
+                html += '<thead><tr><th>Name</th><th>Description</th><th>Duration</th><th>Price</th><th>Link</th></tr></thead>';
+                html += '<tbody>';
+                attractions.forEach(attr => {
+                    html += '<tr>';
+                    html += `<td class="table-name">${attr.name}</td>`;
+                    html += `<td>${attr.description || '-'}</td>`;
+                    html += `<td>${attr.duration || '-'}</td>`;
+                    html += `<td>${attr.price || '-'}</td>`;
+                    html += `<td class="table-link">${attr.link ? `<a href="${attr.link}" target="_blank">View</a>` : '-'}</td>`;
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+            } else {
+                html += '<div class="location-details-empty">No attractions found for this location</div>';
+            }
+            html += '</div>';
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
+            
+            // Focus on the location on the map
+            if (markers[locationId]) {
+                map.setView([location.lat, location.lng], 12, {
                     animate: true,
                     duration: 1
                 });
-                
-                // Open popup after a short delay
-                setTimeout(() => {
-                    markers[locationId].openPopup();
-                }, 300);
             }
+        }
+        
+        // Close location details modal
+        function closeLocationDetailsModal() {
+            const modal = document.getElementById('locationDetailsModal');
+            modal.classList.remove('active');
+            selectedTimelineItemId = null;
+            
+            // Update timeline item visuals
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+        
+        // Calculate distance between two points in km
+        function getDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
         }
 
         // Timeline zoom controls
@@ -4044,6 +4162,8 @@ When creating a JSON file for this PlanPilot:
                     closeInfoModal();
                 } else if (e.target.id === 'planningModal') {
                     closePlanningModal();
+                } else if (e.target.id === 'locationDetailsModal') {
+                    closeLocationDetailsModal();
                 } else if (e.target.id === 'confirmModal') {
                     // Click outside confirm modal = cancel
                     document.getElementById('confirmNo').click();
