@@ -1486,13 +1486,6 @@
             transition: width 0.5s ease-out;
         }
 
-        .loading-timer {
-            margin-top: 10px;
-            font-size: 12px;
-            color: #999;
-            font-family: 'Courier New', monospace;
-        }
-
         .info-content {
             font-size: 14px;
             line-height: 1.6;
@@ -2554,7 +2547,6 @@
             <div class="progress-container">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
-            <p id="loadingTimer" class="loading-timer">0s / 180s</p>
         </div>
     </div>
 
@@ -3848,14 +3840,12 @@
         function showLoadingOverlay(title = 'Processing...', message = 'Please wait') {
             const overlay = document.getElementById('loadingOverlay');
             const progressBar = document.getElementById('progressBar');
-            const timerDisplay = document.getElementById('loadingTimer');
             
             document.getElementById('loadingTitle').textContent = title;
             document.getElementById('loadingMessage').textContent = message;
             
             // Reset progress bar
             progressBar.style.width = '0%';
-            timerDisplay.textContent = `0s / ${MAX_TIMEOUT}s`;
             
             overlay.classList.add('active');
             
@@ -3866,7 +3856,6 @@
                 const progressPercentage = Math.min((elapsedSeconds / MAX_TIMEOUT) * 100, 99);
                 
                 progressBar.style.width = `${progressPercentage}%`;
-                timerDisplay.textContent = `${elapsedSeconds}s / ${MAX_TIMEOUT}s`;
                 
                 // Stop at 99% to avoid reaching 100% before completion
                 if (elapsedSeconds >= MAX_TIMEOUT) {
