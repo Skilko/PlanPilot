@@ -9,6 +9,16 @@
       "description": "Descriptive name for the trip",
       "examples": ["5-Day Paris Adventure", "Sri Lanka Honeymoon 2025"]
     },
+    "arrival_location": {
+      "type": "string",
+      "description": "Starting point or arrival location for the trip (e.g., 'London Heathrow Airport', 'New York City', 'Paris CDG'). Leave empty string if not specified.",
+      "examples": ["London Heathrow Airport", "New York City", ""]
+    },
+    "departure_location": {
+      "type": "string",
+      "description": "Ending point or departure location for the trip (e.g., 'Rome Fiumicino Airport', 'Barcelona', 'Sydney'). Leave empty string if not specified.",
+      "examples": ["Rome Fiumicino Airport", "Barcelona", ""]
+    },
     "locations": {
       "type": "array",
       "description": "Array of all locations in the trip",
@@ -90,11 +100,13 @@
       }
     }
   },
-  "required": ["title", "locations", "connections"],
+  "required": ["title", "arrival_location", "departure_location", "locations", "connections"],
   "additionalProperties": false,
   "examples": [
     {
       "title": "5-Day Paris Art & Food Tour",
+      "arrival_location": "London Heathrow Airport",
+      "departure_location": "Paris Charles de Gaulle Airport",
       "locations": [
         {
           "id": "1",

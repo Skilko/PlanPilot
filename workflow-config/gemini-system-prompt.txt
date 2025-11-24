@@ -42,6 +42,8 @@ Before including any accommodation link, verify it contains:
 JSON FORMAT (REQUIRED):
 {
   "title": "Trip Name",
+  "arrival_location": "Starting point (e.g., 'London Heathrow Airport', 'New York City') or empty string",
+  "departure_location": "Ending point (e.g., 'Paris CDG Airport', 'Rome') or empty string",
   "locations": [
     {
       "id": "string",
@@ -51,7 +53,9 @@ JSON FORMAT (REQUIRED):
       "price": "string",
       "link": "string",
       "lat": number,
-      "lng": number
+      "lng": number,
+      "order": number,
+      "duration": "string (e.g., '3 days', '2 nights', '4 hours')"
     }
   ],
   "connections": [
@@ -62,6 +66,11 @@ JSON FORMAT (REQUIRED):
     }
   ]
 }
+
+TRIP METADATA:
+- arrival_location: Where the traveler starts their journey (airport, city, or general location). Use empty string if not applicable.
+- departure_location: Where the traveler ends their journey (airport, city, or general location). Use empty string if not applicable or same as arrival.
+- These help provide context for the trip's start and end points.
 
 LOCATION TYPES:
 - key-location: Major destinations (cities, regions)

@@ -478,8 +478,8 @@
             transform: translateX(-50%) translateY(-2px);
         }
 
-        /* Timeline Toggle Button */
-        .timeline-toggle-btn {
+        /* Trip Summary Toggle Button */
+        .trip-summary-toggle-btn {
             position: absolute;
             top: 68px;
             left: 50%;
@@ -498,7 +498,7 @@
             display: none;
         }
 
-        .timeline-toggle-btn.visible {
+        .trip-summary-toggle-btn.visible {
             display: block;
             animation: fadeIn 0.4s ease-out;
         }
@@ -514,34 +514,32 @@
             }
         }
 
-        .timeline-toggle-btn:hover {
+        .trip-summary-toggle-btn:hover {
             box-shadow: 0 5px 15px rgba(8, 145, 208, 0.5);
             transform: translateX(-50%) translateY(-2px);
         }
 
-        .timeline-toggle-btn:active {
+        .trip-summary-toggle-btn:active {
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Timeline Styles */
-        .timeline-container {
+        /* Trip Summary Container */
+        .trip-summary-container {
             position: absolute;
             top: 108px;
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
-            max-width: 1200px;
+            max-width: 500px;
             background: rgba(255, 255, 255, 0.98);
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            padding: 16px;
-            padding-bottom: 12px;
             z-index: 999;
             display: none;
             backdrop-filter: blur(10px);
         }
 
-        .timeline-container.visible {
+        .trip-summary-container.visible {
             display: block;
             animation: slideDown 0.4s ease-out;
         }
@@ -557,22 +555,31 @@
             }
         }
 
-        .timeline-controls {
+        .trip-summary-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+            border-radius: 12px 12px 0 0;
             display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .timeline-btn {
-            background: #0891D0;
+        .trip-summary-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .trip-summary-close {
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
             width: 28px;
             height: 28px;
-            border-radius: 6px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -580,140 +587,116 @@
             font-weight: bold;
         }
 
-        .timeline-btn:hover {
-            background: #0670A0;
+        .trip-summary-close:hover {
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.1);
         }
 
-        .timeline-btn:active {
-            transform: scale(0.95);
+        .trip-summary-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
-        .timeline-wrapper {
-            position: relative;
-            overflow: hidden;
+        .trip-summary-body::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .timeline-viewport {
-            overflow-x: auto;
-            overflow-y: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: #0891D0 #f0f0f0;
-        }
-
-        .timeline-viewport::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .timeline-viewport::-webkit-scrollbar-track {
+        .trip-summary-body::-webkit-scrollbar-track {
             background: #f0f0f0;
             border-radius: 4px;
         }
 
-        .timeline-viewport::-webkit-scrollbar-thumb {
+        .trip-summary-body::-webkit-scrollbar-thumb {
             background: #0891D0;
             border-radius: 4px;
         }
 
-        .timeline-viewport::-webkit-scrollbar-thumb:hover {
+        .trip-summary-body::-webkit-scrollbar-thumb:hover {
             background: #0670A0;
         }
 
-        .timeline-content {
-            min-height: 100px;
-            position: relative;
-            padding: 30px 20px 20px 20px;
-        }
-
-        .timeline-period-label {
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
+        .trip-summary-duration {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-            z-index: 10;
-        }
-
-        .timeline-locations {
-            position: relative;
-            min-width: 100%;
-            display: flex;
-            gap: 0;
-            align-items: stretch;
-        }
-
-        .timeline-item {
-            position: relative;
-            min-height: 80px;
-            border-radius: 8px;
             padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .trip-summary-travel {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #0891D0;
+        }
+
+        .trip-summary-travel p {
+            margin: 6px 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .trip-summary-travel strong {
+            color: #0891D0;
+        }
+
+        .trip-summary-locations {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .trip-summary-location-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 14px 16px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            gap: 12px;
+        }
+
+        .trip-summary-location-item:hover {
+            border-color: #0891D0;
+            box-shadow: 0 4px 12px rgba(8, 145, 208, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .trip-summary-location-order {
             background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             color: white;
-            text-align: center;
-        }
-
-        .timeline-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            z-index: 10;
-        }
-
-        .timeline-item.selected {
-            border: 3px solid #FFD700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-            transform: translateY(-4px);
-        }
-
-        .timeline-item-icon {
-            font-size: 24px;
-            margin-bottom: 6px;
-        }
-
-        .timeline-item-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-
-        .timeline-item-duration {
-            font-size: 11px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .timeline-item-order {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            background: rgba(0,0,0,0.3);
-            color: white;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
             font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .trip-summary-location-info {
+            flex: 1;
+        }
+
+        .trip-summary-location-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .trip-summary-location-duration {
+            color: #666;
+            font-size: 13px;
         }
 
         /* Leaflet Layer Control Styling */
@@ -1914,62 +1897,57 @@
                 padding: 12px;
             }
 
-            /* Timeline toggle button mobile */
-            .timeline-toggle-btn {
+            /* Trip Summary mobile styles */
+            .trip-summary-toggle-btn {
                 top: 110px;
                 font-size: 11px;
                 padding: 6px 16px;
             }
 
-            /* Timeline mobile styles */
-            .timeline-container {
+            .trip-summary-container {
                 top: 150px;
                 width: 95%;
-                padding: 10px;
+                max-width: none;
             }
 
-            .timeline-controls {
-                gap: 4px;
+            .trip-summary-header h3 {
+                font-size: 16px;
             }
 
-            .timeline-btn {
-                width: 24px;
-                height: 24px;
+            .trip-summary-body {
+                padding: 15px;
+                max-height: 50vh;
+            }
+
+            .trip-summary-duration {
+                font-size: 14px;
+                padding: 10px 14px;
+            }
+
+            .trip-summary-travel {
+                padding: 10px 14px;
+            }
+
+            .trip-summary-travel p {
+                font-size: 12px;
+            }
+
+            .trip-summary-location-item {
+                padding: 12px 14px;
+            }
+
+            .trip-summary-location-order {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+
+            .trip-summary-location-name {
                 font-size: 14px;
             }
 
-            .timeline-content {
-                min-height: 90px;
-                padding: 25px 10px 15px 10px;
-            }
-
-            .timeline-period-label {
-                font-size: 10px;
-                padding: 3px 10px;
-            }
-
-            .timeline-item {
-                min-height: 70px;
-                padding: 10px 12px;
-            }
-
-            .timeline-item-icon {
-                font-size: 18px;
-                margin-bottom: 3px;
-            }
-
-            .timeline-item-name {
-                font-size: 11px;
-            }
-
-            .timeline-item-duration {
-                font-size: 9px;
-            }
-
-            .timeline-item-order {
-                width: 18px;
-                height: 18px;
-                font-size: 9px;
+            .trip-summary-location-duration {
+                font-size: 12px;
             }
 
             /* Make filter/legend collapsible for mobile */
@@ -2353,24 +2331,21 @@
 
     <div id="map">
         <div id="mapTitle" class="map-title"></div>
-        <button id="timeline-toggle-btn" class="timeline-toggle-btn" onclick="toggleTimeline()">
-            📅 Show Timeline
-        </button>
-        <div id="timeline-container" class="timeline-container">
-            <div class="timeline-controls">
-                <button class="timeline-btn" id="timeline-zoom-out" title="Zoom Out">−</button>
-                <button class="timeline-btn" id="timeline-zoom-in" title="Zoom In">+</button>
-                <button class="timeline-btn" id="timeline-reset" title="Reset View">⟲</button>
+        <!-- Trip Summary -->
+        <div id="trip-summary-container" class="trip-summary-container">
+            <div class="trip-summary-header">
+                <h3>🗺️ Trip Summary</h3>
+                <button id="trip-summary-close" class="trip-summary-close" onclick="toggleTripSummary()">✕</button>
             </div>
-            <div class="timeline-wrapper">
-                <div class="timeline-viewport">
-                    <div class="timeline-content" id="timeline-content">
-                        <div class="timeline-period-label" id="timeline-period-label"></div>
-                        <div class="timeline-locations" id="timeline-locations"></div>
-                    </div>
-                </div>
+            <div class="trip-summary-body">
+                <div id="trip-summary-duration" class="trip-summary-duration"></div>
+                <div id="trip-summary-travel" class="trip-summary-travel"></div>
+                <div id="trip-summary-locations" class="trip-summary-locations"></div>
             </div>
         </div>
+        <button id="trip-summary-toggle-btn" class="trip-summary-toggle-btn" onclick="toggleTripSummary()">
+            🗺️ Show Trip Summary
+        </button>
     </div>
 
     <button id="map-controls-toggle-btn" class="map-controls-toggle-btn" onclick="toggleMapControls()">
@@ -2592,19 +2567,21 @@
                 <p>Use this guide to create or import location data for the PlanPilot. This format is designed for easy data entry and AI agent integration.</p>
                 
                 <h3>Required JSON Structure</h3>
-                <p>The JSON file must contain a <code>locations</code> array and optionally a <code>title</code> and <code>connections</code> fields:</p>
+                <p>The JSON file must contain a <code>locations</code> array and optionally trip metadata and <code>connections</code>:</p>
                 
                 <pre>{
   "title": "Your Trip Name",
+  "arrival_location": "Starting point",
+  "departure_location": "Ending point",
   "locations": [ ... ],
   "connections": [ ... ]
 }</pre>
 
-                <h3>Title Field (Optional)</h3>
+                <h3>Trip Metadata (Optional)</h3>
                 <ul>
-                    <li><code>title</code> (string, optional): The name of your trip or holiday</li>
-                    <li>This will be displayed prominently at the top center of the map</li>
-                    <li>Example: "Sri Lanka Honeymoon", "European Adventure 2025"</li>
+                    <li><code>title</code> (string, optional): The name of your trip or holiday. Displayed at the top center of the map. Example: "Sri Lanka Honeymoon", "European Adventure 2025"</li>
+                    <li><code>arrival_location</code> (string, optional): Where your journey begins (e.g., "London Heathrow Airport", "New York City"). Shows in Trip Summary as travel starting point.</li>
+                    <li><code>departure_location</code> (string, optional): Where your journey ends (e.g., "Paris CDG Airport", "Rome"). Shows in Trip Summary as travel ending point.</li>
                 </ul>
 
                 <h3>Location Object Format</h3>
@@ -2643,6 +2620,8 @@
                 <h3>Complete Example</h3>
                 <pre>{
   "title": "Paris & Rome Adventure",
+  "arrival_location": "London Heathrow Airport",
+  "departure_location": "Rome Fiumicino Airport",
   "locations": [
     {
       "id": "1",
@@ -2955,6 +2934,7 @@
             addMarker(location);
             updateLocationsList();
             updateFilterCounts();
+            updateTripSummary();
             saveData();
             
             // Clear form
@@ -3314,10 +3294,12 @@
             currentMapLayer.addTo(map);
         }
 
-        // Timeline functionality
-        let timelineZoom = 1;
-        let selectedTimelineItemId = null;
-        let timelineVisible = false;
+        // Trip Summary functionality
+        let tripSummaryVisible = false;
+        let tripData = {
+            arrival_location: '',
+            departure_location: ''
+        };
 
         // Parse duration string to hours
         function parseDurationToHours(durationStr) {
@@ -3364,22 +3346,23 @@
             return 8; // Default
         }
 
-        // Update timeline display
-        function updateTimeline() {
-            const container = document.getElementById('timeline-container');
-            const periodLabel = document.getElementById('timeline-period-label');
-            const locationsContainer = document.getElementById('timeline-locations');
+        // Update trip summary display
+        function updateTripSummary() {
+            const container = document.getElementById('trip-summary-container');
+            const durationEl = document.getElementById('trip-summary-duration');
+            const travelEl = document.getElementById('trip-summary-travel');
+            const locationsEl = document.getElementById('trip-summary-locations');
             
-            if (!container || !locationsContainer) return;
+            if (!container || !durationEl || !travelEl || !locationsEl) return;
             
-            // Only show timeline if we have key locations with durations
+            // Only show trip summary if we have key locations with durations
             const keyLocations = locations.filter(loc => 
                 loc.type === 'key-location' && 
                 loc.duration && 
                 loc.duration.trim() !== ''
             );
             
-            const toggleBtn = document.getElementById('timeline-toggle-btn');
+            const toggleBtn = document.getElementById('trip-summary-toggle-btn');
             
             if (keyLocations.length === 0) {
                 container.classList.remove('visible');
@@ -3396,118 +3379,114 @@
                 return orderA - orderB;
             });
             
-            // Calculate total duration and prepare items
+            // Calculate total duration
             let totalHours = 0;
-            const timelineItems = sortedLocations.map(loc => {
-                const hours = parseDurationToHours(loc.duration);
-                const item = {
-                    location: loc,
-                    hours: hours,
-                    startHour: totalHours
-                };
-                totalHours += hours;
-                return item;
+            sortedLocations.forEach(loc => {
+                totalHours += parseDurationToHours(loc.duration);
             });
             
-            // Calculate time period label
             const totalDays = Math.ceil(totalHours / 24);
-            if (periodLabel) {
-                if (totalDays <= 1) {
-                    periodLabel.textContent = '1 Day';
-                } else if (totalDays <= 7) {
-                    periodLabel.textContent = `${totalDays} Days Trip`;
-                } else {
-                    const weeks = Math.floor(totalDays / 7);
-                    const days = totalDays % 7;
-                    periodLabel.textContent = weeks === 1 
-                        ? `1 Week${days > 0 ? ' + ' + days + ' Days' : ''}` 
-                        : `${weeks} Weeks${days > 0 ? ' + ' + days + ' Days' : ''}`;
-                }
+            let durationText = '';
+            if (totalDays <= 1) {
+                durationText = '📅 Total Duration: 1 Day';
+            } else if (totalDays <= 7) {
+                durationText = `📅 Total Duration: ${totalDays} Days`;
+            } else {
+                const weeks = Math.floor(totalDays / 7);
+                const days = totalDays % 7;
+                durationText = weeks === 1 
+                    ? `📅 Total Duration: 1 Week${days > 0 ? ' + ' + days + ' Days' : ''}` 
+                    : `📅 Total Duration: ${weeks} Weeks${days > 0 ? ' + ' + days + ' Days' : ''}`;
+            }
+            durationEl.textContent = durationText;
+            
+            // Show travel to/from information
+            const firstLocation = sortedLocations[0];
+            const lastLocation = sortedLocations[sortedLocations.length - 1];
+            
+            let travelHtml = '';
+            if (tripData.arrival_location && tripData.arrival_location.trim() !== '') {
+                travelHtml += `<p>✈️ <strong>Travel to:</strong> ${tripData.arrival_location} → ${firstLocation.name}</p>`;
+            }
+            if (tripData.departure_location && tripData.departure_location.trim() !== '') {
+                travelHtml += `<p>✈️ <strong>Travel from:</strong> ${lastLocation.name} → ${tripData.departure_location}</p>`;
             }
             
-            // Minimum width for timeline
-            const minTotalWidth = 800;
-            const baseWidth = Math.max(minTotalWidth, totalHours * 10 * timelineZoom);
+            if (travelHtml) {
+                travelEl.innerHTML = travelHtml;
+                travelEl.style.display = 'block';
+            } else {
+                travelEl.style.display = 'none';
+            }
             
-            // Clear locations container
-            locationsContainer.innerHTML = '';
-            locationsContainer.style.width = baseWidth + 'px';
-            
-            // Render timeline items
-            timelineItems.forEach(item => {
-                const minWidth = 100; // Minimum pixel width for readability
-                const itemWidth = Math.max(minWidth, (item.hours / totalHours) * baseWidth);
-                
+            // Render location items
+            locationsEl.innerHTML = '';
+            sortedLocations.forEach((loc, index) => {
                 const itemEl = document.createElement('div');
-                itemEl.className = 'timeline-item';
-                itemEl.dataset.locationId = item.location.id;
-                itemEl.style.width = itemWidth + 'px';
-                itemEl.style.minWidth = minWidth + 'px';
-                itemEl.style.flex = `0 0 ${itemWidth}px`;
+                itemEl.className = 'trip-summary-location-item';
+                itemEl.dataset.locationId = loc.id;
                 
-                if (selectedTimelineItemId === item.location.id) {
-                    itemEl.classList.add('selected');
+                // Convert duration to days for display
+                const hours = parseDurationToHours(loc.duration);
+                const days = Math.ceil(hours / 24);
+                let durationDisplay = loc.duration;
+                
+                // Provide more user-friendly duration display
+                if (days === 1) {
+                    durationDisplay = '1 day';
+                } else if (days > 1) {
+                    durationDisplay = `${days} days`;
                 }
                 
                 itemEl.innerHTML = `
-                    <div class="timeline-item-order">${item.location.order || ''}</div>
-                    <div class="timeline-item-icon">📍</div>
-                    <div class="timeline-item-name" title="${item.location.name}">${item.location.name}</div>
-                    <div class="timeline-item-duration">${item.location.duration}</div>
+                    <div class="trip-summary-location-order">${index + 1}</div>
+                    <div class="trip-summary-location-info">
+                        <div class="trip-summary-location-name">${loc.name}</div>
+                        <div class="trip-summary-location-duration">📍 ${durationDisplay}</div>
+                    </div>
                 `;
                 
                 itemEl.addEventListener('click', () => {
-                    showLocationDetails(item.location.id);
+                    showLocationDetails(loc.id);
                 });
                 
-                locationsContainer.appendChild(itemEl);
+                locationsEl.appendChild(itemEl);
             });
             
-            // Show toggle button if we have timeline data
+            // Show toggle button if we have trip summary data
             if (toggleBtn) {
                 toggleBtn.classList.add('visible');
             }
             
-            // Only show timeline if timelineVisible is true
-            if (timelineVisible) {
+            // Only show trip summary if tripSummaryVisible is true
+            if (tripSummaryVisible) {
                 container.classList.add('visible');
             } else {
                 container.classList.remove('visible');
             }
         }
 
-        // Toggle timeline visibility
-        function toggleTimeline() {
-            timelineVisible = !timelineVisible;
-            const container = document.getElementById('timeline-container');
-            const toggleBtn = document.getElementById('timeline-toggle-btn');
+        // Toggle trip summary visibility
+        function toggleTripSummary() {
+            tripSummaryVisible = !tripSummaryVisible;
+            const container = document.getElementById('trip-summary-container');
+            const toggleBtn = document.getElementById('trip-summary-toggle-btn');
             
-            if (timelineVisible) {
+            if (tripSummaryVisible) {
                 container.classList.add('visible');
                 if (toggleBtn) {
-                    toggleBtn.textContent = '📅 Hide Timeline';
+                    toggleBtn.textContent = '🗺️ Hide Trip Summary';
                 }
             } else {
                 container.classList.remove('visible');
                 if (toggleBtn) {
-                    toggleBtn.textContent = '📅 Show Timeline';
+                    toggleBtn.textContent = '🗺️ Show Trip Summary';
                 }
             }
         }
 
         // Show location details modal
         function showLocationDetails(locationId) {
-            selectedTimelineItemId = locationId;
-            
-            // Update timeline item visuals
-            document.querySelectorAll('.timeline-item').forEach(item => {
-                if (item.dataset.locationId === locationId) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
-            });
-            
             // Find the location
             const location = locations.find(l => l.id === locationId);
             if (!location) return;
@@ -3603,12 +3582,6 @@
         function closeLocationDetailsModal() {
             const modal = document.getElementById('locationDetailsModal');
             modal.classList.remove('active');
-            selectedTimelineItemId = null;
-            
-            // Update timeline item visuals
-            document.querySelectorAll('.timeline-item').forEach(item => {
-                item.classList.remove('selected');
-            });
         }
         
         // Calculate distance between two points in km
@@ -3623,28 +3596,6 @@
             return R * c;
         }
 
-        // Timeline zoom controls
-        document.getElementById('timeline-zoom-in')?.addEventListener('click', () => {
-            timelineZoom = Math.min(timelineZoom * 1.3, 5);
-            updateTimeline();
-        });
-
-        document.getElementById('timeline-zoom-out')?.addEventListener('click', () => {
-            timelineZoom = Math.max(timelineZoom / 1.3, 0.5);
-            updateTimeline();
-        });
-
-        document.getElementById('timeline-reset')?.addEventListener('click', () => {
-            timelineZoom = 1;
-            selectedTimelineItemId = null;
-            updateTimeline();
-            
-            // Reset scroll position
-            const viewport = document.querySelector('.timeline-viewport');
-            if (viewport) {
-                viewport.scrollLeft = 0;
-            }
-        });
 
         // Custom confirm dialog
         function showConfirm(message, title = 'Confirm Action') {
@@ -3767,6 +3718,7 @@
             
             updateLocationsList();
             updateFilterCounts();
+            updateTripSummary();
             saveData();
             console.log('Delete completed');
         }
@@ -3775,6 +3727,8 @@
         function saveData() {
             const data = {
                 title: tripTitle,
+                arrival_location: tripData.arrival_location || '',
+                departure_location: tripData.departure_location || '',
                 locations: locations,
                 connections: connections
             };
@@ -3809,6 +3763,10 @@
                     }
                     console.log('Loaded title:', tripTitle);
                     
+                    // Load trip metadata
+                    tripData.arrival_location = data.arrival_location || '';
+                    tripData.departure_location = data.departure_location || '';
+                    
                     locations = data.locations || [];
                     connections = data.connections || [];
                     console.log('Loaded', locations.length, 'locations and', connections.length, 'connections');
@@ -3828,6 +3786,7 @@
                     console.log('Updating locations list...');
                     updateLocationsList();
                     updateFilterCounts();
+                    updateTripSummary();
                     console.log('loadData completed');
                 } catch (e) {
                     console.error('Error loading data:', e);
@@ -3841,6 +3800,8 @@
         function exportData() {
             const data = {
                 title: tripTitle,
+                arrival_location: tripData.arrival_location || '',
+                departure_location: tripData.departure_location || '',
                 locations: locations,
                 connections: connections,
                 exportDate: new Date().toISOString()
@@ -4229,6 +4190,10 @@ When creating a JSON file for this PlanPilot:
                     document.getElementById('mapTitle').classList.remove('visible');
                 }
                 
+                // Import trip metadata
+                tripData.arrival_location = data.arrival_location || '';
+                tripData.departure_location = data.departure_location || '';
+                
                 locations = data.locations;
                 connections = data.connections || [];
 
@@ -4236,6 +4201,7 @@ When creating a JSON file for this PlanPilot:
                 connections.forEach(conn => drawConnection(conn));
                 updateLocationsList();
                 updateFilterCounts();
+                updateTripSummary();
                 saveData();
 
                 closeImportModal();
@@ -4310,6 +4276,7 @@ When creating a JSON file for this PlanPilot:
                 console.log('Calling updateLocationsList...');
                 updateLocationsList();
                 updateFilterCounts();
+                updateTripSummary();
                 console.log('List updated, calling saveData...');
                 saveData();
                 console.log('Data saved to localStorage');
