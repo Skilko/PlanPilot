@@ -138,3 +138,4 @@ Potential enhancements to consider:
 - Empty links are preferable to broken links (users can search manually if needed)
 - The enhanced logging helps identify if Gemini is not using search correctly
 
+

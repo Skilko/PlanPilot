@@ -612,104 +612,152 @@
         }
 
         .trip-summary-locations {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            overflow-x: auto;
         }
 
-        .trip-summary-location-section {
+        .trip-summary-table {
+            width: 100%;
+            border-collapse: collapse;
             background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
         }
 
-        .trip-summary-location-header {
+        .trip-summary-table thead {
             background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             color: white;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
         }
 
-        .trip-summary-location-number {
-            background: rgba(255, 255, 255, 0.3);
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+        .trip-summary-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #8e44ad;
+        }
+
+        .trip-summary-table th:first-child {
+            width: 40px;
+            text-align: center;
+        }
+
+        .trip-summary-table th:last-child {
+            width: 60px;
+            text-align: center;
+        }
+
+        .trip-summary-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: all 0.2s;
+            cursor: move;
+        }
+
+        .trip-summary-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .trip-summary-table tbody tr.dragging {
+            opacity: 0.5;
+            background: #e3f2fd;
+        }
+
+        .trip-summary-table tbody tr.drag-over {
+            border-top: 3px solid #0891D0;
+        }
+
+        .trip-summary-table td {
+            padding: 12px;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .trip-summary-drag-handle {
+            color: #999;
+            cursor: move;
+            font-size: 16px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .trip-summary-drag-handle:hover {
+            color: #0891D0;
+        }
+
+        .trip-summary-location-cell {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .trip-summary-duration-cell {
+            color: #9b59b6;
+            font-weight: 500;
+        }
+
+        .trip-summary-items-cell {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .trip-summary-items-cell .item-group {
+            margin-bottom: 8px;
+        }
+
+        .trip-summary-items-cell .item-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .trip-summary-items-cell .item-label {
+            color: #0891D0;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .trip-summary-items-cell .item-entry {
+            margin-left: 8px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .trip-summary-items-cell .item-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .trip-summary-items-cell .item-price {
+            color: #27ae60;
+            margin-left: 4px;
+        }
+
+        .trip-summary-items-cell .item-link {
+            color: #0891D0;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .trip-summary-items-cell .item-link:hover {
+            text-decoration: underline;
+        }
+
+        .trip-summary-delete-btn {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            flex-shrink: 0;
+            transition: all 0.2s;
+            margin: 0 auto;
         }
 
-        .trip-summary-location-title {
-            flex: 1;
-            font-size: 16px;
-        }
-
-        .trip-summary-location-days {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        .trip-summary-subsection {
-            padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .trip-summary-subsection:last-child {
-            border-bottom: none;
-        }
-
-        .trip-summary-subsection h4 {
-            margin: 0 0 12px 0;
-            font-size: 14px;
-            color: #0891D0;
-            font-weight: 600;
-        }
-
-        .trip-summary-subsection ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .trip-summary-subsection li {
-            padding: 10px 0;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .trip-summary-subsection li:last-child {
-            border-bottom: none;
-        }
-
-        .trip-summary-subsection li strong {
-            color: #333;
-            font-size: 14px;
-        }
-
-        .trip-summary-subsection li small {
-            color: #666;
-            font-size: 12px;
-            display: block;
-            margin-top: 4px;
-        }
-
-        .trip-summary-subsection li a {
-            color: #0891D0;
-            text-decoration: none;
-            font-size: 12px;
-            display: inline-block;
-            margin-top: 4px;
-        }
-
-        .trip-summary-subsection li a:hover {
-            text-decoration: underline;
+        .trip-summary-delete-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
         }
 
         /* Leaflet Layer Control Styling */
@@ -1939,43 +1987,24 @@
                 font-size: 12px;
             }
 
-            .trip-summary-location-header {
-                padding: 10px 12px;
-                font-size: 14px;
-            }
-
-            .trip-summary-location-number {
-                width: 24px;
-                height: 24px;
+            .trip-summary-table th {
+                padding: 8px;
                 font-size: 12px;
             }
 
-            .trip-summary-location-title {
-                font-size: 14px;
-            }
-
-            .trip-summary-location-days {
-                font-size: 12px;
-            }
-
-            .trip-summary-subsection {
-                padding: 12px;
-            }
-
-            .trip-summary-subsection h4 {
-                font-size: 13px;
-            }
-
-            .trip-summary-subsection li {
-                padding: 8px 0;
-            }
-
-            .trip-summary-subsection li strong {
-                font-size: 13px;
-            }
-
-            .trip-summary-subsection li small {
+            .trip-summary-table td {
+                padding: 8px;
                 font-size: 11px;
+            }
+
+            .trip-summary-drag-handle {
+                font-size: 14px;
+            }
+
+            .trip-summary-delete-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
             }
 
             /* Make filter/legend collapsible for mobile */
@@ -3451,8 +3480,30 @@
                 travelEl.style.display = 'none';
             }
             
-            // Render all locations with their accommodations and attractions
+            // Render all locations with their accommodations and attractions in a table
             locationsEl.innerHTML = '';
+            
+            // Create table
+            const table = document.createElement('table');
+            table.className = 'trip-summary-table';
+            
+            // Table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th></th>
+                    <th>Location</th>
+                    <th>Duration</th>
+                    <th>Accommodations & Attractions</th>
+                    <th>Actions</th>
+                </tr>
+            `;
+            table.appendChild(thead);
+            
+            // Table body
+            const tbody = document.createElement('tbody');
+            tbody.id = 'trip-summary-tbody';
+            
             sortedLocations.forEach((loc, index) => {
                 // Find accommodations and attractions for this location
                 const associatedItems = locations.filter(item => {
@@ -3484,58 +3535,65 @@
                     durationDisplay = `${days} days`;
                 }
                 
-                // Create location section
-                const sectionEl = document.createElement('div');
-                sectionEl.className = 'trip-summary-location-section';
-                
-                let sectionHTML = `
-                    <div class="trip-summary-location-header">
-                        <span class="trip-summary-location-number">${index + 1}</span>
-                        <span class="trip-summary-location-title">${loc.name}</span>
-                        <span class="trip-summary-location-days">${durationDisplay}</span>
-                    </div>
-                `;
+                // Build items HTML
+                let itemsHTML = '';
                 
                 // Add accommodations
                 if (accommodations.length > 0) {
-                    sectionHTML += '<div class="trip-summary-subsection">';
-                    sectionHTML += '<h4>🏨 Accommodations</h4>';
-                    sectionHTML += '<ul>';
+                    itemsHTML += '<div class="item-group">';
+                    itemsHTML += '<span class="item-label">🏨 Accommodations</span>';
                     accommodations.forEach(acc => {
-                        sectionHTML += `<li>`;
-                        sectionHTML += `<strong>${acc.name}</strong>`;
-                        if (acc.price) sectionHTML += ` - ${acc.price}`;
-                        if (acc.description) sectionHTML += `<br><small>${acc.description}</small>`;
-                        if (acc.link) sectionHTML += `<br><a href="${acc.link}" target="_blank">View Details</a>`;
-                        sectionHTML += `</li>`;
+                        itemsHTML += '<div class="item-entry">';
+                        itemsHTML += `<span class="item-name">${acc.name}</span>`;
+                        if (acc.price) itemsHTML += `<span class="item-price">${acc.price}</span>`;
+                        if (acc.link) itemsHTML += `<a href="${acc.link}" target="_blank" class="item-link">🔗</a>`;
+                        itemsHTML += '</div>';
                     });
-                    sectionHTML += '</ul></div>';
+                    itemsHTML += '</div>';
                 }
                 
                 // Add attractions
                 if (attractions.length > 0) {
-                    sectionHTML += '<div class="trip-summary-subsection">';
-                    sectionHTML += '<h4>⭐ Attractions</h4>';
-                    sectionHTML += '<ul>';
+                    itemsHTML += '<div class="item-group">';
+                    itemsHTML += '<span class="item-label">⭐ Attractions</span>';
                     attractions.forEach(attr => {
-                        sectionHTML += `<li>`;
-                        sectionHTML += `<strong>${attr.name}</strong>`;
-                        if (attr.price) sectionHTML += ` - ${attr.price}`;
-                        if (attr.description) sectionHTML += `<br><small>${attr.description}</small>`;
-                        if (attr.link) sectionHTML += `<br><a href="${attr.link}" target="_blank">View Details</a>`;
-                        sectionHTML += `</li>`;
+                        itemsHTML += '<div class="item-entry">';
+                        itemsHTML += `<span class="item-name">${attr.name}</span>`;
+                        if (attr.price) itemsHTML += `<span class="item-price">${attr.price}</span>`;
+                        if (attr.link) itemsHTML += `<a href="${attr.link}" target="_blank" class="item-link">🔗</a>`;
+                        itemsHTML += '</div>';
                     });
-                    sectionHTML += '</ul></div>';
+                    itemsHTML += '</div>';
                 }
                 
                 // Show message if no items
                 if (accommodations.length === 0 && attractions.length === 0) {
-                    sectionHTML += '<div class="trip-summary-subsection"><p style="color: #999; font-style: italic;">No accommodations or attractions found for this location</p></div>';
+                    itemsHTML = '<span style="color: #999; font-style: italic;">No data</span>';
                 }
                 
-                sectionEl.innerHTML = sectionHTML;
-                locationsEl.appendChild(sectionEl);
+                // Create table row
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-location-id', loc.id);
+                tr.setAttribute('draggable', 'true');
+                
+                tr.innerHTML = `
+                    <td class="trip-summary-drag-handle">☰</td>
+                    <td class="trip-summary-location-cell">${loc.name}</td>
+                    <td class="trip-summary-duration-cell">${durationDisplay}</td>
+                    <td class="trip-summary-items-cell">${itemsHTML}</td>
+                    <td>
+                        <button class="trip-summary-delete-btn" onclick="deleteTripSummaryRow('${loc.id}')">🗑️</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
             });
+            
+            table.appendChild(tbody);
+            locationsEl.appendChild(table);
+            
+            // Initialize drag and drop
+            initializeTripSummaryDragDrop();
             
             console.log('Trip summary content updated successfully');
         }
@@ -3564,6 +3622,150 @@
             } else {
                 container.classList.remove('visible');
             }
+        }
+
+        // Initialize drag and drop for trip summary table
+        function initializeTripSummaryDragDrop() {
+            const tbody = document.getElementById('trip-summary-tbody');
+            if (!tbody) return;
+            
+            let draggedRow = null;
+            
+            tbody.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'TR') {
+                    draggedRow = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                }
+            });
+            
+            tbody.addEventListener('dragend', function(e) {
+                if (e.target.tagName === 'TR') {
+                    e.target.classList.remove('dragging');
+                    // Remove any drag-over classes
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach(row => row.classList.remove('drag-over'));
+                }
+            });
+            
+            tbody.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                
+                const afterElement = getDragAfterElement(tbody, e.clientY);
+                const dragging = document.querySelector('.dragging');
+                
+                if (afterElement == null) {
+                    tbody.appendChild(dragging);
+                } else {
+                    tbody.insertBefore(dragging, afterElement);
+                }
+            });
+            
+            tbody.addEventListener('drop', function(e) {
+                e.preventDefault();
+                if (draggedRow) {
+                    // Update the order in the locations array
+                    updateLocationOrderFromTable();
+                    // Refresh the summary to update numbers
+                    updateTripSummary();
+                }
+            });
+        }
+        
+        // Helper function to get the element to insert before during drag
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('tr:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+        
+        // Update location order based on table row order
+        function updateLocationOrderFromTable() {
+            const tbody = document.getElementById('trip-summary-tbody');
+            if (!tbody) return;
+            
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                const locationId = row.getAttribute('data-location-id');
+                const location = locations.find(loc => loc.id === locationId);
+                if (location) {
+                    // Update order - multiply by 100 to leave space for accommodations/attractions
+                    location.order = index * 100;
+                }
+            });
+            
+            // Update map and save
+            updateMap();
+            saveToLocalStorage();
+            
+            console.log('Location order updated from table');
+        }
+        
+        // Delete a trip summary row and its associated location
+        function deleteTripSummaryRow(locationId) {
+            if (!confirm('Are you sure you want to delete this location and all its associated items?')) {
+                return;
+            }
+            
+            // Find the location
+            const location = locations.find(loc => loc.id === locationId);
+            if (!location) {
+                console.log('Location not found:', locationId);
+                return;
+            }
+            
+            // Find all associated items (accommodations and attractions within range)
+            const itemsToDelete = [];
+            locations.forEach(item => {
+                if (item.id === locationId) {
+                    itemsToDelete.push(item.id);
+                    return;
+                }
+                
+                if (item.type === 'key-location') return;
+                
+                // Check if order is close (within 10 positions)
+                if (typeof location.order === 'number' && typeof item.order === 'number') {
+                    const orderDiff = Math.abs(item.order - location.order);
+                    if (orderDiff <= 10) {
+                        itemsToDelete.push(item.id);
+                        return;
+                    }
+                }
+                
+                // Check if geographically close (within ~50km)
+                const distance = getDistance(location.lat, location.lng, item.lat, item.lng);
+                if (distance < 50) {
+                    itemsToDelete.push(item.id);
+                }
+            });
+            
+            // Remove all items
+            console.log('Deleting location and associated items:', itemsToDelete);
+            locations = locations.filter(loc => !itemsToDelete.includes(loc.id));
+            
+            // Remove connections involving this location
+            connections = connections.filter(conn => 
+                conn.from !== locationId && conn.to !== locationId
+            );
+            
+            // Update everything
+            updateMap();
+            updateLocationsList();
+            updateTripSummary();
+            saveToLocalStorage();
+            
+            showAlert(`Deleted ${location.name} and ${itemsToDelete.length - 1} associated item(s)`, 'Location Deleted');
         }
 
         // Show location details modal
