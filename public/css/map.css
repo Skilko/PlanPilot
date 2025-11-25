@@ -451,11 +451,28 @@
     font-size: 16px;
     flex-shrink: 0;
     box-shadow: 0 4px 12px rgba(8, 145, 208, 0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.trip-summary-card-number:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(8, 145, 208, 0.4);
 }
 
 .trip-summary-card-main {
     flex: 1;
     min-width: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.trip-summary-card-main:hover {
+    opacity: 0.8;
+}
+
+.trip-summary-card-main:hover .trip-summary-card-title {
+    color: var(--primary-color);
 }
 
 .trip-summary-card-title {
@@ -464,6 +481,7 @@
     color: #1e293b;
     margin: 0 0 4px 0;
     line-height: 1.3;
+    transition: color 0.2s;
 }
 
 .trip-summary-card-description {
@@ -601,7 +619,8 @@
     border-radius: 10px;
     margin-bottom: 6px;
     border: 1px solid #e2e8f0;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .trip-summary-nearby-item:last-child {
@@ -611,6 +630,8 @@
 .trip-summary-nearby-item:hover {
     border-color: var(--primary-color);
     box-shadow: 0 2px 8px rgba(8, 145, 208, 0.1);
+    cursor: pointer;
+    transform: translateX(4px);
 }
 
 .trip-summary-nearby-icon {

@@ -124,11 +124,14 @@ function formatDaysForStats(totalDays) {
  * Create a nearby item element
  * @param {Object} item - The item (accommodation or attraction)
  * @param {string} type - 'accommodation' or 'attraction'
+ * @param {Object} markers - Map markers object
  * @returns {HTMLElement} - The item element
  */
-function createNearbyItemElement(item, type) {
+function createNearbyItemElement(item, type, markers) {
+    const map = getMap();
     const itemEl = document.createElement('div');
     itemEl.className = 'trip-summary-nearby-item';
+    itemEl.dataset.locationId = item.id;
     
     const icon = type === 'accommodation' ? '🏨' : '⭐';
     const iconClass = type === 'accommodation' ? 'accommodation' : 'attraction';
@@ -147,8 +150,21 @@ function createNearbyItemElement(item, type) {
             <div class="trip-summary-nearby-name">${item.name}</div>
             ${detailsHtml ? `<div class="trip-summary-nearby-detail">${detailsHtml}</div>` : ''}
         </div>
-        ${item.link ? `<a href="${item.link}" target="_blank" class="trip-summary-nearby-link">View</a>` : ''}
+        ${item.link ? `<a href="${item.link}" target="_blank" class="trip-summary-nearby-link" onclick="event.stopPropagation()">View</a>` : ''}
     `;
+    
+    // Add click handler to pan map to this location
+    itemEl.addEventListener('click', (e) => {
+        // Don't trigger if clicking the link
+        if (e.target.classList.contains('trip-summary-nearby-link')) return;
+        
+        if (map && item.lat && item.lng) {
+            map.setView([item.lat, item.lng], 14, { animate: true });
+            if (markers && markers[item.id]) {
+                markers[item.id].openPopup();
+            }
+        }
+    });
     
     return itemEl;
 }
@@ -203,7 +219,7 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
             accSection.className = 'trip-summary-nearby-section';
             accSection.innerHTML = `<div class="trip-summary-nearby-title">🏨 Accommodations</div>`;
             accommodations.forEach(acc => {
-                accSection.appendChild(createNearbyItemElement(acc, 'accommodation'));
+                accSection.appendChild(createNearbyItemElement(acc, 'accommodation', markers));
             });
             details.appendChild(accSection);
         }
@@ -214,7 +230,7 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
             attrSection.className = 'trip-summary-nearby-section';
             attrSection.innerHTML = `<div class="trip-summary-nearby-title">⭐ Attractions</div>`;
             attractions.forEach(attr => {
-                attrSection.appendChild(createNearbyItemElement(attr, 'attraction'));
+                attrSection.appendChild(createNearbyItemElement(attr, 'attraction', markers));
             });
             details.appendChild(attrSection);
         }
@@ -250,6 +266,36 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
  */
 function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCallback, updateListCallback) {
     const map = getMap();
+    
+    // Click on card main area to pan map
+    const cardMain = card.querySelector('.trip-summary-card-main');
+    if (cardMain) {
+        cardMain.style.cursor = 'pointer';
+        cardMain.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (map && loc.lat && loc.lng) {
+                map.setView([loc.lat, loc.lng], 12, { animate: true });
+                if (markers && markers[loc.id]) {
+                    markers[loc.id].openPopup();
+                }
+            }
+        });
+    }
+    
+    // Click on card number to pan map
+    const cardNumber = card.querySelector('.trip-summary-card-number');
+    if (cardNumber) {
+        cardNumber.style.cursor = 'pointer';
+        cardNumber.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (map && loc.lat && loc.lng) {
+                map.setView([loc.lat, loc.lng], 12, { animate: true });
+                if (markers && markers[loc.id]) {
+                    markers[loc.id].openPopup();
+                }
+            }
+        });
+    }
     
     // Zoom button
     const zoomBtn = card.querySelector('.trip-summary-card-btn.zoom');
