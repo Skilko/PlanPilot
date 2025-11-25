@@ -7,9 +7,11 @@
    TABLET STYLES (768px - 1024px)
    ---------------------------------------- */
 @media (max-width: 1024px) and (min-width: 768px) {
-    /* Narrower sidebar */
+    /* Narrower floating sidebar */
     .sidebar {
         width: 280px;
+        top: 15px;
+        left: 15px;
     }
 
     /* Map Controls for tablet */
@@ -74,11 +76,6 @@
         display: flex;
     }
 
-    /* Body adjustments */
-    body {
-        flex-direction: column;
-    }
-
     /* Sidebar - hidden by default, overlay when open */
     .sidebar {
         position: fixed;
@@ -86,10 +83,12 @@
         left: -100%;
         width: 85%;
         max-width: 320px;
-        height: 100vh;
+        height: auto;
+        max-height: 100vh;
         z-index: 1000;
         transition: left 0.3s ease-in-out;
         box-shadow: none;
+        border-radius: 0 20px 20px 0;
     }
 
     .sidebar.active {
@@ -97,15 +96,10 @@
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
     }
 
-    /* Map takes full width */
-    #map {
-        width: 100%;
-        height: 100vh;
-    }
-
     /* Sidebar header adjustments */
     .sidebar-header {
         padding: 15px;
+        border-radius: 0;
     }
 
     .sidebar-header-logo {
@@ -128,11 +122,6 @@
         width: 26px;
         height: 26px;
         font-size: 14px;
-    }
-
-    /* Sidebar scrollable area */
-    .sidebar-scrollable {
-        padding-bottom: 20px;
     }
 
     /* Controls padding */
