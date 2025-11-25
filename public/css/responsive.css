@@ -248,72 +248,157 @@
         padding: 12px;
     }
 
-    /* Trip Summary mobile styles */
+    /* Trip Summary mobile styles - Redesigned */
     .trip-summary-container {
         top: 120px;
         width: 95%;
         max-width: none;
+        border-radius: 16px;
+    }
+
+    .trip-summary-header {
+        padding: 16px 18px;
     }
 
     .trip-summary-header h3 {
-        font-size: 16px;
+        font-size: 17px;
     }
 
     .trip-summary-body {
-        padding: 15px;
-        max-height: 50vh;
+        max-height: 55vh;
     }
 
-    .trip-summary-duration {
-        font-size: 14px;
-        padding: 10px 14px;
+    .trip-summary-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .trip-summary-stat {
+        padding: 12px 8px;
+    }
+
+    .trip-summary-stat-value {
+        font-size: 18px;
+    }
+
+    .trip-summary-stat-label {
+        font-size: 9px;
     }
 
     .trip-summary-travel {
-        padding: 10px 14px;
+        padding: 12px 16px;
     }
 
-    .trip-summary-travel p {
+    .trip-summary-travel-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .trip-summary-travel-route {
         font-size: 12px;
     }
 
-    .trip-summary-location-header {
-        padding: 10px 12px;
+    .trip-summary-timeline {
+        padding: 16px;
+    }
+
+    .trip-summary-card {
+        border-radius: 14px;
+        margin-bottom: 14px;
+    }
+
+    .trip-summary-card::before {
+        left: 24px;
+        top: 52px;
+    }
+
+    .trip-summary-card-header {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .trip-summary-card-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
         font-size: 14px;
     }
 
-    .trip-summary-location-number {
-        width: 24px;
-        height: 24px;
+    .trip-summary-card-title {
+        font-size: 15px;
+    }
+
+    .trip-summary-card-description {
         font-size: 12px;
     }
 
-    .trip-summary-location-title {
-        font-size: 14px;
-    }
-
-    .trip-summary-location-days {
-        font-size: 12px;
-    }
-
-    .trip-summary-subsection {
-        padding: 12px;
-    }
-
-    .trip-summary-subsection h4 {
-        font-size: 13px;
-    }
-
-    .trip-summary-subsection li {
-        padding: 8px 0;
-    }
-
-    .trip-summary-subsection li strong {
-        font-size: 13px;
-    }
-
-    .trip-summary-subsection li small {
+    .trip-summary-card-duration {
+        padding: 5px 10px;
         font-size: 11px;
+    }
+
+    .trip-summary-card-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .trip-summary-card-toggle {
+        padding: 8px 14px;
+        font-size: 11px;
+    }
+
+    .trip-summary-card-details {
+        padding: 0;
+    }
+
+    .trip-summary-card.expanded .trip-summary-card-details {
+        padding: 14px;
+    }
+
+    .trip-summary-nearby-section {
+        margin-bottom: 10px;
+    }
+
+    .trip-summary-nearby-title {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+
+    .trip-summary-nearby-item {
+        padding: 8px 10px;
+        border-radius: 8px;
+    }
+
+    .trip-summary-nearby-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+
+    .trip-summary-nearby-name {
+        font-size: 12px;
+    }
+
+    .trip-summary-nearby-detail {
+        font-size: 10px;
+    }
+
+    .trip-summary-nearby-link {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    .trip-summary-empty {
+        padding: 30px 16px;
+    }
+
+    .trip-summary-empty-icon {
+        font-size: 40px;
+    }
+
+    .trip-summary-empty-text {
+        font-size: 13px;
     }
 
     /* Make filter/legend for mobile */

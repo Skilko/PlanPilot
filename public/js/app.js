@@ -86,7 +86,8 @@ function getUpdateCallbacks() {
             state.tripData, 
             (id) => handleDeleteLocation(id),
             saveCurrentState,
-            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count))
+            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+            state.markers
         )
     };
 }
@@ -250,7 +251,8 @@ function importDataFromJSON(data) {
             state.tripData, 
             (id) => handleDeleteLocation(id),
             saveCurrentState,
-            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count))
+            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+            state.markers
         );
         saveCurrentState();
 
@@ -319,7 +321,8 @@ function clearAllData(showConfirmation) {
             state.tripData, 
             (id) => handleDeleteLocation(id),
             saveCurrentState,
-            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count))
+            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+            state.markers
         );
         saveCurrentState();
 
@@ -360,7 +363,8 @@ function handleToggleTripSummary() {
         state.tripData, 
         (id) => handleDeleteLocation(id),
         saveCurrentState,
-        () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count))
+        () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+        state.markers
     );
 }
 
@@ -464,20 +468,7 @@ function setupEventListeners() {
         });
     }
 
-    // Event delegation for trip summary
-    const tripSummaryLocations = document.getElementById('trip-summary-locations');
-    if (tripSummaryLocations) {
-        tripSummaryLocations.addEventListener('click', function(e) {
-            const deleteBtn = e.target.closest('.trip-summary-delete-btn');
-            if (!deleteBtn) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            const id = deleteBtn.getAttribute('data-id');
-            if (id) handleDeleteLocation(id);
-        });
-    }
+    // Trip summary events are now handled within trip-summary.js via card event listeners
 }
 
 /**
@@ -504,7 +495,8 @@ function init() {
         state.tripData, 
         (id) => handleDeleteLocation(id),
         saveCurrentState,
-        () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count))
+        () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+        state.markers
     );
     updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count));
     

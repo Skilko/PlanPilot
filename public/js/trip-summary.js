@@ -1,6 +1,6 @@
 /**
  * PlanPilot - Trip Summary Module
- * Trip summary panel and calculations
+ * Trip summary panel and calculations - Redesigned with card-based timeline
  */
 
 import { showAlert } from './modals.js';
@@ -9,7 +9,7 @@ import { getMap } from './map.js';
 
 // Trip summary state
 let tripSummaryVisible = false;
-let tripSummaryDraggingRow = null;
+let tripSummaryDraggingCard = null;
 
 /**
  * Parse duration string to hours
@@ -102,223 +102,245 @@ export function getAssociatedItems(baseLocation, locations) {
 }
 
 /**
- * Update trip summary display
- * @param {Array} locations - All locations
- * @param {Object} tripData - Trip metadata (arrival_location, departure_location)
- * @param {Function} deleteCallback - Callback for delete actions
- * @param {Function} saveCallback - Callback to save changes
- * @param {Function} updateListCallback - Callback to update locations list
+ * Format days for stats display
+ * @param {number} totalDays - Total days
+ * @returns {string} - Formatted string
  */
-export function updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback) {
-    console.log('updateTripSummary called, total locations:', locations.length);
-    const container = document.getElementById('trip-summary-container');
-    const durationEl = document.getElementById('trip-summary-duration');
-    const travelEl = document.getElementById('trip-summary-travel');
-    const locationsEl = document.getElementById('trip-summary-locations');
-    
-    if (!container || !durationEl || !travelEl || !locationsEl) {
-        console.log('Trip summary elements not found');
-        return;
-    }
-    
-    // Only show trip summary if we have key locations with durations
-    const keyLocations = locations.filter(loc => 
-        loc.type === 'key-location' && 
-        loc.duration && 
-        loc.duration.trim() !== ''
-    );
-    
-    console.log('Key locations with durations:', keyLocations.length);
-    
-    if (keyLocations.length === 0) {
-        console.log('No key locations with durations found');
-        durationEl.textContent = '';
-        travelEl.innerHTML = '';
-        travelEl.style.display = 'none';
-        locationsEl.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No trip data available</p>';
-        return;
-    }
-    
-    // Sort by order
-    const sortedLocations = [...keyLocations].sort((a, b) => {
-        const orderA = typeof a.order === 'number' ? a.order : 999999;
-        const orderB = typeof b.order === 'number' ? b.order : 999999;
-        return orderA - orderB;
-    });
-    
-    // Calculate total duration
-    let totalHours = 0;
-    sortedLocations.forEach(loc => {
-        totalHours += parseDurationToHours(loc.duration);
-    });
-    
-    const totalDays = Math.ceil(totalHours / 24);
-    let durationText = '';
-    if (totalDays <= 1) {
-        durationText = '📅 Total Duration: 1 Day';
-    } else if (totalDays <= 7) {
-        durationText = `📅 Total Duration: ${totalDays} Days`;
+function formatDaysForStats(totalDays) {
+    if (totalDays <= 7) {
+        return `${totalDays}`;
     } else {
         const weeks = Math.floor(totalDays / 7);
         const days = totalDays % 7;
-        durationText = weeks === 1 
-            ? `📅 Total Duration: 1 Week${days > 0 ? ' + ' + days + ' Days' : ''}` 
-            : `📅 Total Duration: ${weeks} Weeks${days > 0 ? ' + ' + days + ' Days' : ''}`;
-    }
-    durationEl.textContent = durationText;
-    
-    // Show travel to/from information
-    const firstLocation = sortedLocations[0];
-    const lastLocation = sortedLocations[sortedLocations.length - 1];
-    
-    let travelHtml = '';
-    if (tripData.arrival_location && tripData.arrival_location.trim() !== '') {
-        travelHtml += `<p>✈️ <strong>Travel to:</strong> ${tripData.arrival_location} → ${firstLocation.name}</p>`;
-    }
-    if (tripData.departure_location && tripData.departure_location.trim() !== '') {
-        travelHtml += `<p>✈️ <strong>Travel from:</strong> ${lastLocation.name} → ${tripData.departure_location}</p>`;
-    }
-    
-    if (travelHtml) {
-        travelEl.innerHTML = travelHtml;
-        travelEl.style.display = 'block';
-    } else {
-        travelEl.style.display = 'none';
-    }
-    
-    // Render key locations as draggable table rows
-    locationsEl.innerHTML = '';
-    
-    const table = document.createElement('table');
-    table.className = 'trip-summary-table';
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Location</th>
-                <th>Duration</th>
-                <th>Nearby stays & attractions</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
-
-    const tbody = table.querySelector('tbody');
-
-    sortedLocations.forEach((loc, index) => {
-        const { accommodations, attractions } = getAssociatedItems(loc, locations);
-        const notesParts = [];
-
-        if (accommodations.length > 0) {
-            notesParts.push(`🏨 ${accommodations.map(acc => acc.name).join(', ')}`);
+        if (days === 0) {
+            return `${weeks}w`;
         }
-
-        if (attractions.length > 0) {
-            notesParts.push(`⭐ ${attractions.map(attr => attr.name).join(', ')}`);
-        }
-
-        const notesHtml = notesParts.length > 0
-            ? notesParts.map(text => `<span>${text}</span>`).join('')
-            : `<span class="trip-summary-empty-note">No nearby stays or attractions</span>`;
-
-        const row = document.createElement('tr');
-        row.className = 'trip-summary-row';
-        row.dataset.locationId = loc.id;
-        row.draggable = true;
-        row.innerHTML = `
-            <td class="trip-summary-order">${index + 1}</td>
-            <td>
-                <div class="trip-summary-location-name">${loc.name}</div>
-                ${loc.description ? `<div class="trip-summary-location-description">${loc.description}</div>` : ''}
-            </td>
-            <td class="trip-summary-duration-cell">${formatTripSummaryDuration(loc.duration)}</td>
-            <td>
-                <div class="trip-summary-notes">
-                    ${notesHtml}
-                </div>
-            </td>
-            <td class="trip-summary-actions">
-                <button class="trip-summary-delete-btn" data-id="${loc.id}">Delete</button>
-            </td>
-        `;
-
-        attachTripSummaryRowEvents(row, locations, saveCallback, updateListCallback);
-        tbody.appendChild(row);
-    });
-
-    locationsEl.appendChild(table);
-    
-    console.log('Trip summary content updated successfully');
+        return `${weeks}w ${days}d`;
+    }
 }
 
 /**
- * Attach drag and drop events to a trip summary row
- * @param {HTMLElement} row - The table row element
- * @param {Array} locations - All locations
- * @param {Function} saveCallback - Callback to save changes
- * @param {Function} updateListCallback - Callback to update locations list
+ * Create a nearby item element
+ * @param {Object} item - The item (accommodation or attraction)
+ * @param {string} type - 'accommodation' or 'attraction'
+ * @returns {HTMLElement} - The item element
  */
-function attachTripSummaryRowEvents(row, locations, saveCallback, updateListCallback) {
-    row.addEventListener('dragstart', handleTripSummaryDragStart);
-    row.addEventListener('dragover', handleTripSummaryDragOver);
-    row.addEventListener('drop', handleTripSummaryDrop);
-    row.addEventListener('dragend', (event) => handleTripSummaryDragEnd(event, locations, saveCallback, updateListCallback));
+function createNearbyItemElement(item, type) {
+    const itemEl = document.createElement('div');
+    itemEl.className = 'trip-summary-nearby-item';
+    
+    const icon = type === 'accommodation' ? '🏨' : '⭐';
+    const iconClass = type === 'accommodation' ? 'accommodation' : 'attraction';
+    
+    let detailsHtml = '';
+    if (item.duration) {
+        detailsHtml += `<span>${item.duration}</span>`;
+    }
+    if (item.price) {
+        detailsHtml += `<span class="trip-summary-nearby-price">${item.price}</span>`;
+    }
+    
+    itemEl.innerHTML = `
+        <div class="trip-summary-nearby-icon ${iconClass}">${icon}</div>
+        <div class="trip-summary-nearby-info">
+            <div class="trip-summary-nearby-name">${item.name}</div>
+            ${detailsHtml ? `<div class="trip-summary-nearby-detail">${detailsHtml}</div>` : ''}
+        </div>
+        ${item.link ? `<a href="${item.link}" target="_blank" class="trip-summary-nearby-link">View</a>` : ''}
+    `;
+    
+    return itemEl;
 }
 
-function handleTripSummaryDragStart(event) {
-    tripSummaryDraggingRow = event.currentTarget;
+/**
+ * Create a location card element
+ * @param {Object} loc - Location data
+ * @param {number} index - Index in the list
+ * @param {Array} locations - All locations
+ * @param {Object} markers - Map markers
+ * @param {Function} deleteCallback - Delete callback
+ * @param {Function} saveCallback - Save callback
+ * @param {Function} updateListCallback - Update list callback
+ * @returns {HTMLElement} - Card element
+ */
+function createLocationCard(loc, index, locations, markers, deleteCallback, saveCallback, updateListCallback) {
+    const { accommodations, attractions } = getAssociatedItems(loc, locations);
+    const hasNearbyItems = accommodations.length > 0 || attractions.length > 0;
+    
+    const card = document.createElement('div');
+    card.className = 'trip-summary-card';
+    card.dataset.locationId = loc.id;
+    card.draggable = true;
+    
+    // Card Header
+    const header = document.createElement('div');
+    header.className = 'trip-summary-card-header';
+    header.innerHTML = `
+        <div class="trip-summary-card-number">${index + 1}</div>
+        <div class="trip-summary-card-main">
+            <h4 class="trip-summary-card-title">${loc.name}</h4>
+            ${loc.description ? `<p class="trip-summary-card-description">${loc.description}</p>` : ''}
+        </div>
+        <div class="trip-summary-card-meta">
+            ${loc.duration ? `<span class="trip-summary-card-duration">${loc.duration}</span>` : ''}
+            <div class="trip-summary-card-actions">
+                <button class="trip-summary-card-btn zoom" title="Zoom to location" data-id="${loc.id}">🔍</button>
+                <button class="trip-summary-card-btn delete" title="Delete location" data-id="${loc.id}">🗑️</button>
+            </div>
+        </div>
+    `;
+    card.appendChild(header);
+    
+    // Details section (expandable)
+    if (hasNearbyItems) {
+        const details = document.createElement('div');
+        details.className = 'trip-summary-card-details';
+        
+        // Accommodations
+        if (accommodations.length > 0) {
+            const accSection = document.createElement('div');
+            accSection.className = 'trip-summary-nearby-section';
+            accSection.innerHTML = `<div class="trip-summary-nearby-title">🏨 Accommodations</div>`;
+            accommodations.forEach(acc => {
+                accSection.appendChild(createNearbyItemElement(acc, 'accommodation'));
+            });
+            details.appendChild(accSection);
+        }
+        
+        // Attractions
+        if (attractions.length > 0) {
+            const attrSection = document.createElement('div');
+            attrSection.className = 'trip-summary-nearby-section';
+            attrSection.innerHTML = `<div class="trip-summary-nearby-title">⭐ Attractions</div>`;
+            attractions.forEach(attr => {
+                attrSection.appendChild(createNearbyItemElement(attr, 'attraction'));
+            });
+            details.appendChild(attrSection);
+        }
+        
+        card.appendChild(details);
+        
+        // Toggle button
+        const toggle = document.createElement('div');
+        toggle.className = 'trip-summary-card-toggle';
+        toggle.innerHTML = `
+            <span>View ${accommodations.length + attractions.length} nearby place${accommodations.length + attractions.length > 1 ? 's' : ''}</span>
+            <span class="trip-summary-card-toggle-icon">▼</span>
+        `;
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            card.classList.toggle('expanded');
+            const isExpanded = card.classList.contains('expanded');
+            toggle.querySelector('span:first-child').textContent = isExpanded 
+                ? 'Hide details' 
+                : `View ${accommodations.length + attractions.length} nearby place${accommodations.length + attractions.length > 1 ? 's' : ''}`;
+        });
+        card.appendChild(toggle);
+    }
+    
+    // Attach events
+    attachCardEvents(card, loc, locations, markers, deleteCallback, saveCallback, updateListCallback);
+    
+    return card;
+}
+
+/**
+ * Attach events to a location card
+ */
+function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCallback, updateListCallback) {
+    const map = getMap();
+    
+    // Zoom button
+    const zoomBtn = card.querySelector('.trip-summary-card-btn.zoom');
+    if (zoomBtn) {
+        zoomBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (map && loc.lat && loc.lng) {
+                map.setView([loc.lat, loc.lng], 12, { animate: true });
+                if (markers && markers[loc.id]) {
+                    markers[loc.id].openPopup();
+                }
+            }
+        });
+    }
+    
+    // Delete button
+    const deleteBtn = card.querySelector('.trip-summary-card-btn.delete');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (deleteCallback) {
+                deleteCallback(loc.id);
+            }
+        });
+    }
+    
+    // Drag events
+    card.addEventListener('dragstart', handleCardDragStart);
+    card.addEventListener('dragover', handleCardDragOver);
+    card.addEventListener('drop', handleCardDrop);
+    card.addEventListener('dragend', (event) => handleCardDragEnd(event, locations, saveCallback, updateListCallback));
+}
+
+function handleCardDragStart(event) {
+    tripSummaryDraggingCard = event.currentTarget;
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', event.currentTarget.dataset.locationId || '');
     event.currentTarget.classList.add('dragging');
 }
 
-function handleTripSummaryDragOver(event) {
+function handleCardDragOver(event) {
     event.preventDefault();
-    if (!tripSummaryDraggingRow) return;
+    if (!tripSummaryDraggingCard) return;
 
-    const targetRow = event.currentTarget;
-    if (!targetRow || targetRow === tripSummaryDraggingRow) return;
+    const targetCard = event.currentTarget;
+    if (!targetCard || targetCard === tripSummaryDraggingCard) return;
 
-    const tbody = targetRow.parentElement;
-    if (!tbody) return;
+    const container = targetCard.parentElement;
+    if (!container) return;
 
-    const bounding = targetRow.getBoundingClientRect();
+    const bounding = targetCard.getBoundingClientRect();
     const offset = event.clientY - bounding.top;
 
     if (offset < bounding.height / 2) {
-        tbody.insertBefore(tripSummaryDraggingRow, targetRow);
+        container.insertBefore(tripSummaryDraggingCard, targetCard);
     } else {
-        tbody.insertBefore(tripSummaryDraggingRow, targetRow.nextSibling);
+        container.insertBefore(tripSummaryDraggingCard, targetCard.nextSibling);
     }
 }
 
-function handleTripSummaryDrop(event) {
+function handleCardDrop(event) {
     event.preventDefault();
 }
 
-function handleTripSummaryDragEnd(event, locations, saveCallback, updateListCallback) {
+function handleCardDragEnd(event, locations, saveCallback, updateListCallback) {
     event.currentTarget.classList.remove('dragging');
 
-    const tbody = event.currentTarget.parentElement;
-    if (!tbody) {
-        tripSummaryDraggingRow = null;
+    const container = event.currentTarget.parentElement;
+    if (!container) {
+        tripSummaryDraggingCard = null;
         return;
     }
 
-    const orderedIds = Array.from(tbody.querySelectorAll('tr')).map(row => row.dataset.locationId);
-    tripSummaryDraggingRow = null;
-    applyTripSummaryRowOrder(orderedIds, locations, saveCallback, updateListCallback);
+    const orderedIds = Array.from(container.querySelectorAll('.trip-summary-card')).map(card => card.dataset.locationId);
+    tripSummaryDraggingCard = null;
+    
+    // Update order numbers visually
+    const cards = container.querySelectorAll('.trip-summary-card');
+    cards.forEach((card, idx) => {
+        const numberEl = card.querySelector('.trip-summary-card-number');
+        if (numberEl) {
+            numberEl.textContent = idx + 1;
+        }
+    });
+    
+    applyCardOrder(orderedIds, locations, saveCallback, updateListCallback);
 }
 
 /**
  * Apply new order to locations after drag and drop
- * @param {Array} idOrder - Array of location IDs in new order
- * @param {Array} locations - All locations
- * @param {Function} saveCallback - Callback to save changes
- * @param {Function} updateListCallback - Callback to update locations list
  */
-function applyTripSummaryRowOrder(idOrder, locations, saveCallback, updateListCallback) {
+function applyCardOrder(idOrder, locations, saveCallback, updateListCallback) {
     if (!Array.isArray(idOrder) || idOrder.length === 0) {
         return;
     }
@@ -335,23 +357,146 @@ function applyTripSummaryRowOrder(idOrder, locations, saveCallback, updateListCa
 }
 
 /**
+ * Update trip summary display - Redesigned version
+ * @param {Array} locations - All locations
+ * @param {Object} tripData - Trip metadata (arrival_location, departure_location)
+ * @param {Function} deleteCallback - Callback for delete actions
+ * @param {Function} saveCallback - Callback to save changes
+ * @param {Function} updateListCallback - Callback to update locations list
+ * @param {Object} markers - Map markers object
+ */
+export function updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers = {}) {
+    console.log('updateTripSummary called, total locations:', locations.length);
+    const container = document.getElementById('trip-summary-container');
+    const body = document.querySelector('.trip-summary-body');
+    
+    if (!container || !body) {
+        console.log('Trip summary elements not found');
+        return;
+    }
+    
+    // Get all key locations (not just those with durations for better UX)
+    const keyLocations = locations.filter(loc => loc.type === 'key-location');
+    const keyLocationsWithDurations = keyLocations.filter(loc => loc.duration && loc.duration.trim() !== '');
+    const accommodations = locations.filter(loc => loc.type === 'accommodation');
+    const attractions = locations.filter(loc => loc.type === 'attraction');
+    
+    console.log('Key locations:', keyLocations.length);
+    
+    if (keyLocations.length === 0) {
+        console.log('No key locations found');
+        body.innerHTML = `
+            <div class="trip-summary-empty">
+                <div class="trip-summary-empty-icon">🗺️</div>
+                <p class="trip-summary-empty-text">No trip locations yet.<br>Add key locations to see your trip summary.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Sort by order
+    const sortedLocations = [...keyLocations].sort((a, b) => {
+        const orderA = typeof a.order === 'number' ? a.order : 999999;
+        const orderB = typeof b.order === 'number' ? b.order : 999999;
+        return orderA - orderB;
+    });
+    
+    // Calculate total duration
+    let totalHours = 0;
+    keyLocationsWithDurations.forEach(loc => {
+        totalHours += parseDurationToHours(loc.duration);
+    });
+    const totalDays = Math.ceil(totalHours / 24);
+    
+    // Build the new layout
+    let html = '';
+    
+    // Stats Dashboard
+    html += `
+        <div class="trip-summary-stats">
+            <div class="trip-summary-stat">
+                <div class="trip-summary-stat-value">${sortedLocations.length}</div>
+                <div class="trip-summary-stat-label">Stops</div>
+            </div>
+            <div class="trip-summary-stat">
+                <div class="trip-summary-stat-value">${totalDays > 0 ? formatDaysForStats(totalDays) : '—'}</div>
+                <div class="trip-summary-stat-label">Days</div>
+            </div>
+            <div class="trip-summary-stat">
+                <div class="trip-summary-stat-value">${accommodations.length}</div>
+                <div class="trip-summary-stat-label">Stays</div>
+            </div>
+            <div class="trip-summary-stat">
+                <div class="trip-summary-stat-value">${attractions.length}</div>
+                <div class="trip-summary-stat-label">Sights</div>
+            </div>
+        </div>
+    `;
+    
+    // Travel info (if available)
+    const firstLocation = sortedLocations[0];
+    const lastLocation = sortedLocations[sortedLocations.length - 1];
+    
+    if ((tripData.arrival_location && tripData.arrival_location.trim() !== '') || 
+        (tripData.departure_location && tripData.departure_location.trim() !== '')) {
+        html += `<div class="trip-summary-travel">`;
+        html += `<div class="trip-summary-travel-icon">✈️</div>`;
+        html += `<div class="trip-summary-travel-content">`;
+        
+        if (tripData.arrival_location && tripData.arrival_location.trim() !== '') {
+            html += `
+                <div class="trip-summary-travel-route">
+                    <span>${tripData.arrival_location}</span>
+                    <span class="trip-summary-travel-arrow">→</span>
+                    <span><strong>${firstLocation.name}</strong></span>
+                </div>
+            `;
+        }
+        if (tripData.departure_location && tripData.departure_location.trim() !== '' && sortedLocations.length > 1) {
+            html += `
+                <div class="trip-summary-travel-route">
+                    <span><strong>${lastLocation.name}</strong></span>
+                    <span class="trip-summary-travel-arrow">→</span>
+                    <span>${tripData.departure_location}</span>
+                </div>
+            `;
+        }
+        
+        html += `</div></div>`;
+    }
+    
+    // Timeline container placeholder (cards will be added via DOM)
+    html += `<div class="trip-summary-timeline" id="trip-summary-timeline"></div>`;
+    
+    body.innerHTML = html;
+    
+    // Add location cards to timeline
+    const timeline = document.getElementById('trip-summary-timeline');
+    if (timeline) {
+        sortedLocations.forEach((loc, index) => {
+            const card = createLocationCard(loc, index, locations, markers, deleteCallback, saveCallback, updateListCallback);
+            timeline.appendChild(card);
+        });
+    }
+    
+    console.log('Trip summary content updated successfully');
+}
+
+/**
  * Toggle trip summary visibility
  * @param {Array} locations - All locations
  * @param {Object} tripData - Trip metadata
  * @param {Function} deleteCallback - Callback for delete actions
  * @param {Function} saveCallback - Callback to save changes
  * @param {Function} updateListCallback - Callback to update locations list
+ * @param {Object} markers - Map markers object
  */
-export function toggleTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback) {
-    // Only toggle if we have key locations
-    const keyLocations = locations.filter(loc => 
-        loc.type === 'key-location' && 
-        loc.duration && 
-        loc.duration.trim() !== ''
-    );
+export function toggleTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers = {}) {
+    // Check if we have any key locations
+    const keyLocations = locations.filter(loc => loc.type === 'key-location');
     
     if (keyLocations.length === 0) {
-        showAlert('No trip locations found. Add key locations with durations to see the trip summary.', 'Trip Summary');
+        showAlert('No trip locations found. Add key locations to see the trip summary.', 'Trip Summary');
         return;
     }
     
@@ -360,9 +505,28 @@ export function toggleTripSummary(locations, tripData, deleteCallback, saveCallb
     
     if (tripSummaryVisible) {
         // Update the summary content before showing it
-        updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback);
+        updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers);
         container.classList.add('visible');
     } else {
+        container.classList.remove('visible');
+    }
+}
+
+/**
+ * Check if trip summary is currently visible
+ * @returns {boolean}
+ */
+export function isTripSummaryVisible() {
+    return tripSummaryVisible;
+}
+
+/**
+ * Close trip summary panel
+ */
+export function closeTripSummary() {
+    tripSummaryVisible = false;
+    const container = document.getElementById('trip-summary-container');
+    if (container) {
         container.classList.remove('visible');
     }
 }
