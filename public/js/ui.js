@@ -1,10 +1,13 @@
 /**
  * PlanPilot - UI Module
- * Sidebar toggle, mobile menu, edit mode, utilities
+ * Sidebar toggle, mobile menu, edit mode, delete mode, utilities
  */
 
 // Edit mode state
 let editModeActive = false;
+
+// Delete mode state
+let deleteModeActive = false;
 
 /**
  * Toggle sidebar on mobile
@@ -59,10 +62,10 @@ export function toggleEditMode() {
         }
     } else {
         container.style.display = 'none';
-        icon.textContent = '✏️';
+        icon.textContent = '+';
         if (button) {
             button.classList.remove('active');
-            button.title = 'Edit Trip';
+            button.title = 'Add Location';
         }
     }
 }
@@ -88,11 +91,66 @@ export function resetEditMode() {
         container.style.display = 'none';
     }
     if (icon) {
-        icon.textContent = '✏️';
+        icon.textContent = '+';
     }
     if (button) {
         button.classList.remove('active');
-        button.title = 'Edit Trip';
+        button.title = 'Add Location';
+    }
+    
+    // Also reset delete mode when closing
+    resetDeleteMode();
+}
+
+/**
+ * Toggle delete mode - shows/hides delete icons on all items
+ */
+export function toggleDeleteMode() {
+    deleteModeActive = !deleteModeActive;
+    const tripSummaryContainer = document.getElementById('trip-summary-container');
+    const button = document.getElementById('trip-summary-delete-btn');
+    
+    if (deleteModeActive) {
+        if (tripSummaryContainer) {
+            tripSummaryContainer.classList.add('delete-mode');
+        }
+        if (button) {
+            button.classList.add('active');
+            button.title = 'Exit Delete Mode';
+        }
+    } else {
+        if (tripSummaryContainer) {
+            tripSummaryContainer.classList.remove('delete-mode');
+        }
+        if (button) {
+            button.classList.remove('active');
+            button.title = 'Delete Mode';
+        }
+    }
+}
+
+/**
+ * Get delete mode state
+ * @returns {boolean}
+ */
+export function isDeleteModeActive() {
+    return deleteModeActive;
+}
+
+/**
+ * Reset delete mode to inactive state
+ */
+export function resetDeleteMode() {
+    deleteModeActive = false;
+    const tripSummaryContainer = document.getElementById('trip-summary-container');
+    const button = document.getElementById('trip-summary-delete-btn');
+    
+    if (tripSummaryContainer) {
+        tripSummaryContainer.classList.remove('delete-mode');
+    }
+    if (button) {
+        button.classList.remove('active');
+        button.title = 'Delete Mode';
     }
 }
 

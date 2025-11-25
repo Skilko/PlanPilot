@@ -125,6 +125,13 @@
     transition: all 0.2s ease;
 }
 
+/* Plus sign styling */
+#editModeIcon {
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1;
+}
+
 .trip-summary-edit-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     border-color: white;
@@ -138,6 +145,16 @@
 
 .trip-summary-edit-btn.active:hover {
     background: rgba(255, 167, 38, 1);
+}
+
+/* Delete mode button active state - red color */
+#trip-summary-delete-btn.active {
+    background: rgba(231, 76, 60, 0.9);
+    border-color: rgba(231, 76, 60, 1);
+}
+
+#trip-summary-delete-btn.active:hover {
+    background: rgba(231, 76, 60, 1);
 }
 
 .trip-summary-close {
@@ -622,6 +639,44 @@
 
 .trip-summary-nearby-item.dragging .trip-summary-nearby-drag-handle {
     cursor: grabbing;
+}
+
+/* Delete button for nearby items (hidden by default) */
+.trip-summary-nearby-delete {
+    display: none;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--bg-white);
+    color: var(--danger-color);
+    cursor: pointer;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-left: 6px;
+    transition: all 0.2s;
+    align-items: center;
+    justify-content: center;
+}
+
+.trip-summary-nearby-delete:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* Delete mode - show all delete buttons */
+.trip-summary-container.delete-mode .trip-summary-nearby-delete {
+    display: flex;
+}
+
+/* Show delete buttons on key location cards in delete mode */
+.trip-summary-container.delete-mode .trip-summary-card-btn.delete {
+    display: flex;
+}
+
+/* Hide delete buttons on key location cards when NOT in delete mode */
+.trip-summary-container:not(.delete-mode) .trip-summary-card-btn.delete {
+    display: none;
 }
 
 .trip-summary-nearby-icon {

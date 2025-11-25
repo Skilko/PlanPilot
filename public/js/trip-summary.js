@@ -136,11 +136,12 @@ function formatDaysForStats(totalDays) {
  * @param {Object} markers - Map markers object
  * @param {string} keyLocationId - ID of the parent key location
  * @param {Array} locations - All locations
+ * @param {Function} deleteCallback - Callback to delete this item
  * @param {Function} saveCallback - Callback to save changes
  * @param {Function} updateListCallback - Callback to update locations list
  * @returns {HTMLElement} - The item element
  */
-function createNearbyItemElement(item, type, markers, keyLocationId, locations, saveCallback, updateListCallback) {
+function createNearbyItemElement(item, type, markers, keyLocationId, locations, deleteCallback, saveCallback, updateListCallback) {
     const map = getMap();
     const itemEl = document.createElement('div');
     itemEl.className = 'trip-summary-nearby-item';
@@ -167,13 +168,15 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
             ${detailsHtml ? `<div class="trip-summary-nearby-detail">${detailsHtml}</div>` : ''}
         </div>
         ${item.link ? `<a href="${item.link}" target="_blank" class="trip-summary-nearby-link" onclick="event.stopPropagation()">View</a>` : ''}
+        <button class="trip-summary-nearby-delete" title="Delete ${type}" data-id="${item.id}">🗑️</button>
     `;
     
     // Add click handler to pan map to this location
     itemEl.addEventListener('click', (e) => {
-        // Don't trigger if clicking the link or drag handle
+        // Don't trigger if clicking the link, drag handle, or delete button
         if (e.target.classList.contains('trip-summary-nearby-link')) return;
         if (e.target.classList.contains('trip-summary-nearby-drag-handle')) return;
+        if (e.target.classList.contains('trip-summary-nearby-delete')) return;
         
         if (map && item.lat && item.lng) {
             map.setView([item.lat, item.lng], 14, { animate: true });
@@ -182,6 +185,17 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
             }
         }
     });
+    
+    // Add delete button click handler
+    const deleteBtn = itemEl.querySelector('.trip-summary-nearby-delete');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (deleteCallback) {
+                deleteCallback(item.id);
+            }
+        });
+    }
     
     // Add drag event handlers
     itemEl.addEventListener('dragstart', (e) => handleNearbyItemDragStart(e, type, keyLocationId));
@@ -365,7 +379,7 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
                 return orderA - orderB;
             });
             sortedAccommodations.forEach(acc => {
-                accList.appendChild(createNearbyItemElement(acc, 'accommodation', markers, loc.id, locations, saveCallback, updateListCallback));
+                accList.appendChild(createNearbyItemElement(acc, 'accommodation', markers, loc.id, locations, deleteCallback, saveCallback, updateListCallback));
             });
             accSection.appendChild(accList);
             details.appendChild(accSection);
@@ -386,7 +400,7 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
                 return orderA - orderB;
             });
             sortedAttractions.forEach(attr => {
-                attrList.appendChild(createNearbyItemElement(attr, 'attraction', markers, loc.id, locations, saveCallback, updateListCallback));
+                attrList.appendChild(createNearbyItemElement(attr, 'attraction', markers, loc.id, locations, deleteCallback, saveCallback, updateListCallback));
             });
             attrSection.appendChild(attrList);
             details.appendChild(attrSection);

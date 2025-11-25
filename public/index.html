@@ -64,8 +64,11 @@
         <div class="trip-summary-header">
             <h3><span id="tripTitleDisplay">🗺️ Trip Itinerary</span></h3>
             <div class="trip-summary-header-actions">
-                <button id="trip-summary-edit-btn" class="trip-summary-edit-btn" onclick="toggleEditMode()" title="Edit Trip">
-                    <span id="editModeIcon">✏️</span>
+                <button id="trip-summary-edit-btn" class="trip-summary-edit-btn" onclick="toggleEditMode()" title="Add Location">
+                    <span id="editModeIcon">+</span>
+                </button>
+                <button id="trip-summary-delete-btn" class="trip-summary-edit-btn" onclick="toggleDeleteMode()" title="Delete Mode">
+                    <span id="deleteModeIcon">🗑️</span>
                 </button>
                 <button id="trip-summary-close" class="trip-summary-close" onclick="toggleTripSummary()">✕</button>
             </div>

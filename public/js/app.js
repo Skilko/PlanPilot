@@ -18,7 +18,7 @@ import {
 } from './modals.js';
 import { 
     toggleSidebar, closeSidebar, 
-    toggleEditMode, showLogoFallback,
+    toggleEditMode, toggleDeleteMode, showLogoFallback,
     updateClearAllButton
 } from './ui.js';
 import { 
@@ -510,6 +510,7 @@ function init() {
 window.showLogoFallback = showLogoFallback;
 window.updateTripTitle = handleUpdateTripTitle;
 window.toggleEditMode = toggleEditMode;
+window.toggleDeleteMode = toggleDeleteMode;
 window.addLocation = handleAddLocation;
 window.startConnectionMode = handleStartConnectionMode;
 window.cancelConnectionMode = cancelConnectionMode;
