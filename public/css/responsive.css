@@ -213,7 +213,9 @@
         top: 120px;
         width: 95%;
         max-width: none;
+        min-width: 280px;
         border-radius: var(--radius-lg);
+        resize: both;
     }
 
     .trip-summary-header {

@@ -26,16 +26,21 @@
     transform: translateX(-50%);
     width: 94%;
     max-width: 550px;
+    min-width: 320px;
+    min-height: 200px;
+    max-height: 85vh;
     background: var(--bg-white);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
-    z-index: 2001;
+    z-index: 1500;
     display: none;
+    flex-direction: column;
     overflow: hidden;
+    resize: both;
 }
 
 .trip-summary-container.visible {
-    display: block;
+    display: flex;
     animation: tripSummarySlideIn 0.3s ease-out;
 }
 
@@ -61,6 +66,7 @@
     position: relative;
     cursor: grab;
     user-select: none;
+    flex-shrink: 0;
 }
 
 .trip-summary-header:active {
@@ -79,6 +85,20 @@
 
 .trip-summary-container.repositioned {
     /* Override default centering when repositioned */
+}
+
+/* Resize handle visual indicator */
+.trip-summary-container::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: se-resize;
+    z-index: 10;
+    background: linear-gradient(135deg, transparent 50%, rgba(8, 145, 208, 0.3) 50%);
+    border-radius: 0 0 var(--radius-lg) 0;
 }
 
 .trip-summary-header h3 {
@@ -181,7 +201,8 @@
 
 .trip-summary-body {
     padding: 0;
-    max-height: 65vh;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     background: var(--bg-white);
 }
