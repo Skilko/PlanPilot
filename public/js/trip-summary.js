@@ -12,6 +12,10 @@ import { resetEditMode } from './ui.js';
 let tripSummaryVisible = false;
 let tripSummaryDraggingCard = null;
 
+// Panel drag state
+let isPanelDragging = false;
+let panelDragOffset = { x: 0, y: 0 };
+
 /**
  * Parse duration string to hours
  * @param {string} durationStr - Duration string (e.g., "3 days", "2 nights", "4 hours")
@@ -575,10 +579,157 @@ export function closeTripSummary() {
     const container = document.getElementById('trip-summary-container');
     if (container) {
         container.classList.remove('visible');
+        // Reset position to center after a brief delay (after animation)
+        setTimeout(() => {
+            resetPanelPosition();
+        }, 300);
     }
     
     // Reset edit mode when closing
     resetEditMode();
+}
+
+/**
+ * Initialize panel drag functionality
+ */
+export function initPanelDrag() {
+    const container = document.getElementById('trip-summary-container');
+    const header = document.querySelector('.trip-summary-header');
+    
+    if (!container || !header) return;
+    
+    // Mouse events
+    header.addEventListener('mousedown', handlePanelDragStart);
+    document.addEventListener('mousemove', handlePanelDragMove);
+    document.addEventListener('mouseup', handlePanelDragEnd);
+    
+    // Touch events for mobile
+    header.addEventListener('touchstart', handlePanelTouchStart, { passive: false });
+    document.addEventListener('touchmove', handlePanelTouchMove, { passive: false });
+    document.addEventListener('touchend', handlePanelDragEnd);
+}
+
+/**
+ * Handle panel drag start (mouse)
+ */
+function handlePanelDragStart(e) {
+    // Don't start drag if clicking on buttons
+    if (e.target.closest('button')) return;
+    
+    const container = document.getElementById('trip-summary-container');
+    if (!container) return;
+    
+    isPanelDragging = true;
+    container.classList.add('dragging');
+    
+    const rect = container.getBoundingClientRect();
+    panelDragOffset.x = e.clientX - rect.left;
+    panelDragOffset.y = e.clientY - rect.top;
+    
+    // Prevent text selection during drag
+    e.preventDefault();
+}
+
+/**
+ * Handle panel touch start (mobile)
+ */
+function handlePanelTouchStart(e) {
+    // Don't start drag if touching buttons
+    if (e.target.closest('button')) return;
+    
+    const container = document.getElementById('trip-summary-container');
+    if (!container) return;
+    
+    const touch = e.touches[0];
+    isPanelDragging = true;
+    container.classList.add('dragging');
+    
+    const rect = container.getBoundingClientRect();
+    panelDragOffset.x = touch.clientX - rect.left;
+    panelDragOffset.y = touch.clientY - rect.top;
+    
+    e.preventDefault();
+}
+
+/**
+ * Handle panel drag move (mouse)
+ */
+function handlePanelDragMove(e) {
+    if (!isPanelDragging) return;
+    
+    const container = document.getElementById('trip-summary-container');
+    if (!container) return;
+    
+    updatePanelPosition(e.clientX, e.clientY, container);
+}
+
+/**
+ * Handle panel touch move (mobile)
+ */
+function handlePanelTouchMove(e) {
+    if (!isPanelDragging) return;
+    
+    const container = document.getElementById('trip-summary-container');
+    if (!container) return;
+    
+    const touch = e.touches[0];
+    updatePanelPosition(touch.clientX, touch.clientY, container);
+    
+    e.preventDefault();
+}
+
+/**
+ * Update panel position
+ */
+function updatePanelPosition(clientX, clientY, container) {
+    let newX = clientX - panelDragOffset.x;
+    let newY = clientY - panelDragOffset.y;
+    
+    // Get container dimensions
+    const containerRect = container.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    const containerHeight = containerRect.height;
+    
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Constrain to viewport with padding
+    const padding = 10;
+    newX = Math.max(padding, Math.min(newX, viewportWidth - containerWidth - padding));
+    newY = Math.max(padding, Math.min(newY, viewportHeight - containerHeight - padding));
+    
+    // Apply position - switch from centered to absolute positioning
+    container.style.left = `${newX}px`;
+    container.style.top = `${newY}px`;
+    container.style.transform = 'none';
+    container.classList.add('repositioned');
+}
+
+/**
+ * Handle panel drag end
+ */
+function handlePanelDragEnd() {
+    if (!isPanelDragging) return;
+    
+    isPanelDragging = false;
+    const container = document.getElementById('trip-summary-container');
+    if (container) {
+        container.classList.remove('dragging');
+    }
+}
+
+/**
+ * Reset panel position to center
+ */
+export function resetPanelPosition() {
+    const container = document.getElementById('trip-summary-container');
+    if (container) {
+        container.style.left = '50%';
+        container.style.top = '80px';
+        container.style.transform = 'translateX(-50%)';
+        container.classList.remove('repositioned');
+    }
 }
 
 /**

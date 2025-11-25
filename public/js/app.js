@@ -35,7 +35,7 @@ import {
     toggleFilter, updateFilterCounts, applyFilters 
 } from './filters.js';
 import { 
-    updateTripSummary, toggleTripSummary, showLocationDetails 
+    updateTripSummary, toggleTripSummary, showLocationDetails, initPanelDrag, resetPanelPosition 
 } from './trip-summary.js';
 import { handlePlanningFormSubmit } from './api.js';
 
@@ -486,6 +486,9 @@ function init() {
     
     // Setup event listeners
     setupEventListeners();
+    
+    // Initialize panel drag functionality
+    initPanelDrag();
     
     // Update UI
     updateClearAllButton(state.locations.length);
