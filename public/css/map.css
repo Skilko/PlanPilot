@@ -138,6 +138,41 @@
     gap: 10px;
 }
 
+.trip-summary-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trip-summary-edit-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.trip-summary-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.trip-summary-edit-btn.active {
+    background: rgba(255, 167, 38, 0.9);
+    border-color: rgba(255, 167, 38, 1);
+}
+
+.trip-summary-edit-btn.active:hover {
+    background: rgba(255, 167, 38, 1);
+}
+
 .trip-summary-close {
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -164,6 +199,104 @@
     max-height: 65vh;
     overflow-y: auto;
     background: #f8fafc;
+}
+
+/* Edit Trip Container within Trip Summary */
+.trip-summary-edit-container {
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-bottom: 2px solid #bae6fd;
+    animation: slideDown 0.3s ease-out;
+}
+
+.trip-summary-edit-container .control-group {
+    margin-bottom: 16px;
+}
+
+.trip-summary-edit-container .control-group:last-of-type {
+    margin-bottom: 16px;
+}
+
+.trip-summary-edit-container .control-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #1e3a5f;
+    font-size: 13px;
+}
+
+.trip-summary-edit-container .control-group input,
+.trip-summary-edit-container .control-group select,
+.trip-summary-edit-container .control-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: white;
+}
+
+.trip-summary-edit-container .control-group input:focus,
+.trip-summary-edit-container .control-group select:focus,
+.trip-summary-edit-container .control-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(8, 145, 208, 0.1);
+}
+
+.trip-summary-edit-container .control-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.trip-summary-edit-container .control-group small {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.trip-summary-edit-container .connection-mode {
+    background: #fffbeb;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border-left: 4px solid #f59e0b;
+}
+
+.trip-summary-edit-container .connection-mode p {
+    font-size: 13px;
+    color: #92400e;
+    margin: 0 0 10px 0;
+}
+
+.trip-summary-edit-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.trip-summary-edit-actions .btn {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 800px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
 }
 
 /* Stats Dashboard */

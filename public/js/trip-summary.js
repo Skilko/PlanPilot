@@ -6,6 +6,7 @@
 import { showAlert } from './modals.js';
 import { getDistance } from './locations.js';
 import { getMap } from './map.js';
+import { resetEditMode } from './ui.js';
 
 // Trip summary state
 let tripSummaryVisible = false;
@@ -529,6 +530,9 @@ export function closeTripSummary() {
     if (container) {
         container.classList.remove('visible');
     }
+    
+    // Reset edit mode when closing
+    resetEditMode();
 }
 
 /**

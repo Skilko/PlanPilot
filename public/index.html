@@ -53,66 +53,6 @@
 
         <div class="sidebar-scrollable">
             <div class="controls">
-                <button class="btn btn-secondary" onclick="toggleEditMode()" style="margin-bottom: 20px;">
-                    <span id="editModeIcon">✏️</span> <span id="editModeText">Edit Trip</span>
-                </button>
-
-                <div id="editTripContainer" style="display: none;">
-                    <div class="control-group">
-                        <label for="tripTitle">Trip Title</label>
-                        <input type="text" id="tripTitle" placeholder="e.g., Sri Lanka Honeymoon" oninput="updateTripTitle()">
-                        <small>This title will display on your map</small>
-                    </div>
-
-                    <div style="border-top: 2px solid var(--border-color); margin: 20px 0;"></div>
-
-                    <div id="connectionMode" class="connection-mode" style="display: none;">
-                        <p><strong>Connection Mode Active</strong><br>Click on two Key Locations to connect them with a line.</p>
-                        <button class="btn btn-secondary" onclick="cancelConnectionMode()">Cancel</button>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="locationType">Location Type</label>
-                        <select id="locationType">
-                            <option value="key-location">Key Location</option>
-                            <option value="accommodation">Accommodation</option>
-                            <option value="attraction">Attraction</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="locationName">Name</label>
-                        <input type="text" id="locationName" placeholder="e.g., Eiffel Tower">
-                    </div>
-
-                    <div class="control-group">
-                        <label for="locationDescription">Description (Optional)</label>
-                        <textarea id="locationDescription" placeholder="Add notes about this location..."></textarea>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="locationPrice">Price (Optional)</label>
-                        <input type="text" id="locationPrice" placeholder="e.g., $150/night or €25 entry">
-                    </div>
-
-                    <div class="control-group">
-                        <label for="locationLink">Link (Optional)</label>
-                        <input type="url" id="locationLink" placeholder="https://example.com/booking">
-                        <small>Website, booking link, or reference URL</small>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="locationCoords">Coordinates</label>
-                        <input type="text" id="locationCoords" placeholder="Click on map or enter lat, lng" readonly>
-                        <small>Click anywhere on the map to set coordinates</small>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="addLocation()">Add to Map</button>
-                    <button class="btn btn-secondary" onclick="startConnectionMode()">Connect Key Locations</button>
-
-                    <div style="border-top: 2px solid var(--border-color); margin: 20px 0;"></div>
-                </div>
-
                 <div class="items-list">
                     <h3>Your Locations</h3>
                     <div id="locationsList"></div>
@@ -134,7 +74,65 @@
     <div id="trip-summary-container" class="trip-summary-container">
         <div class="trip-summary-header">
             <h3>🗺️ Trip Itinerary</h3>
-            <button id="trip-summary-close" class="trip-summary-close" onclick="toggleTripSummary()">✕</button>
+            <div class="trip-summary-header-actions">
+                <button id="trip-summary-edit-btn" class="trip-summary-edit-btn" onclick="toggleEditMode()" title="Edit Trip">
+                    <span id="editModeIcon">✏️</span>
+                </button>
+                <button id="trip-summary-close" class="trip-summary-close" onclick="toggleTripSummary()">✕</button>
+            </div>
+        </div>
+        <div id="editTripContainer" class="trip-summary-edit-container" style="display: none;">
+            <div class="control-group">
+                <label for="tripTitle">Trip Title</label>
+                <input type="text" id="tripTitle" placeholder="e.g., Sri Lanka Honeymoon" oninput="updateTripTitle()">
+                <small>This title will display on your map</small>
+            </div>
+
+            <div id="connectionMode" class="connection-mode" style="display: none;">
+                <p><strong>Connection Mode Active</strong><br>Click on two Key Locations to connect them with a line.</p>
+                <button class="btn btn-secondary" onclick="cancelConnectionMode()">Cancel</button>
+            </div>
+
+            <div class="control-group">
+                <label for="locationType">Location Type</label>
+                <select id="locationType">
+                    <option value="key-location">Key Location</option>
+                    <option value="accommodation">Accommodation</option>
+                    <option value="attraction">Attraction</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="locationName">Name</label>
+                <input type="text" id="locationName" placeholder="e.g., Eiffel Tower">
+            </div>
+
+            <div class="control-group">
+                <label for="locationDescription">Description (Optional)</label>
+                <textarea id="locationDescription" placeholder="Add notes about this location..."></textarea>
+            </div>
+
+            <div class="control-group">
+                <label for="locationPrice">Price (Optional)</label>
+                <input type="text" id="locationPrice" placeholder="e.g., $150/night or €25 entry">
+            </div>
+
+            <div class="control-group">
+                <label for="locationLink">Link (Optional)</label>
+                <input type="url" id="locationLink" placeholder="https://example.com/booking">
+                <small>Website, booking link, or reference URL</small>
+            </div>
+
+            <div class="control-group">
+                <label for="locationCoords">Coordinates</label>
+                <input type="text" id="locationCoords" placeholder="Click on map or enter lat, lng" readonly>
+                <small>Click anywhere on the map to set coordinates</small>
+            </div>
+
+            <div class="trip-summary-edit-actions">
+                <button class="btn btn-primary" onclick="addLocation()">Add to Map</button>
+                <button class="btn btn-secondary" onclick="startConnectionMode()">Connect Key Locations</button>
+            </div>
         </div>
         <div class="trip-summary-body">
             <!-- Content generated dynamically by trip-summary.js -->

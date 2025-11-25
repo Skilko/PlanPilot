@@ -48,21 +48,22 @@ export function toggleEditMode() {
     editModeActive = !editModeActive;
     const container = document.getElementById('editTripContainer');
     const icon = document.getElementById('editModeIcon');
-    const text = document.getElementById('editModeText');
-    const button = event.target.closest('button');
+    const button = document.getElementById('trip-summary-edit-btn');
     
     if (editModeActive) {
         container.style.display = 'block';
         icon.textContent = '✖️';
-        text.textContent = 'Hide Editor';
-        button.style.background = '#E3F2FD';
-        button.style.border = '2px solid #0891D0';
+        if (button) {
+            button.classList.add('active');
+            button.title = 'Hide Editor';
+        }
     } else {
         container.style.display = 'none';
         icon.textContent = '✏️';
-        text.textContent = 'Edit Trip';
-        button.style.background = '';
-        button.style.border = '';
+        if (button) {
+            button.classList.remove('active');
+            button.title = 'Edit Trip';
+        }
     }
 }
 
@@ -72,6 +73,27 @@ export function toggleEditMode() {
  */
 export function isEditModeActive() {
     return editModeActive;
+}
+
+/**
+ * Reset edit mode to inactive state
+ */
+export function resetEditMode() {
+    editModeActive = false;
+    const container = document.getElementById('editTripContainer');
+    const icon = document.getElementById('editModeIcon');
+    const button = document.getElementById('trip-summary-edit-btn');
+    
+    if (container) {
+        container.style.display = 'none';
+    }
+    if (icon) {
+        icon.textContent = '✏️';
+    }
+    if (button) {
+        button.classList.remove('active');
+        button.title = 'Edit Trip';
+    }
 }
 
 /**
