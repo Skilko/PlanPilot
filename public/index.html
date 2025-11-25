@@ -3395,8 +3395,12 @@
             console.log('Key locations with durations:', keyLocations.length);
             
             if (keyLocations.length === 0) {
-                console.log('No key locations with durations found - hiding trip summary');
-                container.classList.remove('visible');
+                console.log('No key locations with durations found');
+                // Clear content
+                durationEl.textContent = '';
+                travelEl.innerHTML = '';
+                travelEl.style.display = 'none';
+                locationsEl.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No trip data available</p>';
                 return;
             }
             
@@ -3533,12 +3537,7 @@
                 locationsEl.appendChild(sectionEl);
             });
             
-            // Only show trip summary if tripSummaryVisible is true
-            if (tripSummaryVisible) {
-                container.classList.add('visible');
-            } else {
-                container.classList.remove('visible');
-            }
+            console.log('Trip summary content updated successfully');
         }
 
         // Toggle trip summary visibility
@@ -3559,6 +3558,8 @@
             const container = document.getElementById('trip-summary-container');
             
             if (tripSummaryVisible) {
+                // Update the summary content before showing it
+                updateTripSummary();
                 container.classList.add('visible');
             } else {
                 container.classList.remove('visible');
