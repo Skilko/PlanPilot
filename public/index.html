@@ -436,6 +436,17 @@
             animation: globe-spin 4s linear infinite;
         }
 
+        .map-title:hover {
+            background: linear-gradient(135deg, #0a9de0 0%, #0780b0 100%);
+            box-shadow: 0 6px 20px rgba(8, 145, 208, 0.5);
+            transform: translateX(-50%) translateY(-1px);
+            cursor: pointer;
+        }
+
+        .map-title:active {
+            transform: translateX(-50%) translateY(1px);
+        }
+
         @keyframes plane-fly {
             0%, 100% {
                 transform: translateY(-50%) translateX(0);
@@ -478,56 +489,10 @@
             transform: translateX(-50%) translateY(-2px);
         }
 
-        /* Trip Summary Toggle Button */
-        .trip-summary-toggle-btn {
-            position: absolute;
-            top: 68px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #0891D0 0%, #0670A0 100%);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(8, 145, 208, 0.3);
-            z-index: 2002;
-            transition: all 0.3s;
-            display: none;
-            pointer-events: auto;
-        }
-
-        .trip-summary-toggle-btn.visible {
-            display: block !important;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        .trip-summary-toggle-btn:hover {
-            box-shadow: 0 5px 15px rgba(8, 145, 208, 0.5);
-            transform: translateX(-50%) translateY(-2px);
-        }
-
-        .trip-summary-toggle-btn:active {
-            transform: translateX(-50%) translateY(0);
-        }
-
         /* Trip Summary Container */
         .trip-summary-container {
             position: absolute;
-            top: 108px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
@@ -1899,14 +1864,8 @@
             }
 
             /* Trip Summary mobile styles */
-            .trip-summary-toggle-btn {
-                top: 110px;
-                font-size: 11px;
-                padding: 6px 16px;
-            }
-
             .trip-summary-container {
-                top: 150px;
+                top: 120px;
                 width: 95%;
                 max-width: none;
             }
@@ -2331,7 +2290,7 @@
     </div>
 
     <div id="map">
-        <div id="mapTitle" class="map-title"></div>
+        <div id="mapTitle" class="map-title" onclick="toggleTripSummary()"></div>
     </div>
 
     <!-- Trip Summary (outside map container for proper z-index layering) -->
@@ -2346,9 +2305,6 @@
             <div id="trip-summary-locations" class="trip-summary-locations"></div>
         </div>
     </div>
-    <button id="trip-summary-toggle-btn" class="trip-summary-toggle-btn" onclick="toggleTripSummary()">
-        🗺️ Show Trip Summary
-    </button>
 
     <button id="map-controls-toggle-btn" class="map-controls-toggle-btn" onclick="toggleMapControls()">
         🗺️ Map Controls
@@ -3370,18 +3326,11 @@
             
             console.log('Key locations with durations:', keyLocations.length);
             
-            const toggleBtn = document.getElementById('trip-summary-toggle-btn');
-            
             if (keyLocations.length === 0) {
-                console.log('No key locations with durations found - hiding trip summary button');
+                console.log('No key locations with durations found - hiding trip summary');
                 container.classList.remove('visible');
-                if (toggleBtn) {
-                    toggleBtn.classList.remove('visible');
-                }
                 return;
             }
-            
-            console.log('Showing trip summary button');
             
             // Sort by order
             const sortedLocations = [...keyLocations].sort((a, b) => {
@@ -3464,11 +3413,6 @@
                 locationsEl.appendChild(itemEl);
             });
             
-            // Show toggle button if we have trip summary data
-            if (toggleBtn) {
-                toggleBtn.classList.add('visible');
-            }
-            
             // Only show trip summary if tripSummaryVisible is true
             if (tripSummaryVisible) {
                 container.classList.add('visible');
@@ -3479,20 +3423,25 @@
 
         // Toggle trip summary visibility
         function toggleTripSummary() {
+            // Only toggle if we have key locations
+            const keyLocations = locations.filter(loc => 
+                loc.type === 'key-location' && 
+                loc.duration && 
+                loc.duration.trim() !== ''
+            );
+            
+            if (keyLocations.length === 0) {
+                showAlert('No trip locations found. Add key locations with durations to see the trip summary.', 'Trip Summary');
+                return;
+            }
+            
             tripSummaryVisible = !tripSummaryVisible;
             const container = document.getElementById('trip-summary-container');
-            const toggleBtn = document.getElementById('trip-summary-toggle-btn');
             
             if (tripSummaryVisible) {
                 container.classList.add('visible');
-                if (toggleBtn) {
-                    toggleBtn.textContent = '🗺️ Hide Trip Summary';
-                }
             } else {
                 container.classList.remove('visible');
-                if (toggleBtn) {
-                    toggleBtn.textContent = '🗺️ Show Trip Summary';
-                }
             }
         }
 
@@ -4390,18 +4339,6 @@ When creating a JSON file for this PlanPilot:
             
             // Update trip summary on init
             updateTripSummary();
-            
-            // DEBUG: Force show trip summary button to test visibility
-            const debugBtn = document.getElementById('trip-summary-toggle-btn');
-            if (debugBtn) {
-                debugBtn.classList.add('visible');
-                console.log('DEBUG: Forced trip summary button to be visible');
-                console.log('Button element:', debugBtn);
-                console.log('Button computed style:', window.getComputedStyle(debugBtn).display);
-                console.log('Button position:', debugBtn.getBoundingClientRect());
-            } else {
-                console.error('DEBUG: Trip summary button element not found!');
-            }
             
             // Event delegation for dynamically created buttons
             const locationsList = document.getElementById('locationsList');
