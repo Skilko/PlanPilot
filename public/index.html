@@ -57,14 +57,12 @@
     </div>
 
     <!-- Map Container -->
-    <div id="map">
-        <div id="mapTitle" class="map-title" onclick="toggleTripSummary()"></div>
-    </div>
+    <div id="map"></div>
 
     <!-- Trip Summary Panel -->
     <div id="trip-summary-container" class="trip-summary-container">
         <div class="trip-summary-header">
-            <h3>🗺️ Trip Itinerary</h3>
+            <h3><span id="tripTitleDisplay">🗺️ Trip Itinerary</span></h3>
             <div class="trip-summary-header-actions">
                 <button id="trip-summary-edit-btn" class="trip-summary-edit-btn" onclick="toggleEditMode()" title="Edit Trip">
                     <span id="editModeIcon">✏️</span>
@@ -76,7 +74,7 @@
             <div class="control-group">
                 <label for="tripTitle">Trip Title</label>
                 <input type="text" id="tripTitle" placeholder="e.g., Sri Lanka Honeymoon" oninput="updateTripTitle()">
-                <small>This title will display on your map</small>
+                <small>This title will display in the header above</small>
             </div>
 
             <div id="connectionMode" class="connection-mode" style="display: none;">

@@ -46,17 +46,6 @@
         font-size: 12px;
     }
 
-    /* Adjust map title */
-    .map-title {
-        font-size: 14px;
-        padding: 8px 35px;
-    }
-
-    .map-title::before,
-    .map-title::after {
-        font-size: 14px;
-    }
-
     /* Modal adjustments */
     .modal-content {
         max-width: 450px;
@@ -188,24 +177,6 @@
         width: 22px;
         height: 22px;
         margin-right: 12px;
-    }
-
-    /* Map title - mobile optimized */
-    .map-title {
-        top: 70px; /* Below hamburger button */
-        font-size: 14px;
-        padding: 8px 30px;
-        max-width: 85%;
-    }
-
-    .map-title::before {
-        left: 8px;
-        font-size: 14px;
-    }
-
-    .map-title::after {
-        right: 8px;
-        font-size: 14px;
     }
 
     /* Map Controls mobile */
@@ -614,12 +585,6 @@
         height: 80px;
     }
 
-    .map-title {
-        font-size: 12px;
-        padding: 6px 25px;
-        max-width: 90%;
-    }
-
     .map-controls-panel {
         width: calc(100% - 20px);
         left: 10px;
@@ -639,12 +604,6 @@
     .sidebar {
         width: 60%;
         max-width: 350px;
-    }
-
-    .map-title {
-        top: 15px;
-        font-size: 12px;
-        padding: 6px 25px;
     }
 
     /* Map controls for landscape */

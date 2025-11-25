@@ -111,13 +111,10 @@ function handleFocusLocation(id) {
  */
 function handleUpdateTripTitle() {
     state.tripTitle = document.getElementById('tripTitle').value.trim();
-    const mapTitleEl = document.getElementById('mapTitle');
+    const titleDisplay = document.getElementById('tripTitleDisplay');
     
-    if (state.tripTitle) {
-        mapTitleEl.textContent = state.tripTitle;
-        mapTitleEl.classList.add('visible');
-    } else {
-        mapTitleEl.classList.remove('visible');
+    if (titleDisplay) {
+        titleDisplay.textContent = state.tripTitle ? `✈️ ${state.tripTitle}` : '🗺️ Trip Itinerary';
     }
     
     saveCurrentState();
@@ -227,11 +224,9 @@ function importDataFromJSON(data) {
         // Import new data
         state.tripTitle = data.title || '';
         document.getElementById('tripTitle').value = state.tripTitle;
-        if (state.tripTitle) {
-            document.getElementById('mapTitle').textContent = state.tripTitle;
-            document.getElementById('mapTitle').classList.add('visible');
-        } else {
-            document.getElementById('mapTitle').classList.remove('visible');
+        const titleDisplay = document.getElementById('tripTitleDisplay');
+        if (titleDisplay) {
+            titleDisplay.textContent = state.tripTitle ? `✈️ ${state.tripTitle}` : '🗺️ Trip Itinerary';
         }
         
         // Import trip metadata
@@ -308,7 +303,10 @@ function clearAllData(showConfirmation) {
         // Clear data
         state.tripTitle = '';
         document.getElementById('tripTitle').value = '';
-        document.getElementById('mapTitle').classList.remove('visible');
+        const titleDisplay = document.getElementById('tripTitleDisplay');
+        if (titleDisplay) {
+            titleDisplay.textContent = '🗺️ Trip Itinerary';
+        }
         state.locations = [];
         state.connections = [];
         state.tripData.arrival_location = '';
@@ -397,9 +395,9 @@ function loadSavedData() {
         // Load title
         state.tripTitle = saved.title || '';
         document.getElementById('tripTitle').value = state.tripTitle;
-        if (state.tripTitle) {
-            document.getElementById('mapTitle').textContent = state.tripTitle;
-            document.getElementById('mapTitle').classList.add('visible');
+        const titleDisplay = document.getElementById('tripTitleDisplay');
+        if (titleDisplay) {
+            titleDisplay.textContent = state.tripTitle ? `✈️ ${state.tripTitle}` : '🗺️ Trip Itinerary';
         }
         
         // Load trip metadata
