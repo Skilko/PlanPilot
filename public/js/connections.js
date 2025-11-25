@@ -156,3 +156,4 @@ export function clearAllConnectionLines(connectionLines) {
     Object.keys(connectionLines).forEach(key => delete connectionLines[key]);
 }
 
+

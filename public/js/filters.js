@@ -95,3 +95,4 @@ export function applyFilters(locations, markers, updateListCallback) {
     updateFilterCounts(locations);
 }
 
+
