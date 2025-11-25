@@ -618,146 +618,97 @@
         .trip-summary-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .trip-summary-table thead {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-            color: white;
-        }
-
-        .trip-summary-table th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 14px;
-            border-bottom: 2px solid #8e44ad;
-        }
-
-        .trip-summary-table th:first-child {
-            width: 40px;
-            text-align: center;
-        }
-
-        .trip-summary-table th:last-child {
-            width: 60px;
-            text-align: center;
-        }
-
-        .trip-summary-table tbody tr {
-            border-bottom: 1px solid #e0e0e0;
-            transition: all 0.2s;
-            cursor: move;
-        }
-
-        .trip-summary-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .trip-summary-table tbody tr.dragging {
-            opacity: 0.5;
-            background: #e3f2fd;
-        }
-
-        .trip-summary-table tbody tr.drag-over {
-            border-top: 3px solid #0891D0;
-        }
-
-        .trip-summary-table td {
-            padding: 12px;
             font-size: 13px;
+        }
+
+        .trip-summary-table thead th {
+            text-align: left;
+            background: #f4f7fb;
+            color: #2f3542;
+            font-weight: 600;
+            padding: 12px 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .trip-summary-table tbody td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0f0f0;
             vertical-align: top;
         }
 
-        .trip-summary-drag-handle {
-            color: #999;
-            cursor: move;
-            font-size: 16px;
-            text-align: center;
-            user-select: none;
+        .trip-summary-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
-        .trip-summary-drag-handle:hover {
-            color: #0891D0;
+        .trip-summary-table tbody tr:hover {
+            background: #f9fbff;
         }
 
-        .trip-summary-location-cell {
+        .trip-summary-row {
+            background: white;
+            cursor: grab;
+        }
+
+        .trip-summary-row.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .trip-summary-order {
             font-weight: 600;
-            color: #333;
+            color: #0891D0;
+            width: 50px;
+        }
+
+        .trip-summary-location-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f2933;
+        }
+
+        .trip-summary-location-description {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #6b7280;
         }
 
         .trip-summary-duration-cell {
-            color: #9b59b6;
-            font-weight: 500;
-        }
-
-        .trip-summary-items-cell {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .trip-summary-items-cell .item-group {
-            margin-bottom: 8px;
-        }
-
-        .trip-summary-items-cell .item-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .trip-summary-items-cell .item-label {
-            color: #0891D0;
             font-weight: 600;
-            display: block;
-            margin-bottom: 4px;
+            color: #374151;
+            white-space: nowrap;
         }
 
-        .trip-summary-items-cell .item-entry {
-            margin-left: 8px;
-            margin-bottom: 4px;
-            line-height: 1.4;
+        .trip-summary-notes {
+            font-size: 12px;
+            color: #4b5563;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .trip-summary-items-cell .item-name {
-            font-weight: 500;
-            color: #333;
+        .trip-summary-empty-note {
+            font-style: italic;
+            color: #9ca3af;
         }
 
-        .trip-summary-items-cell .item-price {
-            color: #27ae60;
-            margin-left: 4px;
-        }
-
-        .trip-summary-items-cell .item-link {
-            color: #0891D0;
-            text-decoration: none;
-            margin-left: 4px;
-        }
-
-        .trip-summary-items-cell .item-link:hover {
-            text-decoration: underline;
+        .trip-summary-actions {
+            width: 90px;
+            text-align: right;
         }
 
         .trip-summary-delete-btn {
-            background: #e74c3c;
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
+            background: #fee2e2;
+            border: 1px solid #f87171;
+            color: #b91c1c;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
             cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            margin: 0 auto;
+            transition: all 0.2s ease;
         }
 
         .trip-summary-delete-btn:hover {
-            background: #c0392b;
-            transform: scale(1.1);
+            background: #fecaca;
         }
 
         /* Leaflet Layer Control Styling */
@@ -1987,24 +1938,43 @@
                 font-size: 12px;
             }
 
-            .trip-summary-table th {
-                padding: 8px;
+            .trip-summary-location-header {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .trip-summary-location-number {
+                width: 24px;
+                height: 24px;
                 font-size: 12px;
             }
 
-            .trip-summary-table td {
-                padding: 8px;
+            .trip-summary-location-title {
+                font-size: 14px;
+            }
+
+            .trip-summary-location-days {
+                font-size: 12px;
+            }
+
+            .trip-summary-subsection {
+                padding: 12px;
+            }
+
+            .trip-summary-subsection h4 {
+                font-size: 13px;
+            }
+
+            .trip-summary-subsection li {
+                padding: 8px 0;
+            }
+
+            .trip-summary-subsection li strong {
+                font-size: 13px;
+            }
+
+            .trip-summary-subsection li small {
                 font-size: 11px;
-            }
-
-            .trip-summary-drag-handle {
-                font-size: 14px;
-            }
-
-            .trip-summary-delete-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 14px;
             }
 
             /* Make filter/legend collapsible for mobile */
@@ -3355,6 +3325,7 @@
             arrival_location: '',
             departure_location: ''
         };
+        let tripSummaryDraggingRow = null;
 
         // Parse duration string to hours
         function parseDurationToHours(durationStr) {
@@ -3399,6 +3370,36 @@
             if (str.includes('full day')) return 8;
             
             return 8; // Default
+        }
+
+        function formatTripSummaryDuration(durationStr) {
+            if (durationStr && durationStr.trim() !== '') {
+                return durationStr;
+            }
+            return '—';
+        }
+
+        function getAssociatedItems(baseLocation) {
+            if (!baseLocation) {
+                return { accommodations: [], attractions: [] };
+            }
+
+            const associatedItems = locations.filter(item => {
+                if (item.id === baseLocation.id || item.type === 'key-location') return false;
+
+                if (typeof baseLocation.order === 'number' && typeof item.order === 'number') {
+                    const orderDiff = Math.abs(item.order - baseLocation.order);
+                    if (orderDiff <= 10) return true;
+                }
+
+                const distance = getDistance(baseLocation.lat, baseLocation.lng, item.lat, item.lng);
+                return distance < 50;
+            });
+
+            return {
+                accommodations: associatedItems.filter(item => item.type === 'accommodation'),
+                attractions: associatedItems.filter(item => item.type === 'attraction')
+            };
         }
 
         // Update trip summary display
@@ -3480,122 +3481,139 @@
                 travelEl.style.display = 'none';
             }
             
-            // Render all locations with their accommodations and attractions in a table
+            // Render key locations as draggable table rows
             locationsEl.innerHTML = '';
             
-            // Create table
             const table = document.createElement('table');
             table.className = 'trip-summary-table';
-            
-            // Table header
-            const thead = document.createElement('thead');
-            thead.innerHTML = `
-                <tr>
-                    <th></th>
-                    <th>Location</th>
-                    <th>Duration</th>
-                    <th>Accommodations & Attractions</th>
-                    <th>Actions</th>
-                </tr>
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Location</th>
+                        <th>Duration</th>
+                        <th>Nearby stays & attractions</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
             `;
-            table.appendChild(thead);
-            
-            // Table body
-            const tbody = document.createElement('tbody');
-            tbody.id = 'trip-summary-tbody';
-            
+
+            const tbody = table.querySelector('tbody');
+
             sortedLocations.forEach((loc, index) => {
-                // Find accommodations and attractions for this location
-                const associatedItems = locations.filter(item => {
-                    if (item.id === loc.id || item.type === 'key-location') return false;
-                    
-                    // Check if order is close (within 10 positions)
-                    if (typeof loc.order === 'number' && typeof item.order === 'number') {
-                        const orderDiff = Math.abs(item.order - loc.order);
-                        if (orderDiff <= 10) return true;
-                    }
-                    
-                    // Check if geographically close (within ~50km)
-                    const distance = getDistance(loc.lat, loc.lng, item.lat, item.lng);
-                    if (distance < 50) return true;
-                    
-                    return false;
-                });
-                
-                const accommodations = associatedItems.filter(item => item.type === 'accommodation');
-                const attractions = associatedItems.filter(item => item.type === 'attraction');
-                
-                // Convert duration to days for display
-                const hours = parseDurationToHours(loc.duration);
-                const days = Math.ceil(hours / 24);
-                let durationDisplay = loc.duration;
-                if (days === 1) {
-                    durationDisplay = '1 day';
-                } else if (days > 1) {
-                    durationDisplay = `${days} days`;
-                }
-                
-                // Build items HTML
-                let itemsHTML = '';
-                
-                // Add accommodations
+                const { accommodations, attractions } = getAssociatedItems(loc);
+                const notesParts = [];
+
                 if (accommodations.length > 0) {
-                    itemsHTML += '<div class="item-group">';
-                    itemsHTML += '<span class="item-label">🏨 Accommodations</span>';
-                    accommodations.forEach(acc => {
-                        itemsHTML += '<div class="item-entry">';
-                        itemsHTML += `<span class="item-name">${acc.name}</span>`;
-                        if (acc.price) itemsHTML += `<span class="item-price">${acc.price}</span>`;
-                        if (acc.link) itemsHTML += `<a href="${acc.link}" target="_blank" class="item-link">🔗</a>`;
-                        itemsHTML += '</div>';
-                    });
-                    itemsHTML += '</div>';
+                    notesParts.push(`🏨 ${accommodations.map(acc => acc.name).join(', ')}`);
                 }
-                
-                // Add attractions
+
                 if (attractions.length > 0) {
-                    itemsHTML += '<div class="item-group">';
-                    itemsHTML += '<span class="item-label">⭐ Attractions</span>';
-                    attractions.forEach(attr => {
-                        itemsHTML += '<div class="item-entry">';
-                        itemsHTML += `<span class="item-name">${attr.name}</span>`;
-                        if (attr.price) itemsHTML += `<span class="item-price">${attr.price}</span>`;
-                        if (attr.link) itemsHTML += `<a href="${attr.link}" target="_blank" class="item-link">🔗</a>`;
-                        itemsHTML += '</div>';
-                    });
-                    itemsHTML += '</div>';
+                    notesParts.push(`⭐ ${attractions.map(attr => attr.name).join(', ')}`);
                 }
-                
-                // Show message if no items
-                if (accommodations.length === 0 && attractions.length === 0) {
-                    itemsHTML = '<span style="color: #999; font-style: italic;">No data</span>';
-                }
-                
-                // Create table row
-                const tr = document.createElement('tr');
-                tr.setAttribute('data-location-id', loc.id);
-                tr.setAttribute('draggable', 'true');
-                
-                tr.innerHTML = `
-                    <td class="trip-summary-drag-handle">☰</td>
-                    <td class="trip-summary-location-cell">${loc.name}</td>
-                    <td class="trip-summary-duration-cell">${durationDisplay}</td>
-                    <td class="trip-summary-items-cell">${itemsHTML}</td>
+
+                const notesHtml = notesParts.length > 0
+                    ? notesParts.map(text => `<span>${text}</span>`).join('')
+                    : `<span class="trip-summary-empty-note">No nearby stays or attractions</span>`;
+
+                const row = document.createElement('tr');
+                row.className = 'trip-summary-row';
+                row.dataset.locationId = loc.id;
+                row.draggable = true;
+                row.innerHTML = `
+                    <td class="trip-summary-order">${index + 1}</td>
                     <td>
-                        <button class="trip-summary-delete-btn" onclick="deleteTripSummaryRow('${loc.id}')">🗑️</button>
+                        <div class="trip-summary-location-name">${loc.name}</div>
+                        ${loc.description ? `<div class="trip-summary-location-description">${loc.description}</div>` : ''}
+                    </td>
+                    <td class="trip-summary-duration-cell">${formatTripSummaryDuration(loc.duration)}</td>
+                    <td>
+                        <div class="trip-summary-notes">
+                            ${notesHtml}
+                        </div>
+                    </td>
+                    <td class="trip-summary-actions">
+                        <button class="trip-summary-delete-btn" data-id="${loc.id}">Delete</button>
                     </td>
                 `;
-                
-                tbody.appendChild(tr);
+
+                attachTripSummaryRowEvents(row);
+                tbody.appendChild(row);
             });
-            
-            table.appendChild(tbody);
+
             locationsEl.appendChild(table);
             
-            // Initialize drag and drop
-            initializeTripSummaryDragDrop();
-            
             console.log('Trip summary content updated successfully');
+        }
+
+        function attachTripSummaryRowEvents(row) {
+            row.addEventListener('dragstart', handleTripSummaryDragStart);
+            row.addEventListener('dragover', handleTripSummaryDragOver);
+            row.addEventListener('drop', handleTripSummaryDrop);
+            row.addEventListener('dragend', handleTripSummaryDragEnd);
+        }
+
+        function handleTripSummaryDragStart(event) {
+            tripSummaryDraggingRow = event.currentTarget;
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', event.currentTarget.dataset.locationId || '');
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function handleTripSummaryDragOver(event) {
+            event.preventDefault();
+            if (!tripSummaryDraggingRow) return;
+
+            const targetRow = event.currentTarget;
+            if (!targetRow || targetRow === tripSummaryDraggingRow) return;
+
+            const tbody = targetRow.parentElement;
+            if (!tbody) return;
+
+            const bounding = targetRow.getBoundingClientRect();
+            const offset = event.clientY - bounding.top;
+
+            if (offset < bounding.height / 2) {
+                tbody.insertBefore(tripSummaryDraggingRow, targetRow);
+            } else {
+                tbody.insertBefore(tripSummaryDraggingRow, targetRow.nextSibling);
+            }
+        }
+
+        function handleTripSummaryDrop(event) {
+            event.preventDefault();
+        }
+
+        function handleTripSummaryDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+
+            const tbody = event.currentTarget.parentElement;
+            if (!tbody) {
+                tripSummaryDraggingRow = null;
+                return;
+            }
+
+            const orderedIds = Array.from(tbody.querySelectorAll('tr')).map(row => row.dataset.locationId);
+            tripSummaryDraggingRow = null;
+            applyTripSummaryRowOrder(orderedIds);
+        }
+
+        function applyTripSummaryRowOrder(idOrder) {
+            if (!Array.isArray(idOrder) || idOrder.length === 0) {
+                return;
+            }
+
+            idOrder.forEach((id, index) => {
+                const location = locations.find(loc => loc.id === id);
+                if (location) {
+                    location.order = index + 1;
+                }
+            });
+
+            updateLocationsList();
+            updateTripSummary();
+            saveData();
         }
 
         // Toggle trip summary visibility
@@ -3624,177 +3642,13 @@
             }
         }
 
-        // Initialize drag and drop for trip summary table
-        function initializeTripSummaryDragDrop() {
-            const tbody = document.getElementById('trip-summary-tbody');
-            if (!tbody) return;
-            
-            let draggedRow = null;
-            
-            tbody.addEventListener('dragstart', function(e) {
-                if (e.target.tagName === 'TR') {
-                    draggedRow = e.target;
-                    e.target.classList.add('dragging');
-                    e.dataTransfer.effectAllowed = 'move';
-                }
-            });
-            
-            tbody.addEventListener('dragend', function(e) {
-                if (e.target.tagName === 'TR') {
-                    e.target.classList.remove('dragging');
-                    // Remove any drag-over classes
-                    const rows = tbody.querySelectorAll('tr');
-                    rows.forEach(row => row.classList.remove('drag-over'));
-                }
-            });
-            
-            tbody.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                
-                const afterElement = getDragAfterElement(tbody, e.clientY);
-                const dragging = document.querySelector('.dragging');
-                
-                if (afterElement == null) {
-                    tbody.appendChild(dragging);
-                } else {
-                    tbody.insertBefore(dragging, afterElement);
-                }
-            });
-            
-            tbody.addEventListener('drop', function(e) {
-                e.preventDefault();
-                if (draggedRow) {
-                    // Update the order in the locations array
-                    updateLocationOrderFromTable();
-                    // Refresh the summary to update numbers
-                    updateTripSummary();
-                }
-            });
-        }
-        
-        // Helper function to get the element to insert before during drag
-        function getDragAfterElement(container, y) {
-            const draggableElements = [...container.querySelectorAll('tr:not(.dragging)')];
-            
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
-        
-        // Update location order based on table row order
-        function updateLocationOrderFromTable() {
-            const tbody = document.getElementById('trip-summary-tbody');
-            if (!tbody) return;
-            
-            const rows = tbody.querySelectorAll('tr');
-            rows.forEach((row, index) => {
-                const locationId = row.getAttribute('data-location-id');
-                const location = locations.find(loc => loc.id === locationId);
-                if (location) {
-                    // Update order - multiply by 100 to leave space for accommodations/attractions
-                    location.order = index * 100;
-                }
-            });
-            
-            // Update map and save
-            updateMap();
-            saveToLocalStorage();
-            
-            console.log('Location order updated from table');
-        }
-        
-        // Delete a trip summary row and its associated location
-        function deleteTripSummaryRow(locationId) {
-            if (!confirm('Are you sure you want to delete this location and all its associated items?')) {
-                return;
-            }
-            
-            // Find the location
-            const location = locations.find(loc => loc.id === locationId);
-            if (!location) {
-                console.log('Location not found:', locationId);
-                return;
-            }
-            
-            // Find all associated items (accommodations and attractions within range)
-            const itemsToDelete = [];
-            locations.forEach(item => {
-                if (item.id === locationId) {
-                    itemsToDelete.push(item.id);
-                    return;
-                }
-                
-                if (item.type === 'key-location') return;
-                
-                // Check if order is close (within 10 positions)
-                if (typeof location.order === 'number' && typeof item.order === 'number') {
-                    const orderDiff = Math.abs(item.order - location.order);
-                    if (orderDiff <= 10) {
-                        itemsToDelete.push(item.id);
-                        return;
-                    }
-                }
-                
-                // Check if geographically close (within ~50km)
-                const distance = getDistance(location.lat, location.lng, item.lat, item.lng);
-                if (distance < 50) {
-                    itemsToDelete.push(item.id);
-                }
-            });
-            
-            // Remove all items
-            console.log('Deleting location and associated items:', itemsToDelete);
-            locations = locations.filter(loc => !itemsToDelete.includes(loc.id));
-            
-            // Remove connections involving this location
-            connections = connections.filter(conn => 
-                conn.from !== locationId && conn.to !== locationId
-            );
-            
-            // Update everything
-            updateMap();
-            updateLocationsList();
-            updateTripSummary();
-            saveToLocalStorage();
-            
-            showAlert(`Deleted ${location.name} and ${itemsToDelete.length - 1} associated item(s)`, 'Location Deleted');
-        }
-
         // Show location details modal
         function showLocationDetails(locationId) {
             // Find the location
             const location = locations.find(l => l.id === locationId);
             if (!location) return;
             
-            // Find all accommodations and attractions associated with this location
-            // We'll consider items "associated" if they are nearby geographically
-            // or have a similar order number
-            const associatedItems = locations.filter(loc => {
-                if (loc.id === locationId || loc.type === 'key-location') return false;
-                
-                // Check if order is close (within 10 positions)
-                if (typeof location.order === 'number' && typeof loc.order === 'number') {
-                    const orderDiff = Math.abs(loc.order - location.order);
-                    if (orderDiff <= 10) return true;
-                }
-                
-                // Check if geographically close (within ~50km)
-                const distance = getDistance(location.lat, location.lng, loc.lat, loc.lng);
-                if (distance < 50) return true;
-                
-                return false;
-            });
-            
-            const accommodations = associatedItems.filter(item => item.type === 'accommodation');
-            const attractions = associatedItems.filter(item => item.type === 'attraction');
+            const { accommodations, attractions } = getAssociatedItems(location);
             
             // Build modal content
             const modal = document.getElementById('locationDetailsModal');
@@ -4702,6 +4556,26 @@ When creating a JSON file for this PlanPilot:
                 });
             } else {
                 console.error('locationsList element not found during init!');
+            }
+
+            const tripSummaryLocations = document.getElementById('trip-summary-locations');
+            if (tripSummaryLocations) {
+                tripSummaryLocations.addEventListener('click', function(e) {
+                    const deleteBtn = e.target.closest('.trip-summary-delete-btn');
+                    if (!deleteBtn) {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const id = deleteBtn.getAttribute('data-id');
+                    if (id) {
+                        window.deleteLocation(id);
+                    }
+                });
+            } else {
+                console.error('trip-summary-locations element not found during init!');
             }
             
             console.log('=== INITIALIZATION COMPLETE ===');
