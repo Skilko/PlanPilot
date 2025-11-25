@@ -493,13 +493,14 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 3px 10px rgba(8, 145, 208, 0.3);
-            z-index: 1001;
+            z-index: 2002;
             transition: all 0.3s;
             display: none;
+            pointer-events: auto;
         }
 
         .trip-summary-toggle-btn.visible {
-            display: block;
+            display: block !important;
             animation: fadeIn 0.4s ease-out;
         }
 
@@ -534,7 +535,7 @@
             background: rgba(255, 255, 255, 0.98);
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            z-index: 999;
+            z-index: 2001;
             display: none;
             backdrop-filter: blur(10px);
         }
@@ -2249,8 +2250,8 @@
                 </button>
 
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-secondary" onclick="exportData()" style="flex: 1;">📤 Export</button>
-                    <button class="btn btn-secondary" onclick="importData()" style="flex: 1;">📥 Import</button>
+                    <button class="btn btn-secondary" onclick="exportData()" style="flex: 1;">💾 Save</button>
+                    <button class="btn btn-secondary" onclick="importData()" style="flex: 1;">📂 Load</button>
                 </div>
             </div>
         </div>
@@ -2331,22 +2332,23 @@
 
     <div id="map">
         <div id="mapTitle" class="map-title"></div>
-        <!-- Trip Summary -->
-        <div id="trip-summary-container" class="trip-summary-container">
-            <div class="trip-summary-header">
-                <h3>🗺️ Trip Summary</h3>
-                <button id="trip-summary-close" class="trip-summary-close" onclick="toggleTripSummary()">✕</button>
-            </div>
-            <div class="trip-summary-body">
-                <div id="trip-summary-duration" class="trip-summary-duration"></div>
-                <div id="trip-summary-travel" class="trip-summary-travel"></div>
-                <div id="trip-summary-locations" class="trip-summary-locations"></div>
-            </div>
-        </div>
-        <button id="trip-summary-toggle-btn" class="trip-summary-toggle-btn" onclick="toggleTripSummary()">
-            🗺️ Show Trip Summary
-        </button>
     </div>
+
+    <!-- Trip Summary (outside map container for proper z-index layering) -->
+    <div id="trip-summary-container" class="trip-summary-container">
+        <div class="trip-summary-header">
+            <h3>🗺️ Trip Summary</h3>
+            <button id="trip-summary-close" class="trip-summary-close" onclick="toggleTripSummary()">✕</button>
+        </div>
+        <div class="trip-summary-body">
+            <div id="trip-summary-duration" class="trip-summary-duration"></div>
+            <div id="trip-summary-travel" class="trip-summary-travel"></div>
+            <div id="trip-summary-locations" class="trip-summary-locations"></div>
+        </div>
+    </div>
+    <button id="trip-summary-toggle-btn" class="trip-summary-toggle-btn" onclick="toggleTripSummary()">
+        🗺️ Show Trip Summary
+    </button>
 
     <button id="map-controls-toggle-btn" class="map-controls-toggle-btn" onclick="toggleMapControls()">
         🗺️ Map Controls
@@ -2417,7 +2419,7 @@
     <div id="importModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📥 Import Data</h2>
+                <h2>📂 Load Data</h2>
             </div>
             <div class="modal-body">
                 <div class="control-group">
@@ -2432,7 +2434,7 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-primary" onclick="processImport()">Import</button>
+                <button class="btn btn-primary" onclick="processImport()">Load</button>
                 <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
             </div>
         </div>
@@ -4214,9 +4216,9 @@ When creating a JSON file for this PlanPilot:
                 saveData();
 
                 closeImportModal();
-                showAlert('Data imported successfully!', '🎉 Success');
+                showAlert('Data loaded successfully!', '🎉 Success');
             } catch (e) {
-                showAlert('Error importing data: ' + e.message, 'Import Error');
+                showAlert('Error loading data: ' + e.message, 'Load Error');
             }
         }
 
@@ -4388,6 +4390,18 @@ When creating a JSON file for this PlanPilot:
             
             // Update trip summary on init
             updateTripSummary();
+            
+            // DEBUG: Force show trip summary button to test visibility
+            const debugBtn = document.getElementById('trip-summary-toggle-btn');
+            if (debugBtn) {
+                debugBtn.classList.add('visible');
+                console.log('DEBUG: Forced trip summary button to be visible');
+                console.log('Button element:', debugBtn);
+                console.log('Button computed style:', window.getComputedStyle(debugBtn).display);
+                console.log('Button position:', debugBtn.getBoundingClientRect());
+            } else {
+                console.error('DEBUG: Trip summary button element not found!');
+            }
             
             // Event delegation for dynamically created buttons
             const locationsList = document.getElementById('locationsList');
