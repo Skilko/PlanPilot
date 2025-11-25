@@ -3348,12 +3348,16 @@
 
         // Update trip summary display
         function updateTripSummary() {
+            console.log('updateTripSummary called, total locations:', locations.length);
             const container = document.getElementById('trip-summary-container');
             const durationEl = document.getElementById('trip-summary-duration');
             const travelEl = document.getElementById('trip-summary-travel');
             const locationsEl = document.getElementById('trip-summary-locations');
             
-            if (!container || !durationEl || !travelEl || !locationsEl) return;
+            if (!container || !durationEl || !travelEl || !locationsEl) {
+                console.log('Trip summary elements not found');
+                return;
+            }
             
             // Only show trip summary if we have key locations with durations
             const keyLocations = locations.filter(loc => 
@@ -3362,15 +3366,20 @@
                 loc.duration.trim() !== ''
             );
             
+            console.log('Key locations with durations:', keyLocations.length);
+            
             const toggleBtn = document.getElementById('trip-summary-toggle-btn');
             
             if (keyLocations.length === 0) {
+                console.log('No key locations with durations found - hiding trip summary button');
                 container.classList.remove('visible');
                 if (toggleBtn) {
                     toggleBtn.classList.remove('visible');
                 }
                 return;
             }
+            
+            console.log('Showing trip summary button');
             
             // Sort by order
             const sortedLocations = [...keyLocations].sort((a, b) => {
@@ -4376,6 +4385,9 @@ When creating a JSON file for this PlanPilot:
             
             // Update filter counts on init
             updateFilterCounts();
+            
+            // Update trip summary on init
+            updateTripSummary();
             
             // Event delegation for dynamically created buttons
             const locationsList = document.getElementById('locationsList');
