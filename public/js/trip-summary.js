@@ -12,6 +12,11 @@ import { resetEditMode } from './ui.js';
 let tripSummaryVisible = false;
 let tripSummaryDraggingCard = null;
 
+// Nearby item drag state (for accommodations/attractions within key locations)
+let nearbyItemDragging = null;
+let nearbyItemDragType = null; // 'accommodation' or 'attraction'
+let nearbyItemKeyLocationId = null; // The key location these items belong to
+
 // Panel drag state
 let isPanelDragging = false;
 let panelDragOffset = { x: 0, y: 0 };
@@ -129,13 +134,19 @@ function formatDaysForStats(totalDays) {
  * @param {Object} item - The item (accommodation or attraction)
  * @param {string} type - 'accommodation' or 'attraction'
  * @param {Object} markers - Map markers object
+ * @param {string} keyLocationId - ID of the parent key location
+ * @param {Array} locations - All locations
+ * @param {Function} saveCallback - Callback to save changes
+ * @param {Function} updateListCallback - Callback to update locations list
  * @returns {HTMLElement} - The item element
  */
-function createNearbyItemElement(item, type, markers) {
+function createNearbyItemElement(item, type, markers, keyLocationId, locations, saveCallback, updateListCallback) {
     const map = getMap();
     const itemEl = document.createElement('div');
     itemEl.className = 'trip-summary-nearby-item';
     itemEl.dataset.locationId = item.id;
+    itemEl.dataset.itemType = type;
+    itemEl.draggable = true;
     
     const icon = type === 'accommodation' ? '🏨' : '⭐';
     const iconClass = type === 'accommodation' ? 'accommodation' : 'attraction';
@@ -149,6 +160,7 @@ function createNearbyItemElement(item, type, markers) {
     }
     
     itemEl.innerHTML = `
+        <div class="trip-summary-nearby-drag-handle">⋮⋮</div>
         <div class="trip-summary-nearby-icon ${iconClass}">${icon}</div>
         <div class="trip-summary-nearby-info">
             <div class="trip-summary-nearby-name">${item.name}</div>
@@ -159,8 +171,9 @@ function createNearbyItemElement(item, type, markers) {
     
     // Add click handler to pan map to this location
     itemEl.addEventListener('click', (e) => {
-        // Don't trigger if clicking the link
+        // Don't trigger if clicking the link or drag handle
         if (e.target.classList.contains('trip-summary-nearby-link')) return;
+        if (e.target.classList.contains('trip-summary-nearby-drag-handle')) return;
         
         if (map && item.lat && item.lng) {
             map.setView([item.lat, item.lng], 14, { animate: true });
@@ -170,7 +183,127 @@ function createNearbyItemElement(item, type, markers) {
         }
     });
     
+    // Add drag event handlers
+    itemEl.addEventListener('dragstart', (e) => handleNearbyItemDragStart(e, type, keyLocationId));
+    itemEl.addEventListener('dragover', handleNearbyItemDragOver);
+    itemEl.addEventListener('drop', handleNearbyItemDrop);
+    itemEl.addEventListener('dragend', (e) => handleNearbyItemDragEnd(e, type, locations, saveCallback, updateListCallback));
+    
     return itemEl;
+}
+
+/**
+ * Handle drag start for nearby items
+ */
+function handleNearbyItemDragStart(event, type, keyLocationId) {
+    // Prevent the card from dragging when we're dragging a nearby item
+    event.stopPropagation();
+    
+    nearbyItemDragging = event.currentTarget;
+    nearbyItemDragType = type;
+    nearbyItemKeyLocationId = keyLocationId;
+    
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', event.currentTarget.dataset.locationId || '');
+    event.currentTarget.classList.add('dragging');
+}
+
+/**
+ * Handle drag over for nearby items
+ */
+function handleNearbyItemDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!nearbyItemDragging) return;
+    
+    const targetItem = event.currentTarget;
+    if (!targetItem || targetItem === nearbyItemDragging) return;
+    
+    // Only allow reordering within the same type (accommodations with accommodations, attractions with attractions)
+    if (targetItem.dataset.itemType !== nearbyItemDragType) return;
+    
+    const container = targetItem.parentElement;
+    if (!container) return;
+    
+    const bounding = targetItem.getBoundingClientRect();
+    const offset = event.clientY - bounding.top;
+    
+    if (offset < bounding.height / 2) {
+        container.insertBefore(nearbyItemDragging, targetItem);
+    } else {
+        container.insertBefore(nearbyItemDragging, targetItem.nextSibling);
+    }
+}
+
+/**
+ * Handle drop for nearby items
+ */
+function handleNearbyItemDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+}
+
+/**
+ * Handle drag end for nearby items
+ */
+function handleNearbyItemDragEnd(event, type, locations, saveCallback, updateListCallback) {
+    event.currentTarget.classList.remove('dragging');
+    
+    const container = event.currentTarget.parentElement;
+    if (!container) {
+        nearbyItemDragging = null;
+        nearbyItemDragType = null;
+        nearbyItemKeyLocationId = null;
+        return;
+    }
+    
+    // Get ordered IDs of items in this section
+    const orderedIds = Array.from(container.querySelectorAll('.trip-summary-nearby-item'))
+        .filter(item => item.dataset.itemType === type)
+        .map(item => item.dataset.locationId);
+    
+    // Apply the new order to the locations
+    applyNearbyItemOrder(orderedIds, type, locations, saveCallback, updateListCallback);
+    
+    nearbyItemDragging = null;
+    nearbyItemDragType = null;
+    nearbyItemKeyLocationId = null;
+}
+
+/**
+ * Apply new order to nearby items (accommodations/attractions)
+ */
+function applyNearbyItemOrder(idOrder, type, locations, saveCallback, updateListCallback) {
+    if (!Array.isArray(idOrder) || idOrder.length === 0) {
+        return;
+    }
+    
+    // Find the base order for items of this type
+    // Use the lowest current order among the reordered items as the starting point
+    let minOrder = Infinity;
+    idOrder.forEach(id => {
+        const location = locations.find(loc => loc.id === id);
+        if (location && typeof location.order === 'number') {
+            minOrder = Math.min(minOrder, location.order);
+        }
+    });
+    
+    // If no valid orders found, start from a reasonable default
+    if (minOrder === Infinity) {
+        minOrder = 100;
+    }
+    
+    // Apply the new order
+    idOrder.forEach((id, index) => {
+        const location = locations.find(loc => loc.id === id);
+        if (location) {
+            location.order = minOrder + index;
+        }
+    });
+    
+    if (updateListCallback) updateListCallback();
+    if (saveCallback) saveCallback();
 }
 
 /**
@@ -221,10 +354,20 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
         if (accommodations.length > 0) {
             const accSection = document.createElement('div');
             accSection.className = 'trip-summary-nearby-section';
+            accSection.dataset.sectionType = 'accommodation';
             accSection.innerHTML = `<div class="trip-summary-nearby-title">🏨 Accommodations</div>`;
-            accommodations.forEach(acc => {
-                accSection.appendChild(createNearbyItemElement(acc, 'accommodation', markers));
+            const accList = document.createElement('div');
+            accList.className = 'trip-summary-nearby-list';
+            // Sort accommodations by order before rendering
+            const sortedAccommodations = [...accommodations].sort((a, b) => {
+                const orderA = typeof a.order === 'number' ? a.order : 999999;
+                const orderB = typeof b.order === 'number' ? b.order : 999999;
+                return orderA - orderB;
             });
+            sortedAccommodations.forEach(acc => {
+                accList.appendChild(createNearbyItemElement(acc, 'accommodation', markers, loc.id, locations, saveCallback, updateListCallback));
+            });
+            accSection.appendChild(accList);
             details.appendChild(accSection);
         }
         
@@ -232,10 +375,20 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
         if (attractions.length > 0) {
             const attrSection = document.createElement('div');
             attrSection.className = 'trip-summary-nearby-section';
+            attrSection.dataset.sectionType = 'attraction';
             attrSection.innerHTML = `<div class="trip-summary-nearby-title">⭐ Attractions</div>`;
-            attractions.forEach(attr => {
-                attrSection.appendChild(createNearbyItemElement(attr, 'attraction', markers));
+            const attrList = document.createElement('div');
+            attrList.className = 'trip-summary-nearby-list';
+            // Sort attractions by order before rendering
+            const sortedAttractions = [...attractions].sort((a, b) => {
+                const orderA = typeof a.order === 'number' ? a.order : 999999;
+                const orderB = typeof b.order === 'number' ? b.order : 999999;
+                return orderA - orderB;
             });
+            sortedAttractions.forEach(attr => {
+                attrList.appendChild(createNearbyItemElement(attr, 'attraction', markers, loc.id, locations, saveCallback, updateListCallback));
+            });
+            attrSection.appendChild(attrList);
             details.appendChild(attrSection);
         }
         
