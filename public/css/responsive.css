@@ -1,0 +1,590 @@
+/* ========================================
+   PLANPILOT - RESPONSIVE STYLES
+   Media queries for mobile, tablet, desktop
+   ======================================== */
+
+/* ----------------------------------------
+   TABLET STYLES (768px - 1024px)
+   ---------------------------------------- */
+@media (max-width: 1024px) and (min-width: 768px) {
+    /* Narrower sidebar */
+    .sidebar {
+        width: 280px;
+    }
+
+    /* Map Controls for tablet */
+    .map-controls-toggle-btn {
+        bottom: 25px;
+        right: 25px;
+        font-size: 11px;
+        padding: 8px 16px;
+    }
+
+    .map-controls-panel {
+        bottom: 25px;
+        right: 25px;
+        min-width: 260px;
+    }
+
+    .filter-item {
+        font-size: 12px;
+        padding: 5px;
+        margin-bottom: 8px;
+    }
+
+    /* Smaller legend */
+    .legend-item {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .legend-color {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    /* Adjust map title */
+    .map-title {
+        font-size: 14px;
+        padding: 8px 35px;
+    }
+
+    .map-title::before,
+    .map-title::after {
+        font-size: 14px;
+    }
+
+    /* Modal adjustments */
+    .modal-content {
+        max-width: 450px;
+    }
+
+    #infoModal .modal-content {
+        max-width: 600px;
+    }
+}
+
+/* ----------------------------------------
+   MOBILE STYLES (< 768px)
+   ---------------------------------------- */
+@media (max-width: 767px) {
+    /* Show hamburger menu */
+    .hamburger-menu {
+        display: flex;
+    }
+
+    /* Body adjustments */
+    body {
+        flex-direction: column;
+    }
+
+    /* Sidebar - hidden by default, overlay when open */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        max-width: 320px;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease-in-out;
+        box-shadow: none;
+    }
+
+    .sidebar.active {
+        left: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Map takes full width */
+    #map {
+        width: 100%;
+        height: 100vh;
+    }
+
+    /* Sidebar header adjustments */
+    .sidebar-header {
+        padding: 15px;
+    }
+
+    .sidebar-header-logo {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 12px;
+    }
+
+    .sidebar-header h1 {
+        font-size: 24px;
+        gap: 8px;
+    }
+
+    .sidebar-header p {
+        font-size: 13px;
+    }
+
+    /* Info button */
+    .info-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+
+    /* Sidebar scrollable area */
+    .sidebar-scrollable {
+        padding-bottom: 20px;
+    }
+
+    /* Controls padding */
+    .controls {
+        padding: 15px;
+    }
+
+    .sidebar-action-buttons {
+        padding: 12px 15px 15px 15px;
+    }
+
+    /* Increase touch targets for buttons */
+    .btn {
+        padding: 14px;
+        font-size: 15px;
+        min-height: 48px;
+    }
+
+    .btn-primary {
+        font-size: 16px;
+    }
+
+    /* Form inputs - larger for mobile */
+    .control-group input,
+    .control-group select,
+    .control-group textarea {
+        padding: 12px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+        min-height: 44px;
+    }
+
+    .control-group textarea {
+        min-height: 70px;
+    }
+
+    .control-group label {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    /* Item cards */
+    .item {
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .item-name {
+        font-size: 15px;
+    }
+
+    .item-description {
+        font-size: 13px;
+    }
+
+    /* Item action buttons - larger touch targets */
+    .item-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        min-height: 36px;
+    }
+
+    /* Checkboxes and inputs larger */
+    .filter-item input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        margin-right: 12px;
+    }
+
+    /* Map title - mobile optimized */
+    .map-title {
+        top: 70px; /* Below hamburger button */
+        font-size: 14px;
+        padding: 8px 30px;
+        max-width: 85%;
+    }
+
+    .map-title::before {
+        left: 8px;
+        font-size: 14px;
+    }
+
+    .map-title::after {
+        right: 8px;
+        font-size: 14px;
+    }
+
+    /* Map Controls mobile */
+    .map-controls-toggle-btn {
+        bottom: 15px;
+        right: 15px;
+        font-size: 11px;
+        padding: 8px 14px;
+    }
+
+    .map-controls-panel {
+        bottom: 15px;
+        right: 15px;
+        left: 15px;
+        min-width: auto;
+        max-width: none;
+        width: calc(100% - 30px);
+    }
+
+    .map-controls-header h4 {
+        font-size: 14px;
+    }
+
+    .map-controls-section h5 {
+        font-size: 12px;
+    }
+
+    .map-controls-section {
+        padding: 12px;
+    }
+
+    /* Trip Summary mobile styles */
+    .trip-summary-container {
+        top: 120px;
+        width: 95%;
+        max-width: none;
+    }
+
+    .trip-summary-header h3 {
+        font-size: 16px;
+    }
+
+    .trip-summary-body {
+        padding: 15px;
+        max-height: 50vh;
+    }
+
+    .trip-summary-duration {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    .trip-summary-travel {
+        padding: 10px 14px;
+    }
+
+    .trip-summary-travel p {
+        font-size: 12px;
+    }
+
+    .trip-summary-location-header {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .trip-summary-location-number {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .trip-summary-location-title {
+        font-size: 14px;
+    }
+
+    .trip-summary-location-days {
+        font-size: 12px;
+    }
+
+    .trip-summary-subsection {
+        padding: 12px;
+    }
+
+    .trip-summary-subsection h4 {
+        font-size: 13px;
+    }
+
+    .trip-summary-subsection li {
+        padding: 8px 0;
+    }
+
+    .trip-summary-subsection li strong {
+        font-size: 13px;
+    }
+
+    .trip-summary-subsection li small {
+        font-size: 11px;
+    }
+
+    /* Make filter/legend for mobile */
+    .map-controls-section h5 {
+        font-size: 14px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .filter-item {
+        padding: 8px;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .filter-item label {
+        font-size: 14px;
+    }
+
+    .filter-item-count {
+        font-size: 12px;
+        padding: 3px 9px;
+    }
+
+    .legend-item {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .legend-color {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+        margin-right: 12px;
+    }
+
+    /* Leaflet controls */
+    .leaflet-control-layers {
+        margin-top: 5px !important;
+        margin-right: 5px !important;
+    }
+
+    .leaflet-top.leaflet-right {
+        top: 130px; /* Below legend */
+    }
+
+    .leaflet-control-zoom {
+        margin-top: 10px !important;
+        margin-left: 10px !important;
+    }
+
+    .leaflet-control-zoom a {
+        width: 36px !important;
+        height: 36px !important;
+        line-height: 36px !important;
+        font-size: 20px !important;
+    }
+
+    /* Popup adjustments for mobile */
+    .leaflet-popup-content-wrapper {
+        border-radius: 10px !important;
+    }
+
+    .leaflet-popup-content {
+        min-width: 260px !important;
+        max-width: 280px !important;
+        margin: 0 !important;
+    }
+
+    .popup-header {
+        padding: 12px;
+    }
+
+    .popup-header-title {
+        font-size: 16px;
+        padding-right: 25px;
+    }
+
+    .popup-header-type {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .popup-body {
+        padding: 15px;
+    }
+
+    .popup-description {
+        font-size: 13px;
+    }
+
+    .popup-info-row {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    /* Popup close button - larger */
+    .leaflet-popup-close-button {
+        font-size: 24px !important;
+        width: 36px !important;
+        height: 36px !important;
+        right: 2px !important;
+        top: 2px !important;
+    }
+
+    /* Modal - mobile optimized */
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+        max-height: 90vh;
+        border-radius: 12px;
+        margin: 10px;
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-body .control-group input,
+    .modal-body .control-group select,
+    .modal-body .control-group textarea {
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 12px;
+    }
+
+    .modal-actions {
+        padding: 15px 20px;
+        flex-direction: column;
+    }
+
+    .modal-actions .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .modal-actions .btn:last-child {
+        margin-bottom: 0;
+    }
+
+    #infoModal .modal-content {
+        max-width: 95%;
+    }
+
+    #infoModal .modal-actions {
+        flex-direction: row;
+    }
+
+    #infoModal .modal-actions .btn {
+        width: auto;
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    /* Info content adjustments */
+    .info-content {
+        font-size: 13px;
+    }
+
+    .info-content h3 {
+        font-size: 15px;
+        margin-top: 15px;
+    }
+
+    .info-content pre {
+        font-size: 11px;
+        padding: 12px;
+        overflow-x: auto;
+    }
+
+    .info-content code {
+        font-size: 12px;
+    }
+
+    /* Loading overlay */
+    .loading-content {
+        padding: 30px 35px;
+        max-width: 90%;
+        margin: 0 15px;
+    }
+
+    .loading-content h3 {
+        font-size: 18px;
+    }
+
+    .loading-content p {
+        font-size: 13px;
+    }
+
+    /* Data actions */
+    .data-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .data-actions button {
+        width: 100%;
+    }
+}
+
+/* ----------------------------------------
+   EXTRA SMALL MOBILE (< 375px)
+   ---------------------------------------- */
+@media (max-width: 374px) {
+    .sidebar {
+        width: 90%;
+    }
+
+    .sidebar-header h1 {
+        font-size: 22px;
+    }
+
+    .sidebar-header-logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .map-title {
+        font-size: 12px;
+        padding: 6px 25px;
+        max-width: 90%;
+    }
+
+    .map-controls-panel {
+        width: calc(100% - 20px);
+        left: 10px;
+        right: 10px;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 5px;
+    }
+}
+
+/* ----------------------------------------
+   LANDSCAPE MOBILE
+   ---------------------------------------- */
+@media (max-width: 767px) and (orientation: landscape) {
+    .sidebar {
+        width: 60%;
+        max-width: 350px;
+    }
+
+    .map-title {
+        top: 15px;
+        font-size: 12px;
+        padding: 6px 25px;
+    }
+
+    /* Map controls for landscape */
+    .map-controls-panel {
+        max-width: 280px;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .map-controls-toggle-btn {
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .leaflet-top.leaflet-right {
+        top: 80px;
+    }
+}
+
