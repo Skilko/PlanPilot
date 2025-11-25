@@ -496,7 +496,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
-            max-width: 500px;
+            max-width: 700px;
             background: rgba(255, 255, 255, 0.98);
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
@@ -560,7 +560,7 @@
 
         .trip-summary-body {
             padding: 20px;
-            max-height: 60vh;
+            max-height: 70vh;
             overflow-y: auto;
         }
 
@@ -614,55 +614,102 @@
         .trip-summary-locations {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 20px;
         }
 
-        .trip-summary-location-item {
+        .trip-summary-location-section {
             background: white;
             border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 14px 16px;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .trip-summary-location-header {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
+            font-weight: 600;
         }
 
-        .trip-summary-location-item:hover {
-            border-color: #0891D0;
-            box-shadow: 0 4px 12px rgba(8, 145, 208, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .trip-summary-location-order {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-            color: white;
-            width: 32px;
-            height: 32px;
+        .trip-summary-location-number {
+            background: rgba(255, 255, 255, 0.3);
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
             font-size: 14px;
+            font-weight: bold;
             flex-shrink: 0;
         }
 
-        .trip-summary-location-info {
+        .trip-summary-location-title {
             flex: 1;
+            font-size: 16px;
         }
 
-        .trip-summary-location-name {
-            font-weight: 600;
-            color: #333;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-
-        .trip-summary-location-duration {
-            color: #666;
+        .trip-summary-location-days {
             font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .trip-summary-subsection {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .trip-summary-subsection:last-child {
+            border-bottom: none;
+        }
+
+        .trip-summary-subsection h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #0891D0;
+            font-weight: 600;
+        }
+
+        .trip-summary-subsection ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .trip-summary-subsection li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .trip-summary-subsection li:last-child {
+            border-bottom: none;
+        }
+
+        .trip-summary-subsection li strong {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .trip-summary-subsection li small {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .trip-summary-subsection li a {
+            color: #0891D0;
+            text-decoration: none;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .trip-summary-subsection li a:hover {
+            text-decoration: underline;
         }
 
         /* Leaflet Layer Control Styling */
@@ -1892,22 +1939,43 @@
                 font-size: 12px;
             }
 
-            .trip-summary-location-item {
-                padding: 12px 14px;
-            }
-
-            .trip-summary-location-order {
-                width: 28px;
-                height: 28px;
-                font-size: 13px;
-            }
-
-            .trip-summary-location-name {
+            .trip-summary-location-header {
+                padding: 10px 12px;
                 font-size: 14px;
             }
 
-            .trip-summary-location-duration {
+            .trip-summary-location-number {
+                width: 24px;
+                height: 24px;
                 font-size: 12px;
+            }
+
+            .trip-summary-location-title {
+                font-size: 14px;
+            }
+
+            .trip-summary-location-days {
+                font-size: 12px;
+            }
+
+            .trip-summary-subsection {
+                padding: 12px;
+            }
+
+            .trip-summary-subsection h4 {
+                font-size: 13px;
+            }
+
+            .trip-summary-subsection li {
+                padding: 8px 0;
+            }
+
+            .trip-summary-subsection li strong {
+                font-size: 13px;
+            }
+
+            .trip-summary-subsection li small {
+                font-size: 11px;
             }
 
             /* Make filter/legend collapsible for mobile */
@@ -3379,38 +3447,90 @@
                 travelEl.style.display = 'none';
             }
             
-            // Render location items
+            // Render all locations with their accommodations and attractions
             locationsEl.innerHTML = '';
             sortedLocations.forEach((loc, index) => {
-                const itemEl = document.createElement('div');
-                itemEl.className = 'trip-summary-location-item';
-                itemEl.dataset.locationId = loc.id;
+                // Find accommodations and attractions for this location
+                const associatedItems = locations.filter(item => {
+                    if (item.id === loc.id || item.type === 'key-location') return false;
+                    
+                    // Check if order is close (within 10 positions)
+                    if (typeof loc.order === 'number' && typeof item.order === 'number') {
+                        const orderDiff = Math.abs(item.order - loc.order);
+                        if (orderDiff <= 10) return true;
+                    }
+                    
+                    // Check if geographically close (within ~50km)
+                    const distance = getDistance(loc.lat, loc.lng, item.lat, item.lng);
+                    if (distance < 50) return true;
+                    
+                    return false;
+                });
+                
+                const accommodations = associatedItems.filter(item => item.type === 'accommodation');
+                const attractions = associatedItems.filter(item => item.type === 'attraction');
                 
                 // Convert duration to days for display
                 const hours = parseDurationToHours(loc.duration);
                 const days = Math.ceil(hours / 24);
                 let durationDisplay = loc.duration;
-                
-                // Provide more user-friendly duration display
                 if (days === 1) {
                     durationDisplay = '1 day';
                 } else if (days > 1) {
                     durationDisplay = `${days} days`;
                 }
                 
-                itemEl.innerHTML = `
-                    <div class="trip-summary-location-order">${index + 1}</div>
-                    <div class="trip-summary-location-info">
-                        <div class="trip-summary-location-name">${loc.name}</div>
-                        <div class="trip-summary-location-duration">📍 ${durationDisplay}</div>
+                // Create location section
+                const sectionEl = document.createElement('div');
+                sectionEl.className = 'trip-summary-location-section';
+                
+                let sectionHTML = `
+                    <div class="trip-summary-location-header">
+                        <span class="trip-summary-location-number">${index + 1}</span>
+                        <span class="trip-summary-location-title">${loc.name}</span>
+                        <span class="trip-summary-location-days">${durationDisplay}</span>
                     </div>
                 `;
                 
-                itemEl.addEventListener('click', () => {
-                    showLocationDetails(loc.id);
-                });
+                // Add accommodations
+                if (accommodations.length > 0) {
+                    sectionHTML += '<div class="trip-summary-subsection">';
+                    sectionHTML += '<h4>🏨 Accommodations</h4>';
+                    sectionHTML += '<ul>';
+                    accommodations.forEach(acc => {
+                        sectionHTML += `<li>`;
+                        sectionHTML += `<strong>${acc.name}</strong>`;
+                        if (acc.price) sectionHTML += ` - ${acc.price}`;
+                        if (acc.description) sectionHTML += `<br><small>${acc.description}</small>`;
+                        if (acc.link) sectionHTML += `<br><a href="${acc.link}" target="_blank">View Details</a>`;
+                        sectionHTML += `</li>`;
+                    });
+                    sectionHTML += '</ul></div>';
+                }
                 
-                locationsEl.appendChild(itemEl);
+                // Add attractions
+                if (attractions.length > 0) {
+                    sectionHTML += '<div class="trip-summary-subsection">';
+                    sectionHTML += '<h4>⭐ Attractions</h4>';
+                    sectionHTML += '<ul>';
+                    attractions.forEach(attr => {
+                        sectionHTML += `<li>`;
+                        sectionHTML += `<strong>${attr.name}</strong>`;
+                        if (attr.price) sectionHTML += ` - ${attr.price}`;
+                        if (attr.description) sectionHTML += `<br><small>${attr.description}</small>`;
+                        if (attr.link) sectionHTML += `<br><a href="${attr.link}" target="_blank">View Details</a>`;
+                        sectionHTML += `</li>`;
+                    });
+                    sectionHTML += '</ul></div>';
+                }
+                
+                // Show message if no items
+                if (accommodations.length === 0 && attractions.length === 0) {
+                    sectionHTML += '<div class="trip-summary-subsection"><p style="color: #999; font-style: italic;">No accommodations or attractions found for this location</p></div>';
+                }
+                
+                sectionEl.innerHTML = sectionHTML;
+                locationsEl.appendChild(sectionEl);
             });
             
             // Only show trip summary if tripSummaryVisible is true
