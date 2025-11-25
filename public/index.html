@@ -40,27 +40,22 @@
             </div>
             
             <div class="sidebar-action-buttons">
-                <button class="btn btn-primary" onclick="openPlanningModal()" style="margin-bottom: 15px;">
+                <button class="btn btn-primary" onclick="openPlanningModal()" style="margin-bottom: 10px;">
                     🚀 Start Planning
+                </button>
+                
+                <button class="btn btn-secondary" onclick="toggleTripSummary()" style="margin-bottom: 15px;">
+                    📋 Trip Itinerary
                 </button>
 
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-secondary" onclick="exportData()" style="flex: 1;">💾 Save</button>
                     <button class="btn btn-secondary" onclick="importData()" style="flex: 1;">📂 Load</button>
                 </div>
-            </div>
-        </div>
-
-        <div class="sidebar-scrollable">
-            <div class="controls">
-                <div class="items-list">
-                    <h3>Your Locations</h3>
-                    <div id="locationsList"></div>
-                </div>
-
-                <div class="data-actions">
-                    <button class="btn btn-danger" id="clearAllBtn" onclick="clearAll()">🗑️ Clear All</button>
-                </div>
+                
+                <button class="btn btn-danger" id="clearAllBtn" onclick="clearAll()" style="margin-top: 15px;">
+                    🗑️ Clear All
+                </button>
             </div>
         </div>
     </div>
