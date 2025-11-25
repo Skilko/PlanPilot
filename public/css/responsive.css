@@ -237,20 +237,21 @@
         padding: 12px;
     }
 
-    /* Trip Summary mobile styles - Redesigned */
+    /* Trip Summary mobile styles */
     .trip-summary-container {
         top: 120px;
         width: 95%;
         max-width: none;
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
     }
 
     .trip-summary-header {
-        padding: 16px 18px;
+        padding: 15px 20px;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
 
     .trip-summary-header h3 {
-        font-size: 17px;
+        font-size: 18px;
     }
 
     .trip-summary-body {
@@ -288,53 +289,46 @@
     }
 
     .trip-summary-timeline {
-        padding: 16px;
+        padding: 20px;
     }
 
     .trip-summary-card {
-        border-radius: 14px;
-        margin-bottom: 14px;
-    }
-
-    .trip-summary-card::before {
-        left: 24px;
-        top: 52px;
+        margin-bottom: 10px;
     }
 
     .trip-summary-card-header {
-        padding: 14px;
-        gap: 12px;
+        padding: 10px;
+        gap: 10px;
     }
 
     .trip-summary-card-number {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        font-size: 14px;
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
     }
 
     .trip-summary-card-title {
-        font-size: 15px;
+        font-size: 13px;
     }
 
     .trip-summary-card-description {
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .trip-summary-card-duration {
-        padding: 5px 10px;
-        font-size: 11px;
+        padding: 3px 8px;
+        font-size: 10px;
     }
 
     .trip-summary-card-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
     }
 
     .trip-summary-card-toggle {
-        padding: 8px 14px;
-        font-size: 11px;
+        padding: 6px 10px;
+        font-size: 10px;
     }
 
     .trip-summary-card-details {
@@ -342,44 +336,43 @@
     }
 
     .trip-summary-card.expanded .trip-summary-card-details {
-        padding: 14px;
+        padding: 10px;
     }
 
     .trip-summary-nearby-section {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .trip-summary-nearby-title {
         font-size: 10px;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
 
     .trip-summary-nearby-item {
-        padding: 8px 10px;
-        border-radius: 8px;
+        padding: 6px 8px;
     }
 
     .trip-summary-nearby-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 14px;
-    }
-
-    .trip-summary-nearby-name {
+        width: 24px;
+        height: 24px;
         font-size: 12px;
     }
 
+    .trip-summary-nearby-name {
+        font-size: 11px;
+    }
+
     .trip-summary-nearby-detail {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .trip-summary-nearby-link {
-        font-size: 11px;
-        padding: 3px 8px;
+        font-size: 10px;
+        padding: 2px 6px;
     }
 
     .trip-summary-empty {
-        padding: 30px 16px;
+        padding: 30px 20px;
     }
 
     .trip-summary-empty-icon {
@@ -387,6 +380,15 @@
     }
 
     .trip-summary-empty-text {
+        font-size: 13px;
+    }
+    
+    .trip-summary-footer {
+        padding: 15px 20px;
+    }
+    
+    .trip-summary-footer-btn {
+        padding: 10px 16px;
         font-size: 13px;
     }
 
