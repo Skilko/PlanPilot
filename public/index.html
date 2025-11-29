@@ -206,13 +206,13 @@
             </div>
             <div class="modal-body">
                 <div class="control-group">
-                    <label>Option 1: Select JSON File</label>
-                    <input type="file" id="importFile" accept=".json" style="margin-bottom: 10px;" onchange="clearImportText()">
-                    <small>Choose a .json file from your computer</small>
+                    <label>Option 1: Select Trip File</label>
+                    <input type="file" id="importFile" accept=".trip,.json" style="margin-bottom: 10px;" onchange="clearImportText()">
+                    <small>Choose a .trip or .json file from your computer</small>
                 </div>
                 <div style="text-align: center; margin: 15px 0; color: var(--text-muted);">— OR —</div>
                 <div class="control-group">
-                    <label for="importText">Option 2: Paste JSON Data</label>
+                    <label for="importText">Option 2: Paste Trip Data</label>
                     <textarea id="importText" style="min-height: 150px;" oninput="clearImportFile()"></textarea>
                 </div>
             </div>
@@ -402,7 +402,7 @@
                                     <span style="font-size: 20px;">💾</span> Save & Share
                                 </h4>
                                 <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
-                                    <li>Export trips as JSON files for backup</li>
+                                    <li>Export trips as .trip files for backup</li>
                                     <li>Import and share trips with others</li>
                                     <li>Automatic browser storage (no account needed)</li>
                                     <li>Data persists across sessions</li>
@@ -452,7 +452,7 @@
                                 </div>
                                 <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
                                     <li>Click <strong>"📂 Load"</strong></li>
-                                    <li>Upload a JSON file or paste JSON data</li>
+                                    <li>Upload a .trip file or paste trip data</li>
                                     <li>Click <strong>"Import Data"</strong></li>
                                     <li>Your trip loads instantly!</li>
                                 </ol>
@@ -504,7 +504,7 @@
                                 <span style="font-size: 24px; flex-shrink: 0;">💾</span>
                                 <div>
                                     <strong style="color: var(--primary-color);">Export regularly</strong>
-                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Back up your trip or share it with travel companions by exporting as a JSON file.</p>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Back up your trip or share it with travel companions by exporting as a .trip file.</p>
                                 </div>
                             </div>
 

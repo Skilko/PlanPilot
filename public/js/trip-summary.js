@@ -755,6 +755,36 @@ export function isTripSummaryVisible() {
 }
 
 /**
+ * Open trip summary panel (ensure it's visible)
+ * @param {Array} locations - All locations
+ * @param {Object} tripData - Trip metadata
+ * @param {Function} deleteCallback - Callback for delete actions
+ * @param {Function} saveCallback - Callback to save changes
+ * @param {Function} updateListCallback - Callback to update locations list
+ * @param {Object} markers - Map markers object
+ */
+export function openTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers = {}) {
+    // Check if we have any key locations
+    const keyLocations = locations.filter(loc => loc.type === 'key-location');
+    
+    if (keyLocations.length === 0) {
+        return; // Silently return if no locations
+    }
+    
+    const container = document.getElementById('trip-summary-container');
+    
+    if (!tripSummaryVisible) {
+        tripSummaryVisible = true;
+        // Update the summary content before showing it
+        updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers);
+        container.classList.add('visible');
+    } else {
+        // If already visible, just update the content
+        updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers);
+    }
+}
+
+/**
  * Close trip summary panel
  */
 export function closeTripSummary() {

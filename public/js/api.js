@@ -63,9 +63,9 @@ export async function generateTripWithWorkflow(formData, importCallback) {
             throw new Error('Invalid response format from API');
         }
         
-        // Auto-import the generated data
+        // Auto-import the generated data with AI generation flag
         if (importCallback) {
-            importCallback(tripData);
+            importCallback(tripData, true); // true indicates this is from AI generation
         }
         
         hideLoadingOverlay();

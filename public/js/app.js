@@ -34,7 +34,7 @@ import {
     toggleFilter, updateFilterCounts, applyFilters 
 } from './filters.js';
 import { 
-    updateTripSummary, toggleTripSummary, showLocationDetails, initPanelDrag, resetPanelPosition 
+    updateTripSummary, toggleTripSummary, openTripSummary, showLocationDetails, initPanelDrag, resetPanelPosition 
 } from './trip-summary.js';
 import { handlePlanningFormSubmit } from './api.js';
 
@@ -150,7 +150,7 @@ function handleExportData() {
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
-    const filename = state.tripTitle ? state.tripTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.json' : 'planpilot-trip.json';
+    const filename = state.tripTitle ? state.tripTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.trip' : 'planpilot-trip.trip';
     link.href = url;
     link.download = filename;
     link.click();
@@ -208,8 +208,10 @@ function handleProcessImport() {
 
 /**
  * Import data from JSON object
+ * @param {Object} data - The trip data to import
+ * @param {boolean} fromAIGeneration - Whether this import is from AI trip generation
  */
-function importDataFromJSON(data) {
+function importDataFromJSON(data, fromAIGeneration = false) {
     const map = getMap();
     
     try {
@@ -251,6 +253,36 @@ function importDataFromJSON(data) {
         saveCurrentState();
 
         closeImportModal();
+        
+        // If from AI generation, open trip summary and pan to first location
+        if (fromAIGeneration) {
+            // Find first key location
+            const keyLocations = state.locations.filter(loc => loc.type === 'key-location');
+            
+            if (keyLocations.length > 0) {
+                // Open trip summary panel
+                openTripSummary(
+                    state.locations,
+                    state.tripData,
+                    (id) => handleDeleteLocation(id),
+                    saveCurrentState,
+                    () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+                    state.markers
+                );
+                
+                // Pan to first location after a brief delay to allow rendering
+                setTimeout(() => {
+                    const firstLocation = keyLocations[0];
+                    if (map && firstLocation.lat && firstLocation.lng) {
+                        map.setView([firstLocation.lat, firstLocation.lng], 12, { animate: true });
+                        if (state.markers[firstLocation.id]) {
+                            state.markers[firstLocation.id].openPopup();
+                        }
+                    }
+                }, 500);
+            }
+        }
+        
         showAlert('Data loaded successfully!', '🎉 Success');
     } catch (e) {
         showAlert('Error loading data: ' + e.message, 'Load Error');
