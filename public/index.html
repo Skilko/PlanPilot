@@ -335,131 +335,203 @@
 
     <!-- Info Modal -->
     <div id="infoModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
                 <h2>🗺️ About PlanPilot</h2>
             </div>
             <div class="modal-body">
                 <div class="info-content">
-                    <h3>What is PlanPilot?</h3>
-                    <p>PlanPilot is an AI-powered trip planning application that helps you create, visualize, and manage your travel itineraries on an interactive map. Whether you're planning a weekend getaway or a multi-week adventure, PlanPilot makes trip planning effortless and organized.</p>
-                    
-                    <h3>Key Features</h3>
-                    
-                    <h4>🤖 AI Trip Generation</h4>
-                    <ul>
-                        <li>Click <strong>"🚀 Start Planning"</strong> to use AI to generate complete trip plans</li>
-                        <li>Provide your destination, duration, budget level, and interests</li>
-                        <li>AI researches and creates a full itinerary with real accommodations, attractions, prices, and booking links</li>
-                        <li>Automatic GPS coordinates and map visualization</li>
-                        <li>Choose between Quick mode (faster) or Detailed mode (more options)</li>
-                    </ul>
+                    <!-- Introduction Section -->
+                    <div style="background: linear-gradient(135deg, var(--primary-color) 0%, #0a7bb8 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center;">
+                        <h3 style="margin: 0 0 10px 0; color: white; font-size: 20px;">What is PlanPilot?</h3>
+                        <p style="margin: 0; font-size: 14px; line-height: 1.6;">An AI-powered trip planning application that helps you create, visualise, and manage your travel itineraries on an interactive map.</p>
+                    </div>
 
-                    <h4>🗺️ Interactive Map</h4>
-                    <ul>
-                        <li><strong>Purple markers (📍)</strong> - Key destinations and cities</li>
-                        <li><strong>Green markers (🏨)</strong> - Accommodations with prices and booking links</li>
-                        <li><strong>Red markers (⭐)</strong> - Attractions and places to visit</li>
-                        <li>Click any marker to view details, prices, and external links</li>
-                        <li>Visual connection lines show travel routes between destinations</li>
-                        <li>Multiple map styles available (Street, Satellite, Topographic, Dark mode)</li>
-                    </ul>
+                    <!-- Navigation Tabs -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;">
+                        <button class="info-tab-btn active" onclick="showInfoTab('features')" style="flex: 1; min-width: 120px; padding: 10px 15px; border: 2px solid var(--primary-color); background: var(--primary-color); color: white; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Features</button>
+                        <button class="info-tab-btn" onclick="showInfoTab('howto')" style="flex: 1; min-width: 120px; padding: 10px 15px; border: 2px solid var(--border-color); background: white; color: var(--text-primary); border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">How to Use</button>
+                        <button class="info-tab-btn" onclick="showInfoTab('tips')" style="flex: 1; min-width: 120px; padding: 10px 15px; border: 2px solid var(--border-color); background: white; color: var(--text-primary); border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Tips & Tricks</button>
+                    </div>
 
-                    <h4>📋 Trip Itinerary View</h4>
-                    <ul>
-                        <li>Click <strong>"📋 Trip Itinerary"</strong> to see your complete trip timeline</li>
-                        <li>View trip statistics: number of stops, total days, accommodations, and attractions</li>
-                        <li>Each key location shows nearby accommodations and attractions organized by distance</li>
-                        <li>Drag and drop to reorder locations in your itinerary</li>
-                        <li>Click any location to pan the map to that spot</li>
-                        <li>Delete or modify items directly from the itinerary</li>
-                    </ul>
+                    <!-- Features Tab -->
+                    <div id="info-tab-features" class="info-tab-content">
+                        <div style="display: grid; gap: 20px;">
+                            <!-- Feature Card 1 -->
+                            <div style="background: var(--bg-secondary); padding: 18px; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                                <h4 style="margin: 0 0 10px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">🤖</span> AI Trip Generation
+                                </h4>
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>Generate complete trip plans instantly with AI</li>
+                                    <li>Real accommodations with prices and booking links</li>
+                                    <li>Choose Quick or Detailed generation modes</li>
+                                    <li>Automatic GPS coordinates and map visualisation</li>
+                                </ul>
+                            </div>
 
-                    <h4>📍 Manual Location Management</h4>
-                    <ul>
-                        <li>Click anywhere on the map to set coordinates for a new location</li>
-                        <li>Use the sidebar form to add custom locations with details</li>
-                        <li>Edit location type, name, description, price, and links</li>
-                        <li>View and manage all locations in the sidebar list</li>
-                        <li>Filter locations by type using the filter buttons</li>
-                    </ul>
+                            <!-- Feature Card 2 -->
+                            <div style="background: var(--bg-secondary); padding: 18px; border-radius: 8px; border-left: 4px solid #3498db;">
+                                <h4 style="margin: 0 0 10px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">🗺️</span> Interactive Map
+                                </h4>
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li><strong style="color: #9b59b6;">Purple markers (📍)</strong> – Key destinations</li>
+                                    <li><strong style="color: #27ae60;">Green markers (🏨)</strong> – Accommodations</li>
+                                    <li><strong style="color: #e74c3c;">Red markers (⭐)</strong> – Attractions</li>
+                                    <li>Multiple map styles (Street, Satellite, Dark mode)</li>
+                                </ul>
+                            </div>
 
-                    <h4>🔗 Connections Between Locations</h4>
-                    <ul>
-                        <li>Draw lines between key locations to show your travel route</li>
-                        <li>Click "Connect Locations" to enter connection mode</li>
-                        <li>Click two key locations in sequence to create a connection line</li>
-                        <li>Visual route representation on the map</li>
-                    </ul>
+                            <!-- Feature Card 3 -->
+                            <div style="background: var(--bg-secondary); padding: 18px; border-radius: 8px; border-left: 4px solid #e67e22;">
+                                <h4 style="margin: 0 0 10px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">📋</span> Trip Itinerary
+                                </h4>
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>Timeline view of your complete journey</li>
+                                    <li>Trip statistics and duration calculations</li>
+                                    <li>Drag and drop to reorder locations</li>
+                                    <li>Delete or modify items directly</li>
+                                </ul>
+                            </div>
 
-                    <h4>💾 Save & Load Trips</h4>
-                    <ul>
-                        <li><strong>"💾 Save"</strong> - Export your trip as a JSON file for backup or sharing</li>
-                        <li><strong>"📂 Load"</strong> - Import saved trips from JSON files or paste JSON data</li>
-                        <li>All trips automatically save to your browser's local storage</li>
-                        <li>No account required - data persists across sessions</li>
-                    </ul>
+                            <!-- Feature Card 4 -->
+                            <div style="background: var(--bg-secondary); padding: 18px; border-radius: 8px; border-left: 4px solid #27ae60;">
+                                <h4 style="margin: 0 0 10px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 20px;">💾</span> Save & Share
+                                </h4>
+                                <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>Export trips as JSON files for backup</li>
+                                    <li>Import and share trips with others</li>
+                                    <li>Automatic browser storage (no account needed)</li>
+                                    <li>Data persists across sessions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
-                    <h3>How to Use PlanPilot</h3>
-                    
-                    <h4>Option 1: AI-Generated Trip (Easiest)</h4>
-                    <ol>
-                        <li>Click the <strong>"🚀 Start Planning"</strong> button</li>
-                        <li>Fill out the form:
-                            <ul>
-                                <li><strong>Destination:</strong> Where you want to go (e.g., "Paris, France")</li>
-                                <li><strong>Duration:</strong> How long you'll be there (e.g., "5 days")</li>
-                                <li><strong>Budget Level:</strong> Choose Economy, Mid-range, or Luxury</li>
-                                <li><strong>Interests:</strong> Select activities you enjoy (culture, food, adventure, etc.)</li>
-                                <li><strong>Must-Visit:</strong> Any specific places you want to include (optional)</li>
-                            </ul>
-                        </li>
-                        <li>Choose your generation mode (Quick or Detailed)</li>
-                        <li>Click <strong>"Generate Trip Plan"</strong> and wait for AI to create your itinerary</li>
-                        <li>Your trip appears on the map with all markers, details, and connections!</li>
-                    </ol>
+                    <!-- How To Use Tab -->
+                    <div id="info-tab-howto" class="info-tab-content" style="display: none;">
+                        <div style="display: grid; gap: 20px;">
+                            <!-- Method 1 -->
+                            <div style="background: linear-gradient(to right, #f8f9fa, #ffffff); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color);">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <span style="background: var(--primary-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</span>
+                                    <h4 style="margin: 0; color: var(--primary-color);">AI-Generated Trip (Easiest)</h4>
+                                </div>
+                                <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>Click <strong>"🚀 Start Planning"</strong></li>
+                                    <li>Enter destination, duration, and budget level</li>
+                                    <li>Select your interests and must-visit places</li>
+                                    <li>Click <strong>"Generate Trip Plan"</strong></li>
+                                    <li>Your complete itinerary appears on the map!</li>
+                                </ol>
+                            </div>
 
-                    <h4>Option 2: Manual Trip Planning</h4>
-                    <ol>
-                        <li>Click anywhere on the map to set coordinates</li>
-                        <li>In the sidebar, select the location type (Key Location, Accommodation, or Attraction)</li>
-                        <li>Fill in the name, description, price, and link (optional)</li>
-                        <li>Click <strong>"Add Location"</strong> to place it on the map</li>
-                        <li>Repeat for all your destinations</li>
-                        <li>Use "Connect Locations" to draw routes between key destinations</li>
-                    </ol>
+                            <!-- Method 2 -->
+                            <div style="background: linear-gradient(to right, #f8f9fa, #ffffff); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color);">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <span style="background: var(--primary-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</span>
+                                    <h4 style="margin: 0; color: var(--primary-color);">Manual Trip Planning</h4>
+                                </div>
+                                <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>Click anywhere on the map to set coordinates</li>
+                                    <li>Select location type in the sidebar form</li>
+                                    <li>Fill in name, description, price, and link</li>
+                                    <li>Click <strong>"Add Location"</strong></li>
+                                    <li>Use "Connect Locations" to draw travel routes</li>
+                                </ol>
+                            </div>
 
-                    <h4>Option 3: Import Existing Trip</h4>
-                    <ol>
-                        <li>Click <strong>"📂 Load"</strong></li>
-                        <li>Either upload a JSON file or paste JSON data</li>
-                        <li>Click <strong>"Import Data"</strong></li>
-                        <li>Your trip loads instantly on the map</li>
-                    </ol>
+                            <!-- Method 3 -->
+                            <div style="background: linear-gradient(to right, #f8f9fa, #ffffff); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color);">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <span style="background: var(--primary-color); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</span>
+                                    <h4 style="margin: 0; color: var(--primary-color);">Import Existing Trip</h4>
+                                </div>
+                                <ol style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                                    <li>Click <strong>"📂 Load"</strong></li>
+                                    <li>Upload a JSON file or paste JSON data</li>
+                                    <li>Click <strong>"Import Data"</strong></li>
+                                    <li>Your trip loads instantly!</li>
+                                </ol>
+                            </div>
 
-                    <h3>Managing Your Trip</h3>
-                    <ul>
-                        <li><strong>View Details:</strong> Click any marker or location in the sidebar to see full information</li>
-                        <li><strong>Edit Trip Title:</strong> Click the title at the top center of the map to rename your trip</li>
-                        <li><strong>Filter Locations:</strong> Use the type filter buttons to show/hide specific location types</li>
-                        <li><strong>Delete Locations:</strong> Click the delete button next to any location in the sidebar or itinerary</li>
-                        <li><strong>Reorder Itinerary:</strong> Open the Trip Itinerary and drag locations to change their order</li>
-                        <li><strong>Export for Sharing:</strong> Click "💾 Save" to download your trip as a shareable file</li>
-                        <li><strong>Clear Everything:</strong> Use "Clear All" (bottom of sidebar) to start fresh</li>
-                    </ul>
+                            <!-- Quick Actions -->
+                            <div style="background: #e3f2fd; padding: 18px; border-radius: 8px; border-left: 4px solid #2196f3;">
+                                <h4 style="margin: 0 0 12px 0; color: #1976d2;">⚡ Quick Actions</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px; line-height: 1.6;">
+                                    <div><strong>View details:</strong> Click any marker</div>
+                                    <div><strong>Edit title:</strong> Click trip name on map</div>
+                                    <div><strong>Filter view:</strong> Use type filter buttons</div>
+                                    <div><strong>Delete item:</strong> Use delete buttons</div>
+                                    <div><strong>Reorder:</strong> Drag in itinerary view</div>
+                                    <div><strong>Clear all:</strong> Bottom of sidebar</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <h3>Tips & Tricks</h3>
-                    <ul>
-                        <li>Use the Trip Itinerary view to get a timeline overview of your entire journey</li>
-                        <li>Each accommodation and attraction is automatically associated with its nearest key location</li>
-                        <li>Click location names in the itinerary to quickly navigate the map to that spot</li>
-                        <li>Export your trip regularly to back it up or share with travel companions</li>
-                        <li>Try different map styles to see your trip in various visual contexts</li>
-                        <li>Add detailed descriptions to remember why you chose each place</li>
-                    </ul>
+                    <!-- Tips Tab -->
+                    <div id="info-tab-tips" class="info-tab-content" style="display: none;">
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">💡</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Start with AI, then personalise</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Generate a base itinerary with AI, then manually add, remove, or adjust locations to match your exact preferences.</p>
+                                </div>
+                            </div>
 
-                    <div class="note" style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-left: 4px solid var(--primary-color); border-radius: 4px;">
-                        <strong>💡 Pro Tip:</strong> Start with AI generation for a complete base itinerary, then manually add, remove, or adjust locations to personalize it to your exact preferences!
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">🎯</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Use the itinerary view</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Get a timeline overview of your journey with trip statistics, nearby accommodations, and attractions organised by distance.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">🔗</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Navigate quickly</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Click location names in the itinerary to instantly pan the map to that spot and open its marker.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">💾</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Export regularly</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Back up your trip or share it with travel companions by exporting as a JSON file.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">🗺️</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Try different map styles</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Switch between Street, Satellite, Topographic, and Dark mode to see your trip in different visual contexts.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">📝</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Add detailed descriptions</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Include notes about why you chose each place, opening hours, or special requirements to help you remember later.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                                <span style="font-size: 24px; flex-shrink: 0;">🎨</span>
+                                <div>
+                                    <strong style="color: var(--primary-color);">Automatic associations</strong>
+                                    <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 14px;">Each accommodation and attraction is automatically linked to its nearest key location in the itinerary view.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -468,6 +540,33 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Tab switching functionality for info modal
+        function showInfoTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.info-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.info-tab-btn').forEach(btn => {
+                btn.style.background = 'white';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.borderColor = 'var(--border-color)';
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById('info-tab-' + tabName).style.display = 'block';
+            
+            // Highlight active button
+            event.target.style.background = 'var(--primary-color)';
+            event.target.style.color = 'white';
+            event.target.style.borderColor = 'var(--primary-color)';
+            event.target.classList.add('active');
+        }
+    </script>
 
     <!-- Location Details Modal -->
     <div id="locationDetailsModal" class="modal">
