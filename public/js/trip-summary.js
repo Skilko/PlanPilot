@@ -101,7 +101,7 @@ export function getAssociatedItems(baseLocation, locations) {
     const associatedItems = locations.filter(item => {
         // Skip the base location itself and other key locations
         if (item.id === baseLocation.id || item.type === 'key-location') return false;
-        
+
         // Only process accommodations and attractions
         if (item.type !== 'accommodation' && item.type !== 'attraction') return false;
 
@@ -205,10 +205,10 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
     // Add delete button click handler
     const deleteBtn = itemEl.querySelector('.trip-summary-nearby-delete');
     if (deleteBtn) {
-        deleteBtn.addEventListener('click', (e) => {
+        deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
             if (deleteCallback) {
-                deleteCallback(item.id);
+                await deleteCallback(item.id);
             }
         });
     }
@@ -501,10 +501,10 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
     // Delete button
     const deleteBtn = card.querySelector('.trip-summary-card-btn.delete');
     if (deleteBtn) {
-        deleteBtn.addEventListener('click', (e) => {
+        deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
             if (deleteCallback) {
-                deleteCallback(loc.id);
+                await deleteCallback(loc.id);
             }
         });
     }
