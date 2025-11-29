@@ -51,3 +51,4 @@ The app will automatically update when you're online. No need to reinstall!
 
 Need help? The app works the same whether you use it in your browser or install it to your home screen!
 
+

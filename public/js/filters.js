@@ -98,3 +98,4 @@ export function applyFilters(locations, markers, updateListCallback) {
 
 
 
+
