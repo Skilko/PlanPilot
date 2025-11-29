@@ -22,6 +22,88 @@ let isPanelDragging = false;
 let panelDragOffset = { x: 0, y: 0 };
 
 /**
+ * Smart pan to location that accounts for the Trip Itinerary panel
+ * Ensures the marker is visible and not hidden under the panel
+ * @param {number} lat - Latitude
+ * @param {number} lng - Longitude
+ * @param {number} zoom - Zoom level
+ */
+function panToLocationSmart(lat, lng, zoom = 12) {
+    const map = getMap();
+    if (!map) return;
+    
+    const container = document.getElementById('trip-summary-container');
+    const isVisible = container && container.classList.contains('visible');
+    
+    if (!isVisible) {
+        // Panel not visible, just center normally
+        map.setView([lat, lng], zoom, { animate: true });
+        return;
+    }
+    
+    // Get map dimensions
+    const mapSize = map.getSize();
+    const mapContainer = map.getContainer();
+    const mapRect = mapContainer.getBoundingClientRect();
+    
+    // Get panel dimensions and position
+    const panelRect = container.getBoundingClientRect();
+    
+    // Calculate the visible area of the map (area not covered by panel)
+    // The panel is centered, so we need to offset to the side that has more space
+    
+    let offsetX = 0;
+    let offsetY = 0;
+    
+    // Check if panel overlaps with center of map
+    const mapCenterX = mapRect.left + mapRect.width / 2;
+    const mapCenterY = mapRect.top + mapRect.height / 2;
+    
+    const panelLeft = panelRect.left;
+    const panelRight = panelRect.right;
+    const panelTop = panelRect.top;
+    const panelBottom = panelRect.bottom;
+    
+    // If panel covers the center, calculate offset to move marker to visible area
+    if (panelLeft < mapCenterX && panelRight > mapCenterX && 
+        panelTop < mapCenterY && panelBottom > mapCenterY) {
+        
+        // Calculate how much space is available on each side
+        const leftSpace = panelLeft - mapRect.left;
+        const rightSpace = mapRect.right - panelRight;
+        const topSpace = panelTop - mapRect.top;
+        const bottomSpace = mapRect.bottom - panelBottom;
+        
+        // Offset towards the side with more space
+        if (leftSpace > rightSpace) {
+            // More space on left, offset marker to the left
+            offsetX = -(panelRect.width / 2 + leftSpace / 2) * 0.5;
+        } else {
+            // More space on right, offset marker to the right
+            offsetX = (panelRect.width / 2 + rightSpace / 2) * 0.5;
+        }
+        
+        // Also check vertical offset if needed
+        if (topSpace > bottomSpace && topSpace > 100) {
+            offsetY = -(panelRect.height / 4);
+        }
+    }
+    
+    // Convert the target location to pixel coordinates
+    const targetPoint = map.project([lat, lng], zoom);
+    
+    // Apply offset
+    targetPoint.x += offsetX;
+    targetPoint.y += offsetY;
+    
+    // Convert back to lat/lng
+    const targetLatLng = map.unproject(targetPoint, zoom);
+    
+    // Pan to the offset location
+    map.setView(targetLatLng, zoom, { animate: true });
+}
+
+/**
  * Parse duration string to hours
  * @param {string} durationStr - Duration string (e.g., "3 days", "2 nights", "4 hours")
  * @returns {number} - Duration in hours
@@ -195,7 +277,7 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
         if (e.target.classList.contains('trip-summary-nearby-delete')) return;
         
         if (map && item.lat && item.lng) {
-            map.setView([item.lat, item.lng], 14, { animate: true });
+            panToLocationSmart(item.lat, item.lng, 14);
             if (markers && markers[item.id]) {
                 markers[item.id].openPopup();
             }
@@ -461,7 +543,7 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
         cardMain.addEventListener('click', (e) => {
             e.stopPropagation();
             if (map && loc.lat && loc.lng) {
-                map.setView([loc.lat, loc.lng], 12, { animate: true });
+                panToLocationSmart(loc.lat, loc.lng, 12);
                 if (markers && markers[loc.id]) {
                     markers[loc.id].openPopup();
                 }
@@ -476,7 +558,7 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
         cardNumber.addEventListener('click', (e) => {
             e.stopPropagation();
             if (map && loc.lat && loc.lng) {
-                map.setView([loc.lat, loc.lng], 12, { animate: true });
+                panToLocationSmart(loc.lat, loc.lng, 12);
                 if (markers && markers[loc.id]) {
                     markers[loc.id].openPopup();
                 }
@@ -490,7 +572,7 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
         zoomBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (map && loc.lat && loc.lng) {
-                map.setView([loc.lat, loc.lng], 12, { animate: true });
+                panToLocationSmart(loc.lat, loc.lng, 12);
                 if (markers && markers[loc.id]) {
                     markers[loc.id].openPopup();
                 }
@@ -1018,10 +1100,7 @@ export function showLocationDetails(locationId, locations, markers) {
     
     // Focus on the location on the map
     if (markers[locationId]) {
-        map.setView([location.lat, location.lng], 12, {
-            animate: true,
-            duration: 1
-        });
+        panToLocationSmart(location.lat, location.lng, 12);
     }
 }
 
