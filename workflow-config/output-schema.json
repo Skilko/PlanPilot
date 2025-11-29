@@ -69,13 +69,9 @@
           "duration": {
             "type": "string",
             "description": "Recommended stay duration (e.g., '3 days', '2 nights', '4 hours', '1 day'). Use empty string if not applicable."
-          },
-          "keyLocationId": {
-            "type": "string",
-            "description": "For accommodation/attraction types: the ID of the key-location this item belongs to. This explicitly associates hotels and attractions with their parent key location. Use empty string for key-location types."
           }
         },
-        "required": ["id", "type", "name", "description", "price", "link", "lat", "lng", "order", "duration", "keyLocationId"],
+        "required": ["id", "type", "name", "description", "price", "link", "lat", "lng", "order", "duration"],
         "additionalProperties": false
       },
       "minItems": 1
@@ -122,8 +118,7 @@
           "lat": 48.8566,
           "lng": 2.3522,
           "order": 1,
-          "duration": "5 days",
-          "keyLocationId": ""
+          "duration": "5 days"
         },
         {
           "id": "2",
@@ -135,8 +130,7 @@
           "lat": 48.8584,
           "lng": 2.3615,
           "order": 2,
-          "duration": "5 nights",
-          "keyLocationId": "1"
+          "duration": "5 nights"
         },
         {
           "id": "3",
@@ -148,8 +142,7 @@
           "lat": 48.8606,
           "lng": 2.3376,
           "order": 3,
-          "duration": "3 hours",
-          "keyLocationId": "1"
+          "duration": "3 hours"
         }
       ],
       "connections": []

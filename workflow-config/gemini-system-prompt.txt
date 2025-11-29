@@ -55,8 +55,7 @@ JSON FORMAT (REQUIRED):
       "lat": number,
       "lng": number,
       "order": number,
-      "duration": "string (e.g., '3 days', '2 nights', '4 hours')",
-      "keyLocationId": "string (REQUIRED for accommodation/attraction - the ID of the key-location this belongs to)"
+      "duration": "string (e.g., '3 days', '2 nights', '4 hours')"
     }
   ],
   "connections": [
@@ -74,19 +73,9 @@ TRIP METADATA:
 - These help provide context for the trip's start and end points.
 
 LOCATION TYPES:
-- key-location: Major destinations (cities, regions) - keyLocationId should be empty string ""
-- accommodation: Hotels, hostels, Airbnb (MUST have price, link, AND keyLocationId)
-- attraction: Places to visit (entry fees if applicable, MUST have keyLocationId)
-
-CRITICAL - ASSOCIATING ITEMS WITH KEY LOCATIONS:
-⚠️ Every accommodation and attraction MUST include a "keyLocationId" field that references the ID of the key-location it belongs to.
-- This ensures hotels and attractions appear under the CORRECT key location in the trip itinerary
-- The keyLocationId MUST match the "id" of an existing key-location
-- Only associate items that are ACTUALLY relevant to that key location:
-  * Hotels should be within reasonable distance of the key location (same city/town)
-  * Attractions should be places to visit WHILE staying at that key location
-  * Do NOT associate items from other cities or regions
-- Example: A hotel in Paris should have keyLocationId pointing to the Paris key-location, NOT to Versailles
+- key-location: Major destinations (cities, regions)
+- accommodation: Hotels, hostels, Airbnb (MUST have price and link)
+- attraction: Places to visit (entry fees if applicable)
 
 QUANTITY GUIDELINES:
 - 3-5 days: 1 key location, 2-4 accommodations, 5-10 attractions

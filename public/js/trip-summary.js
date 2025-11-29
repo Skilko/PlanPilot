@@ -84,7 +84,7 @@ export function formatTripSummaryDuration(durationStr) {
 
 /**
  * Get associated accommodations and attractions for a key location
- * Uses explicit keyLocationId when available, falls back to proximity-based association
+ * Each accommodation/attraction is only associated with its NEAREST key location
  * @param {Object} baseLocation - The key location
  * @param {Array} locations - All locations
  * @returns {Object} - Object with accommodations and attractions arrays
@@ -94,41 +94,32 @@ export function getAssociatedItems(baseLocation, locations) {
         return { accommodations: [], attractions: [] };
     }
 
-    // First, find items with explicit keyLocationId association
-    const explicitlyAssociated = locations.filter(item => {
+    // Get all key locations for nearest-neighbor comparison
+    const keyLocations = locations.filter(loc => loc.type === 'key-location');
+    
+    // Filter items that belong to this key location (it's their nearest)
+    const associatedItems = locations.filter(item => {
+        // Skip the base location itself and other key locations
         if (item.id === baseLocation.id || item.type === 'key-location') return false;
-        // Check if this item has an explicit keyLocationId that matches our base location
-        return item.keyLocationId && item.keyLocationId === baseLocation.id;
-    });
+        
+        // Only process accommodations and attractions
+        if (item.type !== 'accommodation' && item.type !== 'attraction') return false;
 
-    // For items without keyLocationId, use fallback proximity-based association
-    // Use stricter criteria: only items very close (within 25km) AND not explicitly assigned elsewhere
-    const fallbackAssociated = locations.filter(item => {
-        if (item.id === baseLocation.id || item.type === 'key-location') return false;
+        // Find the nearest key location to this item
+        let nearestKeyLocation = null;
+        let nearestDistance = Infinity;
         
-        // Skip if item has an explicit keyLocationId (it belongs to another location)
-        if (item.keyLocationId && item.keyLocationId !== '') return false;
-        
-        // Calculate distance - use stricter 25km radius for fallback
-        const distance = getDistance(baseLocation.lat, baseLocation.lng, item.lat, item.lng);
-        if (distance >= 25) return false;
-        
-        // For fallback, also check if this item is closer to another key location
-        // Only associate with the nearest key location
-        const keyLocations = locations.filter(loc => loc.type === 'key-location' && loc.id !== baseLocation.id);
-        for (const otherKeyLoc of keyLocations) {
-            const distToOther = getDistance(otherKeyLoc.lat, otherKeyLoc.lng, item.lat, item.lng);
-            if (distToOther < distance) {
-                // This item is closer to another key location, don't associate it here
-                return false;
+        for (const keyLoc of keyLocations) {
+            const distance = getDistance(keyLoc.lat, keyLoc.lng, item.lat, item.lng);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestKeyLocation = keyLoc;
             }
         }
         
-        return true;
+        // Only associate this item with baseLocation if baseLocation is the nearest key location
+        return nearestKeyLocation && nearestKeyLocation.id === baseLocation.id;
     });
-
-    // Combine explicit and fallback associations
-    const associatedItems = [...explicitlyAssociated, ...fallbackAssociated];
 
     return {
         accommodations: associatedItems.filter(item => item.type === 'accommodation'),
