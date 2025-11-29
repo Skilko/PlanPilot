@@ -13,7 +13,6 @@ import {
     openInfoModal, closeInfoModal,
     closeLocationDetailsModal,
     showLoadingOverlay, hideLoadingOverlay,
-    copyGuideToClipboard,
     setupModalCloseHandlers
 } from './modals.js';
 import { 
@@ -529,7 +528,6 @@ window.handlePlanningFormSubmit = handlePlanningSubmit;
 window.openInfoModal = openInfoModal;
 window.closeInfoModal = closeInfoModal;
 window.closeLocationDetailsModal = closeLocationDetailsModal;
-window.copyGuideToClipboard = copyGuideToClipboard;
 window.toggleSidebar = toggleSidebar;
 window.closeSidebar = closeSidebar;
 window.applyFilters = handleApplyFilters;

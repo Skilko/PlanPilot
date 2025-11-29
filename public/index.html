@@ -34,7 +34,7 @@
                 </div>
                 <h1>
                     <span>PlanPilot</span>
-                    <button class="info-btn" onclick="openInfoModal()" title="Format Information">i</button>
+                    <button class="info-btn" onclick="openInfoModal()" title="About PlanPilot">i</button>
                 </h1>
                 <p>Plan your perfect getaway</p>
             </div>
@@ -337,145 +337,130 @@
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📋 JSON Format Guide</h2>
+                <h2>🗺️ About PlanPilot</h2>
             </div>
             <div class="modal-body">
-                <div style="padding: 0 0 15px 0; margin: -10px -10px 20px -10px; border-bottom: 2px solid var(--border-color);">
-                    <button class="btn btn-secondary" onclick="copyGuideToClipboard(event)" style="width: 100%; margin: 0;">📋 Copy Guide for AI</button>
-                    <p style="margin: 10px 0 0 0; font-size: 12px; color: var(--text-secondary); text-align: center;">Copy this guide to your clipboard and paste it into an AI assistant to generate custom JSON files</p>
-                </div>
                 <div class="info-content">
-                    <p>Use this guide to create or import location data for the PlanPilot. This format is designed for easy data entry and AI agent integration.</p>
+                    <h3>What is PlanPilot?</h3>
+                    <p>PlanPilot is an AI-powered trip planning application that helps you create, visualize, and manage your travel itineraries on an interactive map. Whether you're planning a weekend getaway or a multi-week adventure, PlanPilot makes trip planning effortless and organized.</p>
                     
-                    <h3>Required JSON Structure</h3>
-                    <p>The JSON file must contain a <code>locations</code> array and optionally trip metadata and <code>connections</code>:</p>
+                    <h3>Key Features</h3>
                     
-                    <pre>{
-  "title": "Your Trip Name",
-  "arrival_location": "Starting point",
-  "departure_location": "Ending point",
-  "locations": [ ... ],
-  "connections": [ ... ]
-}</pre>
-
-                    <h3>Trip Metadata (Optional)</h3>
+                    <h4>🤖 AI Trip Generation</h4>
                     <ul>
-                        <li><code>title</code> (string, optional): The name of your trip or holiday. Displayed at the top center of the map. Example: "Sri Lanka Honeymoon", "European Adventure 2025"</li>
-                        <li><code>arrival_location</code> (string, optional): Where your journey begins (e.g., "London Heathrow Airport", "New York City"). Shows in Trip Summary as travel starting point.</li>
-                        <li><code>departure_location</code> (string, optional): Where your journey ends (e.g., "Paris CDG Airport", "Rome"). Shows in Trip Summary as travel ending point.</li>
+                        <li>Click <strong>"🚀 Start Planning"</strong> to use AI to generate complete trip plans</li>
+                        <li>Provide your destination, duration, budget level, and interests</li>
+                        <li>AI researches and creates a full itinerary with real accommodations, attractions, prices, and booking links</li>
+                        <li>Automatic GPS coordinates and map visualization</li>
+                        <li>Choose between Quick mode (faster) or Detailed mode (more options)</li>
                     </ul>
 
-                    <h3>Location Object Format</h3>
-                    <p>Each location in the <code>locations</code> array must have the following properties:</p>
-                    
+                    <h4>🗺️ Interactive Map</h4>
                     <ul>
-                        <li><code>id</code> (string, required): Unique identifier for the location</li>
-                        <li><code>type</code> (string, required): Must be one of:
+                        <li><strong>Purple markers (📍)</strong> - Key destinations and cities</li>
+                        <li><strong>Green markers (🏨)</strong> - Accommodations with prices and booking links</li>
+                        <li><strong>Red markers (⭐)</strong> - Attractions and places to visit</li>
+                        <li>Click any marker to view details, prices, and external links</li>
+                        <li>Visual connection lines show travel routes between destinations</li>
+                        <li>Multiple map styles available (Street, Satellite, Topographic, Dark mode)</li>
+                    </ul>
+
+                    <h4>📋 Trip Itinerary View</h4>
+                    <ul>
+                        <li>Click <strong>"📋 Trip Itinerary"</strong> to see your complete trip timeline</li>
+                        <li>View trip statistics: number of stops, total days, accommodations, and attractions</li>
+                        <li>Each key location shows nearby accommodations and attractions organized by distance</li>
+                        <li>Drag and drop to reorder locations in your itinerary</li>
+                        <li>Click any location to pan the map to that spot</li>
+                        <li>Delete or modify items directly from the itinerary</li>
+                    </ul>
+
+                    <h4>📍 Manual Location Management</h4>
+                    <ul>
+                        <li>Click anywhere on the map to set coordinates for a new location</li>
+                        <li>Use the sidebar form to add custom locations with details</li>
+                        <li>Edit location type, name, description, price, and links</li>
+                        <li>View and manage all locations in the sidebar list</li>
+                        <li>Filter locations by type using the filter buttons</li>
+                    </ul>
+
+                    <h4>🔗 Connections Between Locations</h4>
+                    <ul>
+                        <li>Draw lines between key locations to show your travel route</li>
+                        <li>Click "Connect Locations" to enter connection mode</li>
+                        <li>Click two key locations in sequence to create a connection line</li>
+                        <li>Visual route representation on the map</li>
+                    </ul>
+
+                    <h4>💾 Save & Load Trips</h4>
+                    <ul>
+                        <li><strong>"💾 Save"</strong> - Export your trip as a JSON file for backup or sharing</li>
+                        <li><strong>"📂 Load"</strong> - Import saved trips from JSON files or paste JSON data</li>
+                        <li>All trips automatically save to your browser's local storage</li>
+                        <li>No account required - data persists across sessions</li>
+                    </ul>
+
+                    <h3>How to Use PlanPilot</h3>
+                    
+                    <h4>Option 1: AI-Generated Trip (Easiest)</h4>
+                    <ol>
+                        <li>Click the <strong>"🚀 Start Planning"</strong> button</li>
+                        <li>Fill out the form:
                             <ul>
-                                <li><code>"key-location"</code> - Major destinations (purple markers)</li>
-                                <li><code>"accommodation"</code> - Hotels, rentals (green markers)</li>
-                                <li><code>"attraction"</code> - Places to visit (red markers)</li>
+                                <li><strong>Destination:</strong> Where you want to go (e.g., "Paris, France")</li>
+                                <li><strong>Duration:</strong> How long you'll be there (e.g., "5 days")</li>
+                                <li><strong>Budget Level:</strong> Choose Economy, Mid-range, or Luxury</li>
+                                <li><strong>Interests:</strong> Select activities you enjoy (culture, food, adventure, etc.)</li>
+                                <li><strong>Must-Visit:</strong> Any specific places you want to include (optional)</li>
                             </ul>
                         </li>
-                        <li><code>name</code> (string, required): Display name of the location</li>
-                        <li><code>description</code> (string, optional): Additional notes or details</li>
-                        <li><code>price</code> (string, optional): Cost information (e.g., "$150/night", "€25 entry")</li>
-                        <li><code>link</code> (string, optional): URL for booking, website, or reference</li>
-                        <li><code>lat</code> (number, required): Latitude coordinate (-90 to 90)</li>
-                        <li><code>lng</code> (number, required): Longitude coordinate (-180 to 180)</li>
-                    </ul>
-
-                    <h3>Connection Object Format</h3>
-                    <p>Each connection in the <code>connections</code> array connects two Key Locations:</p>
-                    
-                    <ul>
-                        <li><code>id</code> (string, required): Unique identifier (typically "fromId-toId")</li>
-                        <li><code>from</code> (string, required): ID of the first Key Location</li>
-                        <li><code>to</code> (string, required): ID of the second Key Location</li>
-                    </ul>
-
-                    <div class="note">
-                        <strong>⚠️ Note:</strong> Connections only work between locations with type <code>"key-location"</code>. Make sure both <code>from</code> and <code>to</code> reference valid Key Location IDs.
-                    </div>
-
-                    <h3>Complete Example</h3>
-                    <pre>{
-  "title": "Paris & Rome Adventure",
-  "arrival_location": "London Heathrow Airport",
-  "departure_location": "Rome Fiumicino Airport",
-  "locations": [
-    {
-      "id": "1",
-      "type": "key-location",
-      "name": "Paris",
-      "description": "City of Light, arrival point",
-      "price": "",
-      "link": "",
-      "lat": 48.8566,
-      "lng": 2.3522,
-      "order": 1,
-      "duration": "3 days"
-    },
-    {
-      "id": "2",
-      "type": "accommodation",
-      "name": "Hotel de Paris",
-      "description": "5-star hotel near Eiffel Tower",
-      "price": "$250/night",
-      "link": "https://booking.com/hotel-de-paris",
-      "lat": 48.8584,
-      "lng": 2.2945,
-      "order": 2,
-      "duration": "3 nights"
-    },
-    {
-      "id": "3",
-      "type": "attraction",
-      "name": "Louvre Museum",
-      "description": "World's largest art museum",
-      "price": "€17 entry",
-      "link": "https://louvre.fr",
-      "lat": 48.8606,
-      "lng": 2.3376,
-      "order": 3,
-      "duration": "3 hours"
-    },
-    {
-      "id": "4",
-      "type": "key-location",
-      "name": "Rome",
-      "description": "Next destination",
-      "price": "",
-      "link": "",
-      "lat": 41.9028,
-      "lng": 12.4964,
-      "order": 4,
-      "duration": "4 days"
-    }
-  ],
-  "connections": [
-    {
-      "id": "1-4",
-      "from": "1",
-      "to": "4"
-    }
-  ]
-}</pre>
-
-                    <h3>AI Agent Instructions</h3>
-                    <p>When creating a JSON file for this PlanPilot:</p>
-                    <ol>
-                        <li>Add a descriptive <code>title</code> field that summarizes the trip (e.g., "Sri Lanka Honeymoon", "Summer Europe Tour 2025")</li>
-                        <li>Ensure all required fields are present for each location</li>
-                        <li>Add <code>order</code> field (number) to sequence locations chronologically (1, 2, 3, etc.)</li>
-                        <li>Add <code>duration</code> field (string) for stay length: "3 days" for cities, "2 nights" for hotels, "2 hours" for attractions</li>
-                        <li>Use consistent ID formats (strings, unique)</li>
-                        <li>Verify coordinates are valid (use geocoding if needed)</li>
-                        <li>Only create connections between <code>"key-location"</code> types</li>
-                        <li>Include helpful descriptions to provide context</li>
-                        <li>Add price and link information where relevant for accommodation and attractions</li>
-                        <li>Validate JSON syntax before importing</li>
+                        <li>Choose your generation mode (Quick or Detailed)</li>
+                        <li>Click <strong>"Generate Trip Plan"</strong> and wait for AI to create your itinerary</li>
+                        <li>Your trip appears on the map with all markers, details, and connections!</li>
                     </ol>
+
+                    <h4>Option 2: Manual Trip Planning</h4>
+                    <ol>
+                        <li>Click anywhere on the map to set coordinates</li>
+                        <li>In the sidebar, select the location type (Key Location, Accommodation, or Attraction)</li>
+                        <li>Fill in the name, description, price, and link (optional)</li>
+                        <li>Click <strong>"Add Location"</strong> to place it on the map</li>
+                        <li>Repeat for all your destinations</li>
+                        <li>Use "Connect Locations" to draw routes between key destinations</li>
+                    </ol>
+
+                    <h4>Option 3: Import Existing Trip</h4>
+                    <ol>
+                        <li>Click <strong>"📂 Load"</strong></li>
+                        <li>Either upload a JSON file or paste JSON data</li>
+                        <li>Click <strong>"Import Data"</strong></li>
+                        <li>Your trip loads instantly on the map</li>
+                    </ol>
+
+                    <h3>Managing Your Trip</h3>
+                    <ul>
+                        <li><strong>View Details:</strong> Click any marker or location in the sidebar to see full information</li>
+                        <li><strong>Edit Trip Title:</strong> Click the title at the top center of the map to rename your trip</li>
+                        <li><strong>Filter Locations:</strong> Use the type filter buttons to show/hide specific location types</li>
+                        <li><strong>Delete Locations:</strong> Click the delete button next to any location in the sidebar or itinerary</li>
+                        <li><strong>Reorder Itinerary:</strong> Open the Trip Itinerary and drag locations to change their order</li>
+                        <li><strong>Export for Sharing:</strong> Click "💾 Save" to download your trip as a shareable file</li>
+                        <li><strong>Clear Everything:</strong> Use "Clear All" (bottom of sidebar) to start fresh</li>
+                    </ul>
+
+                    <h3>Tips & Tricks</h3>
+                    <ul>
+                        <li>Use the Trip Itinerary view to get a timeline overview of your entire journey</li>
+                        <li>Each accommodation and attraction is automatically associated with its nearest key location</li>
+                        <li>Click location names in the itinerary to quickly navigate the map to that spot</li>
+                        <li>Export your trip regularly to back it up or share with travel companions</li>
+                        <li>Try different map styles to see your trip in various visual contexts</li>
+                        <li>Add detailed descriptions to remember why you chose each place</li>
+                    </ul>
+
+                    <div class="note" style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-left: 4px solid var(--primary-color); border-radius: 4px;">
+                        <strong>💡 Pro Tip:</strong> Start with AI generation for a complete base itinerary, then manually add, remove, or adjust locations to personalize it to your exact preferences!
+                    </div>
                 </div>
             </div>
             <div class="modal-actions">
