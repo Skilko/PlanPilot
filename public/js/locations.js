@@ -78,7 +78,8 @@ export function addLocation(state, updateCallbacks) {
         price: price,
         link: link,
         lat: state.selectedCoords.lat,
-        lng: state.selectedCoords.lng
+        lng: state.selectedCoords.lng,
+        keyLocationId: '' // Will be auto-associated by proximity if not explicitly set
     };
 
     state.locations.push(location);
