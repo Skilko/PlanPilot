@@ -16,7 +16,7 @@ import {
     setupModalCloseHandlers
 } from './modals.js';
 import { 
-    toggleSidebar, closeSidebar, 
+    toggleSidebar, closeSidebar, openSidebarOnMobileIfEmpty,
     toggleEditMode, toggleDeleteMode, showLogoFallback,
     updateClearAllButton
 } from './ui.js';
@@ -354,6 +354,9 @@ function clearAllData(showConfirmation) {
             state.markers
         );
         saveCurrentState();
+        
+        // Open sidebar on mobile after clearing all data
+        openSidebarOnMobileIfEmpty(state.locations);
 
         if (showConfirmation) {
             showAlert('All data cleared', '✅ Success');
@@ -531,6 +534,9 @@ function init() {
         state.markers
     );
     updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count));
+    
+    // Open sidebar on mobile if no key locations exist (for new users)
+    openSidebarOnMobileIfEmpty(state.locations);
     
     console.log('=== INITIALIZATION COMPLETE ===');
 }

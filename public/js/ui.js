@@ -23,6 +23,19 @@ export function toggleSidebar() {
 }
 
 /**
+ * Open sidebar
+ */
+export function openSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const hamburger = document.getElementById('hamburgerBtn');
+    
+    sidebar.classList.add('active');
+    backdrop.classList.add('active');
+    hamburger.classList.add('active');
+}
+
+/**
  * Close sidebar
  */
 export function closeSidebar() {
@@ -41,6 +54,19 @@ export function closeSidebar() {
 export function closeSidebarOnMobile() {
     if (window.innerWidth < 768) {
         closeSidebar();
+    }
+}
+
+/**
+ * Open sidebar on mobile only if no key locations exist
+ * @param {Array} locations - Array of locations
+ */
+export function openSidebarOnMobileIfEmpty(locations) {
+    if (window.innerWidth < 768) {
+        const keyLocations = locations.filter(loc => loc.type === 'key-location');
+        if (keyLocations.length === 0) {
+            openSidebar();
+        }
     }
 }
 

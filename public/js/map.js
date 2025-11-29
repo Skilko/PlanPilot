@@ -22,7 +22,8 @@ export function initMap() {
         zoom: MAP_CONFIG.ZOOM,
         minZoom: MAP_CONFIG.MIN_ZOOM,
         maxZoom: MAP_CONFIG.MAX_ZOOM,
-        worldCopyJump: true
+        worldCopyJump: true,
+        zoomControl: false
     });
     
     // Define different map layers
