@@ -1,0 +1,27 @@
+{
+  "name": "PlanPilot - Trip Planner",
+  "short_name": "PlanPilot",
+  "description": "Plan your perfect getaway with AI-powered trip planning",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1E88E5",
+  "theme_color": "#1E88E5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/planpilot.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/planpilot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "navigation", "productivity"],
+  "screenshots": []
+}
+

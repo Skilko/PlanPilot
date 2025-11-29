@@ -33,6 +33,13 @@
 - Trips persist across sessions
 - No account required
 
+### 📱 Progressive Web App (PWA)
+- **Install to Home Screen** on iOS and Android devices
+- **Offline Access** - Continue planning without internet
+- **Full Screen Mode** - Native app-like experience
+- **Fast Loading** - Cached resources for instant access
+- See [ADD-TO-HOME-SCREEN.md](ADD-TO-HOME-SCREEN.md) for installation instructions
+
 ---
 
 ## 🚀 Tech Stack
@@ -52,6 +59,8 @@
 planpilot/
 ├── public/
 │   ├── index.html           # Main application (single-page app)
+│   ├── manifest.json        # PWA manifest for mobile installation
+│   ├── service-worker.js    # Service worker for offline support
 │   └── planpilot.png        # Logo/branding
 ├── api/
 │   ├── chat-workflow.js     # Serverless function for AI integration
@@ -66,6 +75,7 @@ planpilot/
 ├── vercel.json              # Routing and serverless functions config
 ├── env.template             # Environment variables template
 ├── TESTING.md               # Testing guide for all phases
+├── ADD-TO-HOME-SCREEN.md    # Mobile installation instructions
 └── README.md                # This file
 ```
 
@@ -225,8 +235,8 @@ Contributions welcome! Areas for improvement:
 - Budget tracking and calculations
 - Multi-language support
 - Trip sharing features
-- Mobile app version
-- Offline mode
+- Enhanced offline capabilities
+- Push notifications for trip reminders
 
 ---
 

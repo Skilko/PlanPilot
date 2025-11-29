@@ -9,6 +9,7 @@ import { isTypeVisible } from './filters.js';
 import { isConnectionMode, handleConnectionClick } from './connections.js';
 import { showAlert, showConfirm } from './modals.js';
 import { closeSidebar } from './ui.js';
+import { getAssociatedItems } from './trip-summary.js';
 
 /**
  * Add a marker to the map for a location
@@ -130,7 +131,41 @@ export async function deleteLocation(id, state, updateCallbacks) {
     console.log('deleteLocation called with ID:', id);
     console.log('Current locations:', state.locations);
     
-    const confirmed = await showConfirm('Are you sure you want to delete this location?', 'Delete Location');
+    // Find the location to delete
+    const locationToDelete = state.locations.find(l => l.id === id);
+    if (!locationToDelete) {
+        console.log('Location not found');
+        return;
+    }
+    
+    // Check if this is a key location and get associated items
+    let idsToDelete = [id];
+    let confirmMessage = 'Are you sure you want to delete this location?';
+    let confirmTitle = 'Delete Location';
+    
+    if (locationToDelete.type === 'key-location') {
+        const { accommodations, attractions } = getAssociatedItems(locationToDelete, state.locations);
+        const totalAssociated = accommodations.length + attractions.length;
+        
+        if (totalAssociated > 0) {
+            // Add all associated items to deletion list
+            idsToDelete = [id, ...accommodations.map(a => a.id), ...attractions.map(a => a.id)];
+            
+            // Create detailed warning message
+            const parts = [];
+            if (accommodations.length > 0) {
+                parts.push(`${accommodations.length} accommodation${accommodations.length === 1 ? '' : 's'}`);
+            }
+            if (attractions.length > 0) {
+                parts.push(`${attractions.length} attraction${attractions.length === 1 ? '' : 's'}`);
+            }
+            
+            confirmMessage = `Deleting this key location will also delete ${parts.join(' and ')} associated with it.\n\nTotal items to delete: ${idsToDelete.length}\n\nAre you sure you want to continue?`;
+            confirmTitle = '⚠️ Delete Key Location';
+        }
+    }
+    
+    const confirmed = await showConfirm(confirmMessage, confirmTitle);
     
     if (!confirmed) {
         console.log('User cancelled deletion');
@@ -138,10 +173,11 @@ export async function deleteLocation(id, state, updateCallbacks) {
     }
 
     console.log('User confirmed deletion');
+    console.log('Deleting IDs:', idsToDelete);
 
-    // Remove connections
+    // Remove all connections for all items being deleted
     state.connections = state.connections.filter(conn => {
-        if (conn.from === id || conn.to === id) {
+        if (idsToDelete.includes(conn.from) || idsToDelete.includes(conn.to)) {
             if (state.connectionLines[conn.id]) {
                 map.removeLayer(state.connectionLines[conn.id]);
                 delete state.connectionLines[conn.id];
@@ -151,16 +187,18 @@ export async function deleteLocation(id, state, updateCallbacks) {
         return true;
     });
 
-    // Remove marker
-    if (state.markers[id]) {
-        console.log('Removing marker for ID:', id);
-        map.removeLayer(state.markers[id]);
-        delete state.markers[id];
-    }
+    // Remove all markers for all items being deleted
+    idsToDelete.forEach(deleteId => {
+        if (state.markers[deleteId]) {
+            console.log('Removing marker for ID:', deleteId);
+            map.removeLayer(state.markers[deleteId]);
+            delete state.markers[deleteId];
+        }
+    });
 
-    // Remove location
+    // Remove all locations
     const beforeCount = state.locations.length;
-    state.locations = state.locations.filter(l => l.id !== id);
+    state.locations = state.locations.filter(l => !idsToDelete.includes(l.id));
     console.log('Locations count before:', beforeCount, 'after:', state.locations.length);
     
     if (updateCallbacks.updateList) updateCallbacks.updateList();
