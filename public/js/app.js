@@ -155,6 +155,64 @@ function handleExportData() {
     link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
+    
+    // Show success message
+    showAlert(`Your trip has been successfully saved!\n\nFile: ${filename}\n\nCheck your Downloads folder.`, '💾 Trip Saved');
+}
+
+/**
+ * Handle share trip
+ */
+async function handleShareTrip() {
+    // Check if Web Share API is supported
+    if (!navigator.share || !navigator.canShare) {
+        showAlert('Sharing is not supported on this browser.\n\nPlease use the Save button and share the file manually.', 'Share Not Available');
+        return;
+    }
+    
+    // Create the trip data
+    const data = {
+        title: state.tripTitle,
+        arrival_location: state.tripData.arrival_location || '',
+        departure_location: state.tripData.departure_location || '',
+        locations: state.locations,
+        connections: state.connections,
+        exportDate: new Date().toISOString()
+    };
+    
+    // Check if there's data to share
+    if (state.locations.length === 0) {
+        showAlert('No trip data to share. Please add locations first.', 'Nothing to Share');
+        return;
+    }
+    
+    const dataStr = JSON.stringify(data, null, 2);
+    const filename = state.tripTitle ? state.tripTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.trip' : 'planpilot-trip.trip';
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const file = new File([blob], filename, { type: 'application/json' });
+    
+    // Check if file sharing is supported
+    if (!navigator.canShare({ files: [file] })) {
+        showAlert('File sharing is not supported on this browser.\n\nPlease use the Save button and share the file manually.', 'Share Not Available');
+        return;
+    }
+    
+    try {
+        await navigator.share({
+            title: state.tripTitle || 'PlanPilot Trip',
+            text: 'Check out my trip plan! Open this file in PlanPilot: https://www.ppilot.co.uk',
+            files: [file]
+        });
+        
+        // Success - no alert needed as user saw native share dialog
+        console.log('Trip shared successfully');
+    } catch (error) {
+        // User cancelled or error occurred
+        if (error.name !== 'AbortError') {
+            console.error('Error sharing trip:', error);
+            showAlert('Could not share trip. Please try using the Save button instead.', 'Share Failed');
+        }
+    }
 }
 
 /**
@@ -555,6 +613,7 @@ window.focusLocation = handleFocusLocation;
 window.deleteLocation = handleDeleteLocation;
 window.clearAll = handleClearAll;
 window.exportData = handleExportData;
+window.shareTrip = handleShareTrip;
 window.importData = handleImportData;
 window.processImport = handleProcessImport;
 window.closeImportModal = closeImportModal;
