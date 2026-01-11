@@ -13,7 +13,11 @@ import {
     openInfoModal, closeInfoModal,
     closeLocationDetailsModal,
     showLoadingOverlay, hideLoadingOverlay,
-    setupModalCloseHandlers
+    setupModalCloseHandlers,
+    openNotesModal, closeNotesModal, saveNotes, deleteNotes,
+    openLocationSearchModal, closeLocationSearchModal, handleSearchTypeChange,
+    getCurrentSearchLocation, openSearchResultsModal, closeSearchResultsModal,
+    handleResultCheckboxChange, setResultAction, getSearchResultsData
 } from './modals.js';
 import { 
     toggleSidebar, closeSidebar, openSidebarOnMobileIfEmpty,
@@ -24,6 +28,7 @@ import {
     addMarker, addLocation, focusLocation, deleteLocation,
     updateLocationsList, getDistance
 } from './locations.js';
+import { createPopupContent } from './markers.js';
 import { 
     startConnectionMode, cancelConnectionMode, 
     drawConnection, clearAllConnectionLines,
@@ -36,7 +41,7 @@ import {
 import { 
     updateTripSummary, toggleTripSummary, openTripSummary, showLocationDetails, initPanelDrag, resetPanelPosition 
 } from './trip-summary.js';
-import { handlePlanningFormSubmit } from './api.js';
+import { handlePlanningFormSubmit, searchLocationInfo } from './api.js';
 
 // ============================================
 // APPLICATION STATE
@@ -472,6 +477,316 @@ function handleChangeMapStyle(style) {
     changeMapStyle(style);
 }
 
+/**
+ * Refresh all markers after notes update (to show updated popup content)
+ */
+function refreshMarkerPopup(locationId) {
+    const location = state.locations.find(l => l.id === locationId);
+    if (location && state.markers[locationId]) {
+        const popupContent = createPopupContent(location);
+        state.markers[locationId].setPopupContent(popupContent);
+    }
+}
+
+/**
+ * Handle open notes modal
+ * @param {string} locationId - Location ID
+ */
+function handleOpenNotesModal(locationId) {
+    openNotesModal(locationId, state.locations, () => {
+        // Callback when notes are saved - refresh UI
+        refreshMarkerPopup(locationId);
+        updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count));
+        updateTripSummary(
+            state.locations, 
+            state.tripData, 
+            (id) => handleDeleteLocation(id),
+            saveCurrentState,
+            () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+            state.markers
+        );
+    });
+}
+
+/**
+ * Handle save notes
+ */
+function handleSaveNotes() {
+    saveNotes(state.locations, saveCurrentState);
+}
+
+/**
+ * Handle delete notes
+ */
+function handleDeleteNotes() {
+    deleteNotes(state.locations, saveCurrentState);
+}
+
+/**
+ * Handle close notes modal
+ */
+function handleCloseNotesModal() {
+    closeNotesModal();
+}
+
+// ============================================
+// LOCATION SEARCH HANDLERS
+// ============================================
+
+/**
+ * Handle open location search modal
+ * @param {string} locationId - Location ID
+ * @param {string} locationName - Location name
+ * @param {number} lat - Latitude
+ * @param {number} lng - Longitude
+ */
+function handleOpenLocationSearchModal(locationId, locationName, lat, lng) {
+    openLocationSearchModal(locationId, locationName, lat, lng);
+}
+
+/**
+ * Handle close location search modal
+ */
+function handleCloseLocationSearchModal() {
+    closeLocationSearchModal();
+}
+
+/**
+ * Handle search type change
+ */
+function handleSearchTypeChangeWrapper() {
+    handleSearchTypeChange();
+}
+
+/**
+ * Submit location search
+ */
+async function handleSubmitLocationSearch() {
+    const searchLocation = getCurrentSearchLocation();
+    if (!searchLocation) {
+        showAlert('No location selected', 'Error');
+        return;
+    }
+    
+    const searchType = document.getElementById('searchType').value;
+    const customQuery = document.getElementById('customQuery').value.trim();
+    
+    // Validate custom query if needed
+    if (searchType === 'custom' && !customQuery) {
+        showAlert('Please enter a search query', 'Missing Query');
+        return;
+    }
+    
+    // Close the search modal
+    closeLocationSearchModal();
+    
+    try {
+        // Call the API
+        const results = await searchLocationInfo({
+            locationName: searchLocation.name,
+            lat: searchLocation.lat,
+            lng: searchLocation.lng,
+            searchType: searchType,
+            customQuery: customQuery
+        });
+        
+        // Open results modal
+        openSearchResultsModal(results, searchType);
+    } catch (error) {
+        console.error('Location search failed:', error);
+        // Error already shown by searchLocationInfo
+    }
+}
+
+/**
+ * Handle result checkbox change wrapper
+ * @param {string} resultId - Result ID
+ */
+function handleResultCheckboxChangeWrapper(resultId) {
+    handleResultCheckboxChange(resultId);
+}
+
+/**
+ * Set result action wrapper
+ * @param {string} action - 'add' or 'replace'
+ */
+function handleSetResultAction(action) {
+    setResultAction(action);
+}
+
+/**
+ * Apply search results to the trip
+ */
+async function handleApplySearchResults() {
+    const searchType = document.getElementById('searchType')?.value;
+    const resultsData = getSearchResultsData();
+    
+    if (!resultsData || !resultsData.data) {
+        showAlert('No results to apply', 'Error');
+        return;
+    }
+    
+    // Handle tips - save as notes
+    if (searchType === 'tips' && resultsData.data.tips) {
+        const saveTipsCheckbox = document.getElementById('saveTipsAsNotes');
+        if (saveTipsCheckbox && saveTipsCheckbox.checked) {
+            // Find the location and add tips to notes
+            const location = state.locations.find(l => l.id === resultsData.locationId);
+            if (location) {
+                const existingNotes = location.notes || '';
+                const separator = existingNotes ? '\n\n---\n\n' : '';
+                location.notes = existingNotes + separator + '💡 AI Tips:\n' + resultsData.data.tips;
+                
+                saveCurrentState();
+                updateTripSummary(
+                    state.locations, 
+                    state.tripData, 
+                    (id) => handleDeleteLocation(id),
+                    saveCurrentState,
+                    () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+                    state.markers
+                );
+                
+                closeSearchResultsModal();
+                showAlert('Tips saved to location notes!', '✅ Success');
+                return;
+            }
+        }
+        closeSearchResultsModal();
+        return;
+    }
+    
+    // Handle location results (accommodations, attractions, etc.)
+    if (!resultsData.data.results || !Array.isArray(resultsData.data.results)) {
+        showAlert('No location results to apply', 'Error');
+        return;
+    }
+    
+    if (resultsData.selectedIds.length === 0) {
+        showAlert('Please select at least one result', 'No Selection');
+        return;
+    }
+    
+    if (!resultsData.action) {
+        showAlert('Please choose whether to add or replace results', 'Choose Action');
+        return;
+    }
+    
+    // Get selected results
+    const selectedResults = resultsData.data.results.filter(r => 
+        resultsData.selectedIds.includes(r.id)
+    );
+    
+    // Apply merge logic
+    mergeLocationResults(selectedResults, resultsData.action, resultsData.locationId);
+    
+    closeSearchResultsModal();
+    
+    const actionLabel = resultsData.action === 'add' ? 'added to' : 'replaced in';
+    showAlert(`${selectedResults.length} result(s) ${actionLabel} your trip!`, '✅ Success');
+}
+
+/**
+ * Merge search results into trip locations
+ * @param {Array} newResults - New results to add
+ * @param {string} action - 'add' or 'replace'
+ * @param {string} keyLocationId - ID of the key location these belong to
+ */
+function mergeLocationResults(newResults, action, keyLocationId) {
+    const map = getMap();
+    
+    // Find the key location for order reference
+    const keyLocation = state.locations.find(l => l.id === keyLocationId);
+    const keyLocationOrder = keyLocation ? (keyLocation.order || 1) : 1;
+    
+    // Determine types of results being added
+    const resultTypes = [...new Set(newResults.map(r => r.type))];
+    
+    if (action === 'replace') {
+        // Remove existing items of the same types near this key location
+        const locationsToRemove = state.locations.filter(loc => {
+            if (!resultTypes.includes(loc.type)) return false;
+            if (loc.type === 'key-location') return false;
+            
+            // Check if this location is associated with the key location
+            // (i.e., it's the nearest key location)
+            const keyLocations = state.locations.filter(l => l.type === 'key-location');
+            let nearestKeyLocId = null;
+            let nearestDistance = Infinity;
+            
+            for (const kl of keyLocations) {
+                const distance = getDistance(kl.lat, kl.lng, loc.lat, loc.lng);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestKeyLocId = kl.id;
+                }
+            }
+            
+            return nearestKeyLocId === keyLocationId;
+        });
+        
+        // Remove markers and locations
+        locationsToRemove.forEach(loc => {
+            if (state.markers[loc.id]) {
+                map.removeLayer(state.markers[loc.id]);
+                delete state.markers[loc.id];
+            }
+        });
+        
+        state.locations = state.locations.filter(loc => 
+            !locationsToRemove.some(r => r.id === loc.id)
+        );
+    }
+    
+    // Find the max order among existing locations
+    const maxOrder = Math.max(...state.locations.map(l => l.order || 0), 0);
+    
+    // Add new results
+    newResults.forEach((result, index) => {
+        // Generate a unique ID
+        const newId = `search-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        const newLocation = {
+            id: newId,
+            type: result.type,
+            name: result.name,
+            description: result.description || '',
+            price: result.price || '',
+            link: result.link || '',
+            lat: result.lat,
+            lng: result.lng,
+            order: maxOrder + index + 1,
+            duration: result.duration || ''
+        };
+        
+        // Add to locations
+        state.locations.push(newLocation);
+        
+        // Add marker
+        addMarker(newLocation, state.markers, state.locations, state.connections, state.connectionLines, saveCurrentState);
+    });
+    
+    // Update UI
+    saveCurrentState();
+    updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count));
+    updateFilterCounts(state.locations);
+    updateTripSummary(
+        state.locations, 
+        state.tripData, 
+        (id) => handleDeleteLocation(id),
+        saveCurrentState,
+        () => updateLocationsList(state.locations, getVisibilityFilters(), (count) => updateClearAllButton(count)),
+        state.markers
+    );
+}
+
+/**
+ * Handle close search results modal
+ */
+function handleCloseSearchResultsModal() {
+    closeSearchResultsModal();
+}
+
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -634,6 +949,20 @@ window.changeMapStyle = handleChangeMapStyle;
 window.toggleTripSummary = handleToggleTripSummary;
 window.showConfirm = showConfirm;
 window.forceReset = forceReset;
+window.openNotesModal = handleOpenNotesModal;
+window.saveNotes = handleSaveNotes;
+window.deleteNotes = handleDeleteNotes;
+window.closeNotesModal = handleCloseNotesModal;
+
+// Location search modal handlers
+window.openLocationSearchModal = handleOpenLocationSearchModal;
+window.closeLocationSearchModal = handleCloseLocationSearchModal;
+window.handleSearchTypeChange = handleSearchTypeChangeWrapper;
+window.submitLocationSearch = handleSubmitLocationSearch;
+window.handleResultCheckboxChange = handleResultCheckboxChangeWrapper;
+window.setResultAction = handleSetResultAction;
+window.applySearchResults = handleApplySearchResults;
+window.closeSearchResultsModal = handleCloseSearchResultsModal;
 
 // Run initialization when DOM is ready
 if (document.readyState === 'loading') {

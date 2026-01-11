@@ -604,6 +604,114 @@
         </div>
     </div>
 
+    <!-- Location Search Modal -->
+    <div id="locationSearchModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>🔍 Search Location Info</h2>
+            </div>
+            <div class="modal-body">
+                <div id="searchLocationContext" class="search-location-context">
+                    <span class="search-location-icon">📍</span>
+                    <span id="searchLocationName" class="search-location-name">Location Name</span>
+                </div>
+                
+                <div class="control-group">
+                    <label for="searchType">What would you like to find?</label>
+                    <select id="searchType" onchange="handleSearchTypeChange()">
+                        <option value="accommodations">🏨 More Accommodations</option>
+                        <option value="attractions">⭐ More Attractions</option>
+                        <option value="restaurants">🍽️ Restaurants & Dining</option>
+                        <option value="transportation">🚌 Transportation Options</option>
+                        <option value="tips">💡 Local Tips & Advice</option>
+                        <option value="custom">✏️ Custom Search</option>
+                    </select>
+                </div>
+                
+                <div id="customQueryGroup" class="control-group" style="display: none;">
+                    <label for="customQuery">Your Search Query</label>
+                    <input type="text" id="customQuery" placeholder="e.g., Best sunset viewpoints, Family-friendly activities">
+                </div>
+                
+                <div class="search-info-note">
+                    <strong>ℹ️ Note:</strong> AI will search for current information and return real results with prices and links where available.
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="submitLocationSearch()">🔍 Search</button>
+                <button class="btn btn-secondary" onclick="closeLocationSearchModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results Modal -->
+    <div id="searchResultsModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 id="searchResultsTitle">🔍 Search Results</h2>
+            </div>
+            <div class="modal-body">
+                <div id="searchResultsContext" class="search-results-context">
+                    <span id="searchResultsLocationName"></span>
+                    <span id="searchResultsType" class="search-results-type"></span>
+                </div>
+                
+                <!-- Tips display (for tips search type) -->
+                <div id="searchResultsTips" class="search-results-tips" style="display: none;">
+                    <!-- Tips content will be inserted here -->
+                </div>
+                
+                <!-- Results list (for other search types) -->
+                <div id="searchResultsList" class="search-results-list">
+                    <!-- Results will be populated dynamically -->
+                </div>
+                
+                <!-- Action choice (add vs replace) -->
+                <div id="searchResultsActions" class="search-results-actions" style="display: none;">
+                    <div class="search-action-choice">
+                        <label class="search-action-label">How would you like to apply these results?</label>
+                        <div class="search-action-buttons">
+                            <button class="btn btn-action-choice" id="btnAddResults" onclick="setResultAction('add')">
+                                <span class="action-icon">➕</span>
+                                <span class="action-text">Add to existing</span>
+                            </button>
+                            <button class="btn btn-action-choice" id="btnReplaceResults" onclick="setResultAction('replace')">
+                                <span class="action-icon">🔄</span>
+                                <span class="action-text">Replace existing</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="applySearchResultsBtn" onclick="applySearchResults()" disabled>Apply Selected</button>
+                <button class="btn btn-secondary" onclick="closeSearchResultsModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div id="notesModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="notesModalTitle">📝 Location Notes</h2>
+            </div>
+            <div class="modal-body">
+                <div id="notesLocationName" class="notes-location-name"></div>
+                <div class="control-group">
+                    <label for="notesTextarea">Your Notes</label>
+                    <textarea id="notesTextarea" rows="8" placeholder="Add your notes about this location... (e.g., opening hours, tips, reservations, what to pack)"></textarea>
+                    <small>Notes are saved automatically when you click Save</small>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="saveNotes()">💾 Save Notes</button>
+                <button class="btn btn-secondary" onclick="closeNotesModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="deleteNotes()" id="deleteNotesBtn" style="display: none;">🗑️ Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     

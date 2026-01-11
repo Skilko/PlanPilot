@@ -78,6 +78,63 @@ export async function generateTripWithWorkflow(formData, importCallback) {
     }
 }
 
-
-
-
+/**
+ * Search for specific information about a location
+ * @param {Object} params - Search parameters
+ * @param {string} params.locationName - Name of the location
+ * @param {number} params.lat - Latitude
+ * @param {number} params.lng - Longitude
+ * @param {string} params.searchType - Type of search (accommodations, attractions, restaurants, transportation, tips, custom)
+ * @param {string} [params.customQuery] - Custom query for custom search type
+ * @param {string} [params.budget] - Budget level (optional)
+ * @returns {Promise<Object>} - Search results
+ */
+export async function searchLocationInfo(params) {
+    const { locationName, lat, lng, searchType, customQuery, budget } = params;
+    
+    // Map search types to display names for loading message
+    const searchTypeLabels = {
+        accommodations: 'accommodations',
+        attractions: 'attractions',
+        restaurants: 'restaurants',
+        transportation: 'transportation options',
+        tips: 'local tips',
+        custom: 'information'
+    };
+    
+    const loadingTitle = `Searching for ${searchTypeLabels[searchType] || 'information'}...`;
+    const loadingMessage = `Finding ${searchTypeLabels[searchType] || 'results'} near ${locationName}`;
+    
+    showLoadingOverlay(loadingTitle, loadingMessage);
+    
+    try {
+        const response = await fetch('/api/location-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                locationName,
+                lat,
+                lng,
+                searchType,
+                customQuery,
+                budget
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+        }
+        
+        const searchData = await response.json();
+        
+        hideLoadingOverlay();
+        
+        return searchData;
+    } catch (error) {
+        console.error('Error searching location info:', error);
+        hideLoadingOverlay();
+        showAlert('Error searching: ' + error.message, '❌ Search Failed');
+        throw error;
+    }
+}

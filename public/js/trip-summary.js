@@ -3,10 +3,24 @@
  * Trip summary panel and calculations - Redesigned with card-based timeline
  */
 
-import { showAlert } from './modals.js';
+import { showAlert, openNotesModal as openNotesModalFromModals } from './modals.js';
 import { getDistance } from './locations.js';
 import { getMap } from './map.js';
 import { resetEditMode } from './ui.js';
+
+/**
+ * Truncate notes text for display
+ * @param {string} text - Full notes text
+ * @param {number} maxLength - Maximum length
+ * @returns {string} - Truncated text
+ */
+function truncateNotes(text, maxLength = 60) {
+    if (!text) return '';
+    // Replace newlines with spaces for preview
+    const singleLine = text.replace(/\n/g, ' ').trim();
+    if (singleLine.length <= maxLength) return singleLine;
+    return singleLine.substring(0, maxLength).trim() + '...';
+}
 
 // Trip summary state
 let tripSummaryVisible = false;
@@ -249,6 +263,7 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
     
     const icon = type === 'accommodation' ? '🏨' : '⭐';
     const iconClass = type === 'accommodation' ? 'accommodation' : 'attraction';
+    const hasNotes = item.notes && item.notes.trim() !== '';
     
     let detailsHtml = '';
     if (item.duration) {
@@ -264,17 +279,21 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
         <div class="trip-summary-nearby-info">
             <div class="trip-summary-nearby-name">${item.name}</div>
             ${detailsHtml ? `<div class="trip-summary-nearby-detail">${detailsHtml}</div>` : ''}
+            ${hasNotes ? `<div class="trip-summary-nearby-notes" title="${item.notes.replace(/"/g, '&quot;')}">📝 ${truncateNotes(item.notes, 40)}</div>` : ''}
         </div>
+        <button class="trip-summary-nearby-notes-btn ${hasNotes ? 'has-notes' : ''}" title="${hasNotes ? 'Edit Notes' : 'Add Notes'}" data-id="${item.id}">📝</button>
         ${item.link ? `<a href="${item.link}" target="_blank" class="trip-summary-nearby-link" onclick="event.stopPropagation()">View</a>` : ''}
         <button class="trip-summary-nearby-delete" title="Delete ${type}" data-id="${item.id}">🗑️</button>
     `;
     
     // Add click handler to pan map to this location
     itemEl.addEventListener('click', (e) => {
-        // Don't trigger if clicking the link, drag handle, or delete button
+        // Don't trigger if clicking the link, drag handle, delete button, notes button, or notes text
         if (e.target.classList.contains('trip-summary-nearby-link')) return;
         if (e.target.classList.contains('trip-summary-nearby-drag-handle')) return;
         if (e.target.classList.contains('trip-summary-nearby-delete')) return;
+        if (e.target.classList.contains('trip-summary-nearby-notes-btn')) return;
+        if (e.target.closest('.trip-summary-nearby-notes')) return;
         
         if (map && item.lat && item.lng) {
             panToLocationSmart(item.lat, item.lng, 14);
@@ -283,6 +302,24 @@ function createNearbyItemElement(item, type, markers, keyLocationId, locations, 
             }
         }
     });
+    
+    // Add notes button click handler
+    const notesBtn = itemEl.querySelector('.trip-summary-nearby-notes-btn');
+    if (notesBtn) {
+        notesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openNotesFromTripSummary(item.id);
+        });
+    }
+    
+    // Add notes text click handler
+    const notesText = itemEl.querySelector('.trip-summary-nearby-notes');
+    if (notesText) {
+        notesText.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openNotesFromTripSummary(item.id);
+        });
+    }
     
     // Add delete button click handler
     const deleteBtn = itemEl.querySelector('.trip-summary-nearby-delete');
@@ -432,6 +469,7 @@ function applyNearbyItemOrder(idOrder, type, locations, saveCallback, updateList
 function createLocationCard(loc, index, locations, markers, deleteCallback, saveCallback, updateListCallback) {
     const { accommodations, attractions } = getAssociatedItems(loc, locations);
     const hasNearbyItems = accommodations.length > 0 || attractions.length > 0;
+    const hasNotes = loc.notes && loc.notes.trim() !== '';
     
     const card = document.createElement('div');
     card.className = 'trip-summary-card';
@@ -446,10 +484,18 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
         <div class="trip-summary-card-main">
             <h4 class="trip-summary-card-title">${loc.name}</h4>
             ${loc.description ? `<p class="trip-summary-card-description">${loc.description}</p>` : ''}
+            ${hasNotes ? `
+                <div class="trip-summary-card-notes">
+                    <span class="trip-summary-card-notes-icon">📝</span>
+                    <span class="trip-summary-card-notes-text">${truncateNotes(loc.notes, 60)}</span>
+                </div>
+            ` : ''}
         </div>
         <div class="trip-summary-card-meta">
             ${loc.duration ? `<span class="trip-summary-card-duration">${loc.duration}</span>` : ''}
             <div class="trip-summary-card-actions">
+                <button class="trip-summary-card-btn search" title="Search for more info" data-id="${loc.id}" data-name="${loc.name}" data-lat="${loc.lat}" data-lng="${loc.lng}">🔎</button>
+                <button class="trip-summary-card-btn notes ${hasNotes ? 'has-notes' : ''}" title="${hasNotes ? 'Edit Notes' : 'Add Notes'}" data-id="${loc.id}">📝</button>
                 <button class="trip-summary-card-btn zoom" title="Zoom to location" data-id="${loc.id}">🔍</button>
                 <button class="trip-summary-card-btn delete" title="Delete location" data-id="${loc.id}">🗑️</button>
             </div>
@@ -530,6 +576,30 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
     return card;
 }
 
+// Store references for notes modal
+let notesModalLocations = null;
+let notesModalSaveCallback = null;
+let notesModalUpdateCallback = null;
+
+/**
+ * Set up references for notes modal (called from updateTripSummary)
+ */
+function setNotesModalReferences(locations, saveCallback, updateCallback) {
+    notesModalLocations = locations;
+    notesModalSaveCallback = saveCallback;
+    notesModalUpdateCallback = updateCallback;
+}
+
+/**
+ * Open notes modal from trip summary
+ * @param {string} locationId - Location ID
+ */
+export function openNotesFromTripSummary(locationId) {
+    if (notesModalLocations && notesModalSaveCallback) {
+        openNotesModalFromModals(locationId, notesModalLocations, notesModalUpdateCallback);
+    }
+}
+
 /**
  * Attach events to a location card
  */
@@ -541,6 +611,8 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
     if (cardMain) {
         cardMain.style.cursor = 'pointer';
         cardMain.addEventListener('click', (e) => {
+            // Don't trigger if clicking on notes preview
+            if (e.target.closest('.trip-summary-card-notes')) return;
             e.stopPropagation();
             if (map && loc.lat && loc.lng) {
                 panToLocationSmart(loc.lat, loc.lng, 12);
@@ -548,6 +620,16 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
                     markers[loc.id].openPopup();
                 }
             }
+        });
+    }
+    
+    // Click on notes preview to open notes modal
+    const notesPreview = card.querySelector('.trip-summary-card-notes');
+    if (notesPreview) {
+        notesPreview.style.cursor = 'pointer';
+        notesPreview.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openNotesFromTripSummary(loc.id);
         });
     }
     
@@ -562,6 +644,27 @@ function attachCardEvents(card, loc, locations, markers, deleteCallback, saveCal
                 if (markers && markers[loc.id]) {
                     markers[loc.id].openPopup();
                 }
+            }
+        });
+    }
+    
+    // Notes button
+    const notesBtn = card.querySelector('.trip-summary-card-btn.notes');
+    if (notesBtn) {
+        notesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openNotesFromTripSummary(loc.id);
+        });
+    }
+    
+    // Search button
+    const searchBtn = card.querySelector('.trip-summary-card-btn.search');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Call the global openLocationSearchModal function
+            if (typeof window.openLocationSearchModal === 'function') {
+                window.openLocationSearchModal(loc.id, loc.name, loc.lat, loc.lng);
             }
         });
     }
@@ -690,6 +793,12 @@ export function updateTripSummary(locations, tripData, deleteCallback, saveCallb
         console.log('Trip summary elements not found');
         return;
     }
+    
+    // Set up notes modal references
+    setNotesModalReferences(locations, saveCallback, () => {
+        updateTripSummary(locations, tripData, deleteCallback, saveCallback, updateListCallback, markers);
+        if (updateListCallback) updateListCallback();
+    });
     
     // Get all key locations (not just those with durations for better UX)
     const keyLocations = locations.filter(loc => loc.type === 'key-location');

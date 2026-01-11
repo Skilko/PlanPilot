@@ -482,6 +482,36 @@
     line-height: 1.4;
 }
 
+/* Notes preview in card */
+.trip-summary-card-notes {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #FFF8E1;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid #FFA726;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.trip-summary-card-notes:hover {
+    background: #FFECB3;
+}
+
+.trip-summary-card-notes-icon {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.trip-summary-card-notes-text {
+    font-size: 11px;
+    color: var(--text-primary);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
 .trip-summary-card-meta {
     display: flex;
     align-items: center;
@@ -516,6 +546,26 @@
     justify-content: center;
     font-size: 12px;
     transition: all 0.2s;
+}
+
+.trip-summary-card-btn.notes {
+    background: var(--bg-white);
+    color: #FFA726;
+}
+
+.trip-summary-card-btn.notes:hover {
+    background: #FFA726;
+    color: white;
+}
+
+.trip-summary-card-btn.notes.has-notes {
+    background: #FFF3E0;
+    color: #FF9800;
+}
+
+.trip-summary-card-btn.notes.has-notes:hover {
+    background: #FF9800;
+    color: white;
 }
 
 .trip-summary-card-btn.zoom {
@@ -746,6 +796,59 @@
 .trip-summary-nearby-price {
     color: var(--success-color);
     font-weight: 600;
+}
+
+/* Notes preview in nearby items */
+.trip-summary-nearby-notes {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    padding: 4px 6px;
+    background: #FFF8E1;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.trip-summary-nearby-notes:hover {
+    background: #FFECB3;
+}
+
+/* Notes button for nearby items */
+.trip-summary-nearby-notes-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--bg-white);
+    color: #FFA726;
+    cursor: pointer;
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-left: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trip-summary-nearby-notes-btn:hover {
+    background: #FFA726;
+    color: white;
+}
+
+.trip-summary-nearby-notes-btn.has-notes {
+    background: #FFF3E0;
+    color: #FF9800;
+}
+
+.trip-summary-nearby-notes-btn.has-notes:hover {
+    background: #FF9800;
+    color: white;
 }
 
 .trip-summary-nearby-link {
@@ -1190,6 +1293,86 @@
     color: #555;
     flex: 1;
     font-weight: 500;
+}
+
+/* Notes section in popup */
+.popup-notes-section {
+    background: #FFF8E1;
+    border-radius: var(--radius-md);
+    padding: 12px;
+    border-left: 3px solid #FFA726;
+}
+
+.popup-notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.popup-notes-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #FF9800;
+}
+
+.popup-notes-edit-btn {
+    background: rgba(255, 152, 0, 0.15);
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.popup-notes-edit-btn:hover {
+    background: rgba(255, 152, 0, 0.3);
+}
+
+.popup-notes-content {
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    max-height: 100px;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+/* Notes button in popup actions */
+.popup-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 8px;
+}
+
+.popup-notes-btn {
+    flex: 1;
+    padding: 10px 16px;
+    background: #FFF3E0;
+    border: 2px solid #FFA726;
+    border-radius: var(--radius-md);
+    color: #FF9800;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.popup-notes-btn:hover {
+    background: #FFA726;
+    color: white;
+}
+
+.popup-notes-btn.has-notes {
+    background: #FFA726;
+    color: white;
+}
+
+.popup-notes-btn.has-notes:hover {
+    background: #FF9800;
+    border-color: #FF9800;
 }
 
 .popup-button-container {

@@ -42,6 +42,7 @@ export function createCustomIcon(type) {
 export function createPopupContent(location) {
     const typeIcon = MARKER_ICONS[location.type];
     const typeName = location.type.replace('-', ' ').toUpperCase();
+    const hasNotes = location.notes && location.notes.trim() !== '';
     
     let popupContent = `
         <div>
@@ -61,6 +62,15 @@ export function createPopupContent(location) {
                             <div class="popup-info-label">💰 Price:</div>
                             <div class="popup-info-value">${location.price}</div>
                         </div>
+                    </div>
+                ` : ''}
+                ${hasNotes ? `
+                    <div class="popup-section popup-notes-section">
+                        <div class="popup-notes-header">
+                            <span class="popup-notes-label">📝 Notes</span>
+                            <button class="popup-notes-edit-btn" onclick="openNotesModal('${location.id}')" title="Edit notes">✏️</button>
+                        </div>
+                        <div class="popup-notes-content">${location.notes.replace(/\n/g, '<br>')}</div>
                     </div>
                 ` : ''}
                 ${location.link ? `
@@ -83,6 +93,11 @@ export function createPopupContent(location) {
                         </a>
                     </div>
                 ` : ''}
+                <div class="popup-section popup-actions">
+                    <button class="popup-notes-btn ${hasNotes ? 'has-notes' : ''}" onclick="openNotesModal('${location.id}')">
+                        📝 ${hasNotes ? 'Edit Notes' : 'Add Notes'}
+                    </button>
+                </div>
             </div>
         </div>
     `;
