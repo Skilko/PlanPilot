@@ -150,10 +150,31 @@ Provide 5-8 results. Respond with ONLY the JSON object.`;
     
     // Make the API request with retry logic
     let lastError = null;
+    let lastResponseText = null;
     const maxRetries = 2;
     
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
+        console.log(`Attempt ${attempt + 1} of ${maxRetries + 1}...`);
+        
+        const requestBody = {
+          contents: [{
+            parts: [{ text: attempt > 0 ? userPrompt + '\n\nIMPORTANT: Your response must be ONLY valid JSON. No markdown, no explanation.' : userPrompt }]
+          }],
+          systemInstruction: {
+            parts: [{
+              text: systemPrompt
+            }]
+          },
+          generationConfig: {
+            temperature: attempt > 0 ? 0.5 : 0.7,
+            maxOutputTokens: 4096
+          },
+          tools: [{
+            google_search: {}
+          }]
+        };
+        
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
           {
@@ -161,30 +182,20 @@ Provide 5-8 results. Respond with ONLY the JSON object.`;
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              contents: [{
-                parts: [{ text: attempt > 0 ? userPrompt + '\n\nREMINDER: Respond with ONLY valid JSON, no other text.' : userPrompt }]
-              }],
-              systemInstruction: {
-                parts: [{
-                  text: systemPrompt
-                }]
-              },
-              generationConfig: {
-                temperature: attempt > 0 ? 0.5 : 0.7, // Lower temperature on retry
-                maxOutputTokens: 4096,
-                responseMimeType: "application/json" // Request JSON response
-              },
-              tools: [{
-                google_search: {}
-              }]
-            })
+            body: JSON.stringify(requestBody)
           }
         );
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('Google Gemini API error:', {
+          const errorText = await response.text();
+          let errorData = {};
+          try {
+            errorData = JSON.parse(errorText);
+          } catch (e) {
+            errorData = { rawError: errorText };
+          }
+          
+          console.error(`Attempt ${attempt + 1} - API error:`, {
             status: response.status,
             statusText: response.statusText,
             error: errorData
@@ -193,12 +204,17 @@ Provide 5-8 results. Respond with ONLY the JSON object.`;
           // Don't retry on auth/rate limit errors
           if (response.status === 401 || response.status === 403 || response.status === 429) {
             return res.status(response.status).json({ 
-              error: `Gemini API error: ${errorData.error?.message || response.statusText}`,
+              error: `API error: ${errorData.error?.message || response.statusText}`,
               details: errorData
             });
           }
           
-          lastError = new Error(`API error: ${response.status}`);
+          lastError = new Error(`API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+          
+          // Wait a bit before retrying
+          if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
           continue;
         }
 
@@ -206,8 +222,19 @@ Provide 5-8 results. Respond with ONLY the JSON object.`;
         
         // Extract the generated content
         if (!result.candidates || result.candidates.length === 0) {
-          console.error('No candidates in response:', result);
-          lastError = new Error('No response generated');
+          console.error(`Attempt ${attempt + 1} - No candidates in response:`, JSON.stringify(result).substring(0, 500));
+          lastError = new Error('No response generated from model');
+          
+          // Check for prompt feedback issues
+          if (result.promptFeedback) {
+            console.error('Prompt feedback:', result.promptFeedback);
+            if (result.promptFeedback.blockReason) {
+              return res.status(400).json({
+                error: `Request blocked: ${result.promptFeedback.blockReason}`,
+                details: result.promptFeedback
+              });
+            }
+          }
           continue;
         }
 
@@ -215,19 +242,30 @@ Provide 5-8 results. Respond with ONLY the JSON object.`;
         
         // Check for content filtering
         if (candidate.finishReason === 'SAFETY') {
+          console.error('Content filtered for safety');
           return res.status(500).json({ 
             error: 'Content was filtered for safety reasons',
             details: 'Please try different search terms'
           });
         }
+        
+        // Check for other finish reasons that indicate problems
+        if (candidate.finishReason === 'RECITATION') {
+          console.error('Content blocked due to recitation');
+          lastError = new Error('Response blocked due to content policy');
+          continue;
+        }
 
         if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
-          console.error('No content parts in response:', candidate);
+          console.error(`Attempt ${attempt + 1} - No content parts. Candidate:`, JSON.stringify(candidate).substring(0, 500));
           lastError = new Error('No content in response');
           continue;
         }
 
         const responseText = candidate.content.parts[0].text;
+        lastResponseText = responseText;
+        
+        console.log(`Attempt ${attempt + 1} - Got response (${responseText.length} chars)`);
         
         // Try to parse JSON with robust extraction
         const searchData = extractAndParseJSON(responseText, searchType, locationName, lat, lng);
@@ -241,23 +279,39 @@ Provide 5-8 results. Respond with ONLY the JSON object.`;
             console.log(`📊 Location Search (${searchType}) - Used ${candidate.groundingMetadata.groundingChunks?.length || 0} search result(s)`);
           }
 
+          console.log(`Success! Returning ${validatedData.results?.length || 0} results`);
           return res.status(200).json(validatedData);
         }
         
         lastError = new Error('Failed to parse JSON from response');
-        console.error(`Attempt ${attempt + 1}: Failed to parse JSON. Response text:`, responseText.substring(0, 500));
+        console.error(`Attempt ${attempt + 1}: Failed to parse JSON. Response preview:`, responseText.substring(0, 300));
+        
+        // Wait before retry
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
         
       } catch (fetchError) {
-        console.error(`Attempt ${attempt + 1} failed:`, fetchError);
+        console.error(`Attempt ${attempt + 1} failed with exception:`, fetchError.message);
         lastError = fetchError;
+        
+        // Wait before retry
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
     }
     
     // All retries failed
-    console.error('All retry attempts failed:', lastError);
+    console.error('All retry attempts failed. Last error:', lastError?.message);
+    if (lastResponseText) {
+      console.error('Last response text preview:', lastResponseText.substring(0, 500));
+    }
+    
     return res.status(500).json({ 
       error: 'Failed to get valid response after multiple attempts',
-      message: lastError?.message || 'Unknown error'
+      message: lastError?.message || 'Unknown error',
+      hint: 'The AI returned an invalid response format. Please try again.'
     });
     
   } catch (error) {

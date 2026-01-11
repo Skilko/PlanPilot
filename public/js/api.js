@@ -136,7 +136,14 @@ export async function searchLocationInfo(params) {
     } catch (error) {
         console.error('Error searching location info:', error);
         hideLoadingOverlay();
-        showAlert('Error searching: ' + error.message, '❌ Search Failed');
+        
+        // Provide a more helpful error message
+        let errorMessage = error.message;
+        if (errorMessage.includes('Failed to get valid response')) {
+            errorMessage = 'The AI had trouble generating results. Please try again or use different search terms.';
+        }
+        
+        showAlert('Error searching: ' + errorMessage, '❌ Search Failed');
         throw error;
     }
 }
