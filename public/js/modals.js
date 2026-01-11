@@ -386,6 +386,7 @@ export function openLocationSearchModal(locationId, locationName, lat, lng) {
     const searchTypeSelect = document.getElementById('searchType');
     const customQueryGroup = document.getElementById('customQueryGroup');
     const customQueryInput = document.getElementById('customQuery');
+    const searchDetailsInput = document.getElementById('searchDetails');
     
     // Store current location info
     currentSearchLocationId = locationId;
@@ -398,6 +399,7 @@ export function openLocationSearchModal(locationId, locationName, lat, lng) {
     searchTypeSelect.value = 'accommodations'; // Default
     customQueryGroup.style.display = 'none';
     customQueryInput.value = '';
+    if (searchDetailsInput) searchDetailsInput.value = '';
     
     modal.classList.add('active');
 }

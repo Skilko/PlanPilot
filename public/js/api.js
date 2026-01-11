@@ -86,11 +86,12 @@ export async function generateTripWithWorkflow(formData, importCallback) {
  * @param {number} params.lng - Longitude
  * @param {string} params.searchType - Type of search (accommodations, attractions, restaurants, transportation, tips, custom)
  * @param {string} [params.customQuery] - Custom query for custom search type
+ * @param {string} [params.additionalDetails] - Additional details/preferences for the search
  * @param {string} [params.budget] - Budget level (optional)
  * @returns {Promise<Object>} - Search results
  */
 export async function searchLocationInfo(params) {
-    const { locationName, lat, lng, searchType, customQuery, budget } = params;
+    const { locationName, lat, lng, searchType, customQuery, additionalDetails, budget } = params;
     
     // Map search types to display names for loading message
     const searchTypeLabels = {
@@ -117,6 +118,7 @@ export async function searchLocationInfo(params) {
                 lng,
                 searchType,
                 customQuery,
+                additionalDetails,
                 budget
             })
         });

@@ -570,6 +570,7 @@ async function handleSubmitLocationSearch() {
     
     const searchType = document.getElementById('searchType').value;
     const customQuery = document.getElementById('customQuery').value.trim();
+    const searchDetails = document.getElementById('searchDetails')?.value.trim() || '';
     
     // Validate custom query if needed
     if (searchType === 'custom' && !customQuery) {
@@ -587,7 +588,8 @@ async function handleSubmitLocationSearch() {
             lat: searchLocation.lat,
             lng: searchLocation.lng,
             searchType: searchType,
-            customQuery: customQuery
+            customQuery: customQuery,
+            additionalDetails: searchDetails
         });
         
         // Open results modal

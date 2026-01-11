@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   // Extract search parameters from request body
-  const { locationName, lat, lng, searchType, customQuery, budget } = req.body;
+  const { locationName, lat, lng, searchType, customQuery, additionalDetails, budget } = req.body;
 
   // Validate required fields
   if (!locationName || lat === undefined || lng === undefined || !searchType) {
@@ -101,6 +101,7 @@ Provide relevant results with names, descriptions, prices (if applicable), links
     const userPrompt = `${searchPrompts[searchType]}
 
 ${budget ? `Budget Level: ${budget}` : ''}
+${additionalDetails ? `Additional Requirements/Preferences: ${additionalDetails}` : ''}
 
 CRITICAL REQUIREMENTS:
 1. Search for CURRENT information using Google Search

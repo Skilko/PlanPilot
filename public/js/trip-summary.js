@@ -494,7 +494,7 @@ function createLocationCard(loc, index, locations, markers, deleteCallback, save
         <div class="trip-summary-card-meta">
             ${loc.duration ? `<span class="trip-summary-card-duration">${loc.duration}</span>` : ''}
             <div class="trip-summary-card-actions">
-                <button class="trip-summary-card-btn search" title="Search for more info" data-id="${loc.id}" data-name="${loc.name}" data-lat="${loc.lat}" data-lng="${loc.lng}">🔎</button>
+                <button class="trip-summary-card-btn search" title="Search for more info" data-id="${loc.id}" data-name="${loc.name}" data-lat="${loc.lat}" data-lng="${loc.lng}">✨</button>
                 <button class="trip-summary-card-btn notes ${hasNotes ? 'has-notes' : ''}" title="${hasNotes ? 'Edit Notes' : 'Add Notes'}" data-id="${loc.id}">📝</button>
                 <button class="trip-summary-card-btn zoom" title="Zoom to location" data-id="${loc.id}">🔍</button>
                 <button class="trip-summary-card-btn delete" title="Delete location" data-id="${loc.id}">🗑️</button>
